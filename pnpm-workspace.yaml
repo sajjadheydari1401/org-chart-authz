@@ -1,0 +1,8 @@
+packages:
+  # specify a package in a direct subdir of the root
+  - "backend"
+  - "frontend"
+  # exclude packages that are inside test directories
+  - "!**/test/**"
+allowBuilds:
+  unrs-resolver: true

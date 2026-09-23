@@ -4,7 +4,7 @@ import { cn } from "@/lib/cn";
 import { AppSpinner } from "../app-spinner";
 
 const buttonBaseStyles =
-  "relative inline-flex min-h-11 min-w-11 max-w-full items-center justify-center gap-2 rounded-lg border font-medium transition-colors motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:border-border disabled:bg-muted disabled:text-muted-foreground";
+  "relative inline-flex min-h-11 min-w-11 max-w-full cursor-pointer items-center justify-center gap-2 rounded-lg border font-medium transition-colors motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:border-border disabled:bg-muted disabled:text-muted-foreground";
 
 const buttonVariantStyles = {
   primary:

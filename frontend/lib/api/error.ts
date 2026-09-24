@@ -19,6 +19,9 @@ const errorMessages: Record<number, string> = {
   422: "The provided information is invalid.",
   429: "Too many requests. Please try again later.",
   500: "Something went wrong. Please try again later.",
+  502: "The service is currently unavailable. Please try again.",
+  503: "The service is currently unavailable. Please try again later.",
+  504: "The request timed out. Please try again.",
 };
 
 export function createApiError(

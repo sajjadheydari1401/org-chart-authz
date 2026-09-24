@@ -2,19 +2,7 @@ export interface SignupRequest {
   username: string;
   email: string;
   password: string;
-  mobile_number: string;
-  systemUsername: string;
-  systemPassword: string;
-  roleName: string;
-  smsTemplate: string;
-  patternName: string;
-  smsSystemName: string;
-}
-
-export interface SignupResponse {
-  success: boolean;
-  result: unknown;
-  message: string;
+  mobile: string;
 }
 
 export interface LoginRequest {

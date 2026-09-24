@@ -8,8 +8,12 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { isProviderResponse } from '../lib/auth.js';
 import { SignupDto } from './dto/signup.dto.js';
+import {
+  AuthResponse,
+  AuthErrorResult,
+  SignupSuccessResult,
+} from '../types/auth.js';
 
 @Injectable()
 export class AuthService {
@@ -57,11 +61,8 @@ export class AuthService {
         throw new BadGatewayException();
       }
 
-      const data: unknown = await response.json();
-
-      if (!isProviderResponse(data)) {
-        throw new BadGatewayException();
-      }
+      const data: AuthResponse<SignupSuccessResult | AuthErrorResult> =
+        await response.json();
 
       if (!data.success) {
         throw new BadRequestException();

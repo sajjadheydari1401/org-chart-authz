@@ -1,10 +1,23 @@
-export interface ProviderSignupResponse {
+export interface AuthResponse<T> {
   success: boolean;
-  result: {
-    username: string;
-    systemId: string;
-    roleName: string;
-  };
+  result: T;
   message: string;
-  level: string;
+  level?: string;
 }
+
+export type SignupSuccessResult = {
+  username: string;
+  systemId: string;
+  roleName: string;
+};
+
+export type AuthErrorResult = {
+  success: boolean;
+  status_code: number;
+  timestamp: string;
+  path: string;
+  message_developer: {
+    fa: string;
+    en: string;
+  };
+};

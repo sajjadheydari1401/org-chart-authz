@@ -1,16 +1,16 @@
-// import { redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 
 import { VerifySmsForm } from "@/components/auth/verify-sms-form";
 import { AuthCard } from "@/components/auth/auth-card";
-// import { getPendingMobile } from "@/lib/auth/session";
-// import { maskMobile } from "@/lib/auth/session";
+import { getPendingMobile } from "@/lib/auth/session";
+import { maskMobile } from "@/lib/auth/session";
 
 export default async function VerifySmsPage() {
-  // const mobile = await getPendingMobile();
+  const mobile = await getPendingMobile();
 
-  // if (!mobile) {
-  //   redirect("/signup");
-  // }
+  if (!mobile) {
+    redirect("/signup");
+  }
 
   return (
     <AuthCard
@@ -20,7 +20,7 @@ export default async function VerifySmsPage() {
         <>
           We sent a verification code to{" "}
           <span className="font-medium text-foreground" dir="ltr">
-            {/* {maskMobile(mobile)} */}
+            {maskMobile(mobile)}
           </span>
           .
         </>

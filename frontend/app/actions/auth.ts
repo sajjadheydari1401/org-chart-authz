@@ -5,6 +5,7 @@ import { z } from "zod";
 
 import { api } from "@/lib/api/server";
 import { ApiError } from "@/lib/api/error";
+import { registerAccount } from "@/lib/auth/signup";
 import {
   clearPendingMobile,
   clearSession,
@@ -24,7 +25,6 @@ import type {
   AuthActionResult,
   AuthTokenResponse,
   LoginRequest,
-  SignupRequest,
   VerifySmsRequest,
 } from "@/types/auth";
 
@@ -62,33 +62,8 @@ export async function signupAction(
     };
   }
 
-  const body: SignupRequest = {
-    email: parsed.data.email,
-    username: parsed.data.username,
-    password: parsed.data.password,
-    mobile: parsed.data.mobile,
-  };
-
-  try {
-    await api<void>("/auth/signup", {
-      method: "POST",
-      body: JSON.stringify(body),
-    });
-  } catch (error) {
-    if (error instanceof ApiError) {
-      return {
-        success: false,
-        message: error.message,
-      };
-    }
-
-    console.error("Signup failed:", error);
-
-    return {
-      success: false,
-      message: "Unable to create your account",
-    };
-  }
+  const result = await registerAccount(parsed.data);
+  if (!result.success) return result;
 
   await setPendingMobile(parsed.data.mobile);
 

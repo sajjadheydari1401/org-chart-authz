@@ -9,6 +9,12 @@ function normalizeDigits(value: string): string {
 export const signupSchema = z.object({
   email: z.string().trim().email("Enter a valid email address"),
 
+  username: z
+    .string()
+    .trim()
+    .min(2, "Username must be at least 2 characters")
+    .max(40, "Username must be at most 40 characters"),
+
   password: z.string().min(8, "Password must be at least 8 characters"),
 
   mobile: z

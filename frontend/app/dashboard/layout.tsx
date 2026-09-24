@@ -1,21 +1,21 @@
 import type { ReactNode } from "react";
-// import { redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 
 import { logoutAction } from "@/app/actions/auth";
 import { AppButton } from "@/components/common/ui/app-button";
 import { AppLink } from "@/components/common/ui/app-link";
-// import { getAccessToken } from "@/lib/auth/session";
+import { getAccessToken } from "@/lib/auth/session";
 
 export default async function DashboardLayout({
   children,
 }: {
   children: ReactNode;
 }) {
-  // const accessToken = await getAccessToken();
+  const accessToken = await getAccessToken();
 
-  // if (!accessToken) {
-  //   redirect("/login");
-  // }
+  if (!accessToken) {
+    redirect("/login");
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">

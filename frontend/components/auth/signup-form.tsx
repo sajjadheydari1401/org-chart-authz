@@ -1,10 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-// import { signupAction } from "@/app/actions/auth";
+import { signupAction } from "@/app/actions/auth";
 import { AppButton } from "@/components/common/ui/app-button";
 import { AppFormError } from "@/components/common/ui/app-form-error";
 import { AppFormField } from "@/components/common/ui/app-form-field";
@@ -16,8 +15,6 @@ import {
 } from "@/lib/schemas/auth";
 
 export function SignupForm() {
-  const [formError, setFormError] = useState<string | undefined>();
-
   const {
     register,
     handleSubmit,
@@ -25,47 +22,55 @@ export function SignupForm() {
     formState: { errors, isSubmitting },
   } = useForm<SignupFormInput, unknown, SignupFormData>({
     resolver: zodResolver(signupSchema),
-
     defaultValues: {
       email: "",
+      username: "",
       password: "",
       mobile: "",
     },
   });
 
   async function onSubmit(data: SignupFormData) {
-    // setFormError(undefined);
+    const result = await signupAction(data);
 
-    // const result = await signupAction(data);
+    if (result.success) {
+      return;
+    }
 
-    // if (result.success) {
-    //   return;
-    // }
+    const fieldErrors = result.fieldErrors;
 
-    // const fieldErrors = result.fieldErrors;
+    if (fieldErrors?.email) {
+      setError("email", {
+        type: "server",
+        message: fieldErrors.email,
+      });
+    }
 
-    // if (fieldErrors?.email) {
-    //   setError("email", {
-    //     type: "server",
-    //     message: fieldErrors.email,
-    //   });
-    // }
+    if (fieldErrors?.username) {
+      setError("username", {
+        type: "server",
+        message: fieldErrors.username,
+      });
+    }
 
-    // if (fieldErrors?.mobile) {
-    //   setError("mobile", {
-    //     type: "server",
-    //     message: fieldErrors.mobile,
-    //   });
-    // }
+    if (fieldErrors?.mobile) {
+      setError("mobile", {
+        type: "server",
+        message: fieldErrors.mobile,
+      });
+    }
 
-    // if (fieldErrors?.password) {
-    //   setError("password", {
-    //     type: "server",
-    //     message: fieldErrors.password,
-    //   });
-    // }
+    if (fieldErrors?.password) {
+      setError("password", {
+        type: "server",
+        message: fieldErrors.password,
+      });
+    }
 
-    // setFormError(result.message);
+    setError("root", {
+      type: "server",
+      message: result.message,
+    });
   }
 
   return (
@@ -83,6 +88,22 @@ export function SignupForm() {
           placeholder="you@example.com"
           invalid={Boolean(errors.email)}
           {...register("email")}
+        />
+      </AppFormField>
+
+      <AppFormField
+        label="Username"
+        htmlFor="username"
+        error={errors.username?.message}
+        required
+      >
+        <AppInput
+          id="username"
+          type="text"
+          autoComplete="username"
+          placeholder="My User Name"
+          invalid={Boolean(errors.username)}
+          {...register("username")}
         />
       </AppFormField>
 
@@ -121,9 +142,9 @@ export function SignupForm() {
         />
       </AppFormField>
 
-      {formError && (
+      {errors.root?.message && (
         <div className="rounded-lg border border-destructive bg-destructive-subtle px-4 py-3">
-          <AppFormError message={formError} />
+          <AppFormError message={errors.root.message} />
         </div>
       )}
 

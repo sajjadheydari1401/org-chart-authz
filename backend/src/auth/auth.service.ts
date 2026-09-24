@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { isProviderResponse } from '../../lib/auth.js';
+import { isProviderResponse } from '../lib/auth.js';
 import { SignupDto } from './dto/signup.dto.js';
 
 @Injectable()
@@ -70,6 +70,8 @@ export class AuthService {
       return { success: true };
     } catch (error) {
       if (error instanceof HttpException) {
+        console.error('Signup error', error);
+
         throw error;
       }
 

@@ -4,6 +4,8 @@ import type { AnchorHTMLAttributes, ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
 const linkVariantStyles = {
+  unstyled: "",
+
   default:
     "rounded-sm text-primary hover:text-primary-hover active:text-primary-active",
 

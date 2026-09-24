@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { AppCard } from "../common/ui/card/app-card";
 import { AppCardContent } from "../common/ui/card/app-card-content";
+import { AppLink } from "../common/ui/app-link";
 
 export interface DashboardCardProps {
   href: string;
@@ -14,10 +14,7 @@ export function DashboardCard({
   description,
 }: DashboardCardProps) {
   return (
-    <Link
-      href={href}
-      className="group block rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-    >
+    <AppLink href={href} variant="unstyled" className="group block rounded-xl">
       <AppCard className="h-full transition-colors group-hover:bg-muted">
         <AppCardContent className="flex h-full flex-col">
           <div
@@ -39,6 +36,6 @@ export function DashboardCard({
           </p>
         </AppCardContent>
       </AppCard>
-    </Link>
+    </AppLink>
   );
 }

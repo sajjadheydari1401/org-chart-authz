@@ -15,15 +15,38 @@ function GraphControls() {
 
   return (
     <Panel position="top-right" className="max-w-[calc(100%-1rem)]">
-      <div role="group" aria-label="Chart controls" className="flex flex-wrap gap-2 rounded-xl border border-border bg-surface p-2">
-        <AppButton type="button" variant="secondary" size="sm" aria-label="Zoom in" onClick={() => void zoomIn()}>
+      <div
+        role="group"
+        aria-label="کنترل‌های نمودار"
+        className="flex flex-wrap gap-2 rounded-xl border border-border bg-surface p-2"
+      >
+        <AppButton
+          type="button"
+          variant="secondary"
+          size="sm"
+          aria-label="بزرگ‌نمایی"
+          onClick={() => void zoomIn()}
+        >
           +
         </AppButton>
-        <AppButton type="button" variant="secondary" size="sm" aria-label="Zoom out" onClick={() => void zoomOut()}>
+
+        <AppButton
+          type="button"
+          variant="secondary"
+          size="sm"
+          aria-label="کوچک‌نمایی"
+          onClick={() => void zoomOut()}
+        >
           −
         </AppButton>
-        <AppButton type="button" variant="secondary" size="sm" onClick={() => void fitView({ padding: 0 })}>
-          Fit chart
+
+        <AppButton
+          type="button"
+          variant="secondary"
+          size="sm"
+          onClick={() => void fitView({ padding: 0 })}
+        >
+          بازنشانی
         </AppButton>
       </div>
     </Panel>

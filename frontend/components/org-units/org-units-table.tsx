@@ -6,11 +6,11 @@ import {
   AppTableColumn,
 } from "@/components/common/ui/app-table/app-table";
 import { rawUnits } from "@/data/org-units";
-import type { OrgUnit } from "@/types/org-unit";
+import type { IOrgUnit } from "@/types/org-unit";
 
 const unitNames = new Map(rawUnits.map((unit) => [unit.id, unit.name]));
 
-const columns: AppTableColumn<OrgUnit>[] = [
+const columns: AppTableColumn<IOrgUnit>[] = [
   { key: "id", header: "ID" },
   { key: "name", header: "Name" },
   {

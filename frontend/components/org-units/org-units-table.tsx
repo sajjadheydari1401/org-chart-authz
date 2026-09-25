@@ -11,26 +11,26 @@ import type { IOrgUnit } from "@/types/org-unit";
 const unitNames = new Map(rawUnits.map((unit) => [unit.id, unit.name]));
 
 const columns: AppTableColumn<IOrgUnit>[] = [
-  { key: "id", header: "ID" },
-  { key: "name", header: "Name" },
+  { key: "id", header: "شناسه" },
+  { key: "name", header: "نام" },
   {
     key: "parentId",
-    header: "Parent unit",
+    header: "واحد بالادست",
     render: (unit) =>
       unit.parentId === null ? "—" : (unitNames.get(unit.parentId) ?? "—"),
   },
 ];
 
-export function OrgUnitsTable() {
+export function OrgUnitsTable({ units, caption }: { units: readonly IOrgUnit[]; caption: string }) {
   const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
 
   return (
     <AppTable
       columns={columns}
-      data={rawUnits}
+      data={units}
       rowKey={(unit) => unit.id}
       rowLabel={(unit) => unit.name}
-      caption="Organizational units"
+      caption={caption}
       selectedKeys={selectedKeys}
       onSelectionChange={setSelectedKeys}
     />

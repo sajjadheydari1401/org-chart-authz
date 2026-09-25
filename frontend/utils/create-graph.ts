@@ -2,12 +2,12 @@ import dagre from "@dagrejs/dagre";
 import type { Edge } from "@xyflow/react";
 
 import type { UnitNode } from "@/components/units-chart/unit-card";
-import type { OrgUnit } from "@/types/org-unit";
+import type { IOrgUnit } from "@/types/org-unit";
 
 const NODE_WIDTH = 220;
 const NODE_HEIGHT = 60;
 
-export function createGraph(units: OrgUnit[]) {
+export function createGraph(units: IOrgUnit[]) {
   const graph = new dagre.graphlib.Graph();
 
   // Dagre expects edge metadata even when we don't need custom edge data.

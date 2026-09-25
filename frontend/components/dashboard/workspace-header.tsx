@@ -5,9 +5,10 @@ import { routes } from "@/lib/routes";
 
 const navigation = [
   { label: "کاربران", href: routes.users },
-  { label: "نقش‌ها", href: routes.roles },
   { label: "واحدهای سازمانی", href: routes.orgUnits },
+  { label: "نقش‌ها", href: routes.roles },
   { label: "منابع", href: routes.resources },
+  { label: "دسترسی‌ها", href: routes.accesses },
 ];
 
 export function WorkspaceHeader() {

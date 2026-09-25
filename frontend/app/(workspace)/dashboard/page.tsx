@@ -1,6 +1,6 @@
-import { InfoCard } from "@/components/common/info-card";
 import { DashboardCard } from "@/components/dashboard/dashboard-card";
 import { OrganizationGraph } from "@/components/units-chart/organization-graph";
+import { routes } from "@/lib/routes";
 
 export default function DashboardPage() {
   return (
@@ -13,18 +13,17 @@ export default function DashboardPage() {
         </h1>
 
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-          Manage your organization structure, people, roles, and access.
+          Manage roles, users, organizational units, and resources.
         </p>
       </header>
 
-      <section aria-labelledby="organization-heading" className="space-y-4">
-        <OrganizationGraph />
+      <section aria-labelledby="management-heading" className="space-y-4">
         <div>
           <h2
-            id="organization-heading"
+            id="management-heading"
             className="text-lg font-semibold text-foreground"
           >
-            Organization
+            Workspace management
           </h2>
 
           <p className="mt-1 text-sm text-muted-foreground">
@@ -32,31 +31,47 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <DashboardCard
-            href="/dashboard/org-chart"
-            title="Organization chart"
-            description="View and manage reporting relationships across your organization."
+            href={routes.roles}
+            title="Roles"
+            description="Manage roles and their permissions."
           />
 
           <DashboardCard
-            href="/dashboard/people"
-            title="People"
-            description="View and manage people in your organization."
+            href={routes.users}
+            title="Users"
+            description="Manage users in your organization."
           />
 
           <DashboardCard
-            href="/dashboard/access"
-            title="Roles & permissions"
-            description="Manage application roles, permissions, and access."
+            href={routes.orgUnits}
+            title="Org Units"
+            description="Manage organizational units and their hierarchy."
+          />
+
+          <DashboardCard
+            href={routes.resources}
+            title="Resources"
+            description="Manage resources and access permissions."
           />
         </div>
       </section>
 
-      <InfoCard title="Secure workspace">
-        Access to protected organization data is validated by the backend using
-        your authenticated session.
-      </InfoCard>
+      <section aria-labelledby="organization-heading" className="space-y-4">
+        <div>
+          <h2
+            id="organization-heading"
+            className="text-lg font-semibold text-foreground"
+          >
+            Organization chart
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            View the hierarchy of your organizational units.
+          </p>
+        </div>
+        <OrganizationGraph />
+      </section>
     </div>
   );
 }

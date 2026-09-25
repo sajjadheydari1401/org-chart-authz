@@ -4,4 +4,5 @@ export const routes = {
   users: "/users",
   orgUnits: "/org-units",
   resources: "/resources",
+  accesses: "/accesses",
 } as const;

@@ -6,14 +6,12 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-sm font-medium text-primary">Workspace</p>
-
         <h1 className="mt-2 text-3xl font-semibold tracking-tight text-foreground">
-          Dashboard
+          داشبورد
         </h1>
 
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-          Manage roles, users, organizational units, and resources.
+          مدیریت نقش‌ها، کاربران، واحدهای سازمانی و منابع.
         </p>
       </header>
 
@@ -23,37 +21,37 @@ export default function DashboardPage() {
             id="management-heading"
             className="text-lg font-semibold text-foreground"
           >
-            Workspace management
+            مدیریت فضای کاری
           </h2>
 
           <p className="mt-1 text-sm text-muted-foreground">
-            Choose an area to manage.
+            بخش موردنظر برای مدیریت را انتخاب کنید.
           </p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <DashboardCard
             href={routes.roles}
-            title="Roles"
-            description="Manage roles and their permissions."
+            title="نقش‌ها"
+            description="مدیریت نقش‌ها و مجوزهای آن‌ها."
           />
 
           <DashboardCard
             href={routes.users}
-            title="Users"
-            description="Manage users in your organization."
+            title="کاربران"
+            description="مدیریت کاربران سازمان."
           />
 
           <DashboardCard
             href={routes.orgUnits}
-            title="Org Units"
-            description="Manage organizational units and their hierarchy."
+            title="واحدهای سازمانی"
+            description="مدیریت واحدهای سازمانی و ساختار سلسله‌مراتبی آن‌ها."
           />
 
           <DashboardCard
             href={routes.resources}
-            title="Resources"
-            description="Manage resources and access permissions."
+            title="منابع"
+            description="مدیریت منابع و مجوزهای دسترسی."
           />
         </div>
       </section>
@@ -64,12 +62,13 @@ export default function DashboardPage() {
             id="organization-heading"
             className="text-lg font-semibold text-foreground"
           >
-            Organization chart
+            چارت سازمانی
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            View the hierarchy of your organizational units.
+            مشاهده ساختار سلسله‌مراتبی واحدهای سازمانی.
           </p>
         </div>
+        {/* چارت سازمانی */}
         <OrganizationGraph />
       </section>
     </div>

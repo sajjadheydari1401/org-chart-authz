@@ -1,5 +1,6 @@
 import { InfoCard } from "@/components/common/info-card";
 import { DashboardCard } from "@/components/dashboard/dashboard-card";
+import { OrganizationGraph } from "@/components/units-chart/organization-graph";
 
 export default function DashboardPage() {
   return (
@@ -17,6 +18,7 @@ export default function DashboardPage() {
       </header>
 
       <section aria-labelledby="organization-heading" className="space-y-4">
+        <OrganizationGraph />
         <div>
           <h2
             id="organization-heading"

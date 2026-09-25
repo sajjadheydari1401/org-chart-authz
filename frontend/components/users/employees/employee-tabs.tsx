@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AppTab } from "@/components/common/ui/app-tab/app-tab";
 import { EngineeringTabContent } from "./engineering/engineering-tab-content";
 import { FinanceTabContent } from "./finance/finance-tab-content";
+import { HrTabContent } from "./hr/hr-tab-content";
 
 const TAB_NAMES = [
   { value: "engineering", label: "فنی و مهندسی" },
@@ -14,7 +15,7 @@ const TAB_NAMES = [
 const TAB_CONTENTS = {
   engineering: <EngineeringTabContent />,
   finance: <FinanceTabContent />,
-  hr: <></>,
+  hr: <HrTabContent />,
 };
 
 export function EmployeeTabs() {

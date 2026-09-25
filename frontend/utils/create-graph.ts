@@ -1,6 +1,7 @@
 import dagre from "@dagrejs/dagre";
-import type { Edge, Node } from "@xyflow/react";
+import type { Edge } from "@xyflow/react";
 
+import type { UnitNode } from "@/components/units-chart/unit-card";
 import type { OrgUnit } from "@/types/org-unit";
 
 const NODE_WIDTH = 220;
@@ -23,8 +24,10 @@ export function createGraph(units: OrgUnit[]) {
 
   // React Flow needs flat nodes. Positions start at zero because
   // Dagre will calculate the actual coordinates later.
-  const nodes: Node[] = units.map((unit) => ({
+  const nodes: UnitNode[] = units.map((unit) => ({
     id: String(unit.id),
+    type: "unit",
+    style: { width: NODE_WIDTH, height: NODE_HEIGHT },
     data: {
       label: unit.name,
     },

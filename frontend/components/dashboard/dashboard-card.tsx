@@ -14,7 +14,13 @@ export function DashboardCard({
   description,
 }: DashboardCardProps) {
   return (
-    <AppLink href={href} variant="unstyled" className="group block rounded-xl">
+    <AppLink
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      variant="unstyled"
+      className="group block rounded-xl"
+    >
       <AppCard className="h-full transition-colors group-hover:bg-muted">
         <AppCardContent className="flex h-full flex-col">
           <div

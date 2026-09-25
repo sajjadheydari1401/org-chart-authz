@@ -12,7 +12,7 @@ export default async function WorkspaceLayout({
   const accessToken = await getAccessToken();
 
   if (!accessToken) {
-    redirect("/login");
+    // redirect("/login");
   }
 
   return (

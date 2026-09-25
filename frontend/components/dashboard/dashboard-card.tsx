@@ -37,7 +37,7 @@ export function DashboardCard({
           </p>
 
           <p className="mt-4 text-sm font-medium text-primary group-hover:text-primary-hover">
-            Open
+            مشاهده
             <span aria-hidden="true"> →</span>
           </p>
         </AppCardContent>

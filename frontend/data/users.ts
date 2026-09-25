@@ -1,5 +1,25 @@
 import { IEmployee } from "@/types/user";
 
+export const AccountingEmployees: IEmployee[] = [
+  {
+    id: 11,
+    name: "فاطمه موسوی",
+    email: "fatemeh.mousavi@example.com",
+    teamId: 4,
+  },
+  {
+    id: 12,
+    name: "حسین نادری",
+    email: "hossein.naderi@example.com",
+    teamId: 4,
+  },
+  {
+    id: 13,
+    name: "الهام رستمی",
+    teamId: 4,
+  },
+];
+
 export const ItEmployees: IEmployee[] = [
   {
     id: 1,

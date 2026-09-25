@@ -1,5 +1,7 @@
-export interface User {
-  id: string;
-  email: string;
-  mobile: string;
+export interface IEmployee {
+  id: number;
+  name: string;
+  email?: string;
+  mobile?: string;
+  teamId: number;
 }

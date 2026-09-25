@@ -1,5 +1,17 @@
 import { IEmployee } from "@/types/user";
 
+export const EmployeeAffairsEmployees: IEmployee[] = [
+  { id: 14, name: "شیرین امینی", email: "shirin.amini@example.com", teamId: 5 },
+  { id: 15, name: "بهرام اکبری", email: "bahram.akbari@example.com", teamId: 5 },
+  { id: 16, name: "لیلا کریمی", teamId: 5 },
+];
+
+export const RecruitmentEmployees: IEmployee[] = [
+  { id: 17, name: "آرمان رضایی", email: "arman.rezaei@example.com", teamId: 6 },
+  { id: 18, name: "پریسا مرادی", email: "parisa.moradi@example.com", teamId: 6 },
+  { id: 19, name: "سامان حسینی", teamId: 6 },
+];
+
 export const AccountingEmployees: IEmployee[] = [
   {
     id: 11,

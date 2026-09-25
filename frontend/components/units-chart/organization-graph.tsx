@@ -14,7 +14,7 @@ function GraphControls() {
   const { zoomIn, zoomOut, fitView } = useReactFlow();
 
   return (
-    <Panel position="top-left" className="max-w-[calc(100%-1rem)]">
+    <Panel position="top-right" className="max-w-[calc(100%-1rem)]">
       <div role="group" aria-label="Chart controls" className="flex flex-wrap gap-2 rounded-xl border border-border bg-surface p-2">
         <AppButton type="button" variant="secondary" size="sm" aria-label="Zoom in" onClick={() => void zoomIn()}>
           +

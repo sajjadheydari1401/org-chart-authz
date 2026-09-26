@@ -1,11 +1,10 @@
-﻿import { ArgumentsHost, Catch, ExceptionFilter, Logger } from '@nestjs/common';
+﻿import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { normalizeError } from '../normalize-error.js';
+import { appLogger } from '../../logger/winston-logger-config.js';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
-  private readonly logger = new Logger(HttpExceptionFilter.name);
-
   catch(exception: unknown, host: ArgumentsHost) {
     const context = host.switchToHttp();
     const response = context.getResponse<Response>();
@@ -15,7 +14,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const error = normalizeError(exception);
     // Axios errors may include credentials; log only safe request metadata.
     if (error.statusCode >= 500) {
-      this.logger.error({ statusCode: error.statusCode, method: request.method, path: request.path });
+      appLogger.error('Request failed', {
+        statusCode: error.statusCode,
+        method: request.method,
+        path: request.path,
+      });
     }
     response.status(error.statusCode).json({
       ...error,

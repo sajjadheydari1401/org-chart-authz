@@ -1,8 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { showError } from "@/lib/api/show-error";
+import { showError, showSuccess } from "@/lib/api/show-error";
 import { TRANSPORT_ERROR_MESSAGE } from "@/lib/api/transport-error";
 
 import { loginAction } from "@/app/actions/auth";
@@ -16,6 +17,7 @@ import {
 } from "@/lib/schemas/auth";
 
 export function LoginForm() {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -30,8 +32,16 @@ export function LoginForm() {
   });
 
   async function onSubmit(data: LoginFormData) {
-    const result = await loginAction(data).catch(() => ({ success: false as const, message: TRANSPORT_ERROR_MESSAGE }));
-    if (!result.success) showError(result.message);
+    const result = await loginAction(data).catch(() => ({
+      success: false as const,
+      message: TRANSPORT_ERROR_MESSAGE,
+    }));
+    if (result.success) {
+      if (result.message) showSuccess(result.message);
+      router.push("/dashboard");
+      return;
+    }
+    showError(result.message);
   }
 
   return (
@@ -67,7 +77,6 @@ export function LoginForm() {
           {...register("password")}
         />
       </AppFormField>
-
 
       <AppButton type="submit" loading={isSubmitting} className="w-full">
         ورود

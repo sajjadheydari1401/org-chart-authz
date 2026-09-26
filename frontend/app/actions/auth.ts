@@ -67,7 +67,7 @@ export async function signupAction(
 
   await setPendingUsername(parsed.data.username);
 
-  redirect("/verify-sms");
+  return result;
 }
 
 /*
@@ -103,7 +103,7 @@ export async function loginAction(
     password: parsed.data.password,
   };
 
-  let result: AuthTokenResponse;
+  let result: { data: AuthTokenResponse; message?: string };
 
   try {
     result = await AppApi<AuthTokenResponse>("/auth/login", {
@@ -115,10 +115,13 @@ export async function loginAction(
     return toActionError(error);
   }
 
-  await setAccessToken(result.accessToken);
+  await setAccessToken(result.data.accessToken);
   await clearPendingUsername();
 
-  redirect("/dashboard");
+  return {
+    success: true,
+    ...(result.message ? { message: result.message } : {}),
+  };
 }
 
 /*
@@ -159,7 +162,7 @@ export async function verifySmsAction(
 
   await clearPendingUsername();
 
-  redirect("/login");
+  return result;
 }
 
 /*

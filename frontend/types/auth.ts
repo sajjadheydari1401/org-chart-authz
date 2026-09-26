@@ -20,6 +20,7 @@ export interface AuthTokenResponse {
 
 export interface AuthActionSuccess {
   success: true;
+  message?: string;
 }
 
 export interface AuthActionError {

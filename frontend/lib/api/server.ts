@@ -8,10 +8,15 @@ import { TRANSPORT_ERROR_MESSAGE } from "./transport-error";
 
 type ApiRequestConfig = AxiosRequestConfig & { authenticated?: boolean };
 
+export interface AppApiResponse<T> {
+  data: T;
+  message?: string;
+}
+
 export async function AppApi<T>(
   path: string,
   { authenticated = true, ...config }: ApiRequestConfig = {},
-): Promise<T> {
+): Promise<AppApiResponse<T>> {
   if (!API.defaults.baseURL) throw new Error("API_URL is not configured");
 
   const token = authenticated ? await getAccessToken() : null;
@@ -32,9 +37,15 @@ export async function AppApi<T>(
   if (response.status < 200 || response.status >= 300) {
     throw new ApiError(response.status, TRANSPORT_ERROR_MESSAGE);
   }
-  if (response.status === 204) return undefined as T;
+  if (response.status === 204) return { data: undefined as T };
 
   const success = apiSuccessSchema.safeParse(response.data);
   if (!success.success) throw new ApiError(502, TRANSPORT_ERROR_MESSAGE);
-  return success.data.data as T;
+  const backendMessage = success.data.message;
+  const message =
+    typeof backendMessage === "string"
+      ? backendMessage
+      : backendMessage?.fa?.trim() || backendMessage?.en?.trim() || undefined;
+
+  return { data: success.data.data as T, message };
 }

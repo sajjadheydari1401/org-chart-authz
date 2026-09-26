@@ -14,12 +14,15 @@ export async function registerAccount(
     mobile: input.mobile,
   };
   try {
-    await AppApi("/auth/signup", {
+    const response = await AppApi("/auth/signup", {
       method: "POST",
       data: body,
       authenticated: false,
     });
-    return { success: true };
+    return {
+      success: true,
+      ...(response.message ? { message: response.message } : {}),
+    };
   } catch (error) {
     return toActionError(error);
   }

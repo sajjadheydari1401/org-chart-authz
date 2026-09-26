@@ -9,4 +9,10 @@ export const apiErrorSchema = z.object({
 export const apiSuccessSchema = z.object({
   status: z.literal("success"),
   data: z.unknown(),
+  message: z
+    .union([
+      z.string().min(1),
+      z.object({ fa: z.string().optional(), en: z.string().optional() }),
+    ])
+    .optional(),
 });

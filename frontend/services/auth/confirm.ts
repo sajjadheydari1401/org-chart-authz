@@ -9,12 +9,15 @@ export async function verifyPhoneNumber(
   input: VerifySmsFormData,
 ): Promise<AuthActionResult> {
   try {
-    await AppApi("/auth/confirm-sms", {
+    const response = await AppApi("/auth/confirm-sms", {
       method: "POST",
       authenticated: false,
       data: { code: input.code, username: await getPendingUsername() },
     });
-    return { success: true };
+    return {
+      success: true,
+      ...(response.message ? { message: response.message } : {}),
+    };
   } catch (error) {
     return toActionError(error);
   }

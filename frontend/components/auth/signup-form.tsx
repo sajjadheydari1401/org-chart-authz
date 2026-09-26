@@ -1,8 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { showError } from "@/lib/api/show-error";
+import { showError, showSuccess } from "@/lib/api/show-error";
 import { TRANSPORT_ERROR_MESSAGE } from "@/lib/api/transport-error";
 
 import { signupAction } from "@/app/actions/auth";
@@ -16,6 +17,7 @@ import {
 } from "@/lib/schemas/auth";
 
 export function SignupForm() {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -39,6 +41,8 @@ export function SignupForm() {
     }));
 
     if (result.success) {
+      if (result.message) showSuccess(result.message);
+      router.push("/verify-sms");
       return;
     }
 
@@ -144,7 +148,6 @@ export function SignupForm() {
           {...register("password")}
         />
       </AppFormField>
-
 
       <AppButton type="submit" loading={isSubmitting} className="w-full">
         ایجاد حساب

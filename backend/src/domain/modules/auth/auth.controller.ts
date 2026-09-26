@@ -3,6 +3,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service.js';
 import { SignupDto } from './dto/signup.dto.js';
 import { ConfirmSMSDto } from './dto/confirm-sms.dto.js';
+import { LoginDto } from './dto/login.dto.js';
 import { FormatResponseInterceptor } from '../../../common/utils/interceptor/format-response.interceptor.js';
 
 @ApiTags('Auth')
@@ -19,5 +20,10 @@ export class AuthController {
   @Post('confirm-sms')
   confirmSms(@Body() input: ConfirmSMSDto) {
     return this.authService.confirmSms(input);
+  }
+
+  @Post('login')
+  login(@Body() input: LoginDto) {
+    return this.authService.login(input);
   }
 }

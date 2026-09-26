@@ -7,6 +7,7 @@ import { ConfigService } from '@nestjs/config';
 
 import { SignupDto } from './dto/signup.dto.js';
 import { ConfirmSMSDto } from './dto/confirm-sms.dto.js';
+import { LoginDto } from './dto/login.dto.js';
 import { ProviderError } from '../../../common/filter/provider-error.js';
 import { AppApi } from '../../../common/utils/api/AppApi.js';
 
@@ -16,7 +17,15 @@ interface ProviderResponse {
   result?: {
     status_code?: number;
     message_developer?: { en?: string; fa?: string };
+    username?: string;
+    userId?: string;
+    accessToken?: string;
+    access_token?: string;
+    token?: string;
   };
+  accessToken?: string;
+  access_token?: string;
+  token?: string;
 }
 
 @Injectable()
@@ -49,6 +58,41 @@ export class AuthService {
       username: input.username,
       code: input.code,
     });
+  }
+
+  async login(input: LoginDto): Promise<{
+    accessToken: string;
+    username: string;
+    userId: string;
+  }> {
+    const url = this.providerUrl('/auth/login_UP');
+    const { data } = await AppApi.post<ProviderResponse>(url, {
+      systemUsername: this.config.getOrThrow<string>('AUTH_SYSTEM_USERNAME'),
+      systemPassword: this.config.getOrThrow<string>('AUTH_SYSTEM_PASSWORD'),
+      roleName: this.config.getOrThrow<string>('AUTH_ROLE_NAME'),
+      username: input.username,
+      password: input.password,
+    });
+
+    if (data?.success === false) throw new ProviderError(data);
+    if (data?.success !== true) throw new BadGatewayException();
+
+    const accessToken = data.result?.token;
+    const username = data.result?.username;
+    const userId = data.result?.userId;
+
+    if (
+      typeof accessToken !== 'string' ||
+      !accessToken.trim() ||
+      typeof username !== 'string' ||
+      !username.trim() ||
+      typeof userId !== 'string' ||
+      !userId.trim()
+    ) {
+      throw new BadGatewayException();
+    }
+
+    return { accessToken, username, userId };
   }
 
   private async postToProvider(

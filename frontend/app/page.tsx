@@ -13,24 +13,24 @@ export default async function Home() {
   return (
     <main className="min-h-screen bg-background text-foreground">
       <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-6">
-        <header className="flex min-h-20 items-center justify-between gap-6 border-b border-border">
+        <header className="flex min-h-20 flex-wrap items-center justify-between gap-4 border-b border-border py-4">
           <AppLink href="/" className="text-lg font-semibold tracking-tight">
-            Org Chart
+            چارت سازمانی سیمرغ
           </AppLink>
 
-          <nav aria-label="Main navigation" className="flex items-center gap-2">
+          <nav aria-label="ناوبری اصلی" className="flex items-center gap-2">
             {isAuthenticated ? (
               <AppLink href="/dashboard" variant="primary">
-                Dashboard
+                داشبورد
               </AppLink>
             ) : (
               <>
                 <AppLink href="/login" variant="secondary">
-                  Sign in
+                  ورود
                 </AppLink>
 
                 <AppLink href="/signup" variant="primary">
-                  Create account
+                  ایجاد حساب
                 </AppLink>
               </>
             )}
@@ -41,34 +41,33 @@ export default async function Home() {
           <div className="grid w-full gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.75fr)] lg:items-center">
             <div className="max-w-2xl">
               <p className="text-sm font-medium text-primary">
-                Organization management
+                مدیریت سازمان
               </p>
 
               <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
-                Your organization,
+                سازمان شما،
                 <span className="block text-muted-foreground">
-                  clearly structured.
+                  با ساختاری روشن و منظم.
                 </span>
               </h1>
 
               <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">
-                Manage people, reporting relationships, roles, and permissions
-                from one secure workspace.
+                کاربران، روابط سازمانی، نقش‌ها و مجوزها را در یک فضای کاری امن مدیریت کنید.
               </p>
 
               <div className="mt-8 flex flex-wrap gap-3">
                 {isAuthenticated ? (
                   <AppLink href="/dashboard" variant="primary">
-                    Open dashboard
+                    ورود به داشبورد
                   </AppLink>
                 ) : (
                   <>
                     <AppLink href="/signup" variant="primary">
-                      Create account
+                      ایجاد حساب
                     </AppLink>
 
                     <AppLink href="/login" variant="secondary">
-                      Sign in
+                      ورود
                     </AppLink>
                   </>
                 )}
@@ -78,33 +77,33 @@ export default async function Home() {
             <AppCard className="rounded-2xl">
               <AppCardHeader>
                 <p className="text-sm font-medium text-muted-foreground">
-                  Workspace
+                  فضای کاری
                 </p>
 
                 <AppCardTitle className="text-xl">
-                  Everything in one place
+                  همه‌چیز در یک مکان
                 </AppCardTitle>
               </AppCardHeader>
 
               <AppCardContent className="space-y-3">
                 <FeatureCard
-                  title="Organization chart"
-                  description="Understand reporting relationships and team structure."
+                  title="چارت سازمانی"
+                  description="روابط سازمانی و ساختار تیم‌ها را به‌روشنی ببینید."
                 />
 
                 <FeatureCard
-                  title="People"
-                  description="Manage the people who belong to your organization."
+                  title="کاربران"
+                  description="کاربران سازمان خود را مدیریت کنید."
                 />
 
                 <FeatureCard
-                  title="Roles and permissions"
-                  description="Control application access through roles and permissions."
+                  title="نقش‌ها و مجوزها"
+                  description="دسترسی به سامانه را با نقش‌ها و مجوزها کنترل کنید."
                 />
 
                 <FeatureCard
-                  title="Secure access"
-                  description="Protect accounts with password authentication and SMS verification."
+                  title="دسترسی امن"
+                  description="با رمز عبور و تأیید پیامکی از حساب‌های کاربری محافظت کنید."
                 />
               </AppCardContent>
             </AppCard>
@@ -112,7 +111,7 @@ export default async function Home() {
         </section>
 
         <footer className="border-t border-border py-6">
-          <p className="text-sm text-muted-foreground">Org Chart</p>
+          <p className="text-sm text-muted-foreground">چارت سازمانی سیمرغ</p>
         </footer>
       </div>
     </main>

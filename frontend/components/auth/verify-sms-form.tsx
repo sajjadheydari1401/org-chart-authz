@@ -53,9 +53,9 @@ export function VerifySmsForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
       <AppFormField
-        label="Verification code"
+        label="کد تأیید"
         htmlFor="code"
-        hint="Enter the 6-digit code from the SMS."
+        hint="کد ۶ رقمی ارسال‌شده در پیامک را وارد کنید."
         error={errors.code?.message}
         required
       >
@@ -80,7 +80,7 @@ export function VerifySmsForm() {
       )}
 
       <AppButton type="submit" loading={isSubmitting} className="w-full">
-        Verify mobile
+        تأیید شماره همراه
       </AppButton>
     </form>
   );

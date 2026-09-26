@@ -76,7 +76,7 @@ export function SignupForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
       <AppFormField
-        label="Email"
+        label="ایمیل"
         htmlFor="email"
         error={errors.email?.message}
         required
@@ -84,6 +84,7 @@ export function SignupForm() {
         <AppInput
           id="email"
           type="email"
+          dir="ltr"
           autoComplete="email"
           placeholder="you@example.com"
           invalid={Boolean(errors.email)}
@@ -92,7 +93,7 @@ export function SignupForm() {
       </AppFormField>
 
       <AppFormField
-        label="Username"
+        label="نام کاربری"
         htmlFor="username"
         error={errors.username?.message}
         required
@@ -101,16 +102,16 @@ export function SignupForm() {
           id="username"
           type="text"
           autoComplete="username"
-          placeholder="My User Name"
+          placeholder="نام کاربری شما"
           invalid={Boolean(errors.username)}
           {...register("username")}
         />
       </AppFormField>
 
       <AppFormField
-        label="Mobile"
+        label="شماره همراه"
         htmlFor="mobile"
-        hint="Use an Iranian mobile number, for example 09123456789."
+        hint="شماره همراه ایران را وارد کنید؛ برای مثال ۰۹۱۲۳۴۵۶۷۸۹."
         error={errors.mobile?.message}
         required
       >
@@ -127,9 +128,9 @@ export function SignupForm() {
       </AppFormField>
 
       <AppFormField
-        label="Password"
+        label="رمز عبور"
         htmlFor="password"
-        hint="Use at least 8 characters."
+        hint="حداقل ۸ نویسه وارد کنید."
         error={errors.password?.message}
         required
       >
@@ -149,7 +150,7 @@ export function SignupForm() {
       )}
 
       <AppButton type="submit" loading={isSubmitting} className="w-full">
-        Create account
+        ایجاد حساب
       </AppButton>
     </form>
   );

@@ -63,7 +63,7 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
       <AppFormField
-        label="Email"
+        label="ایمیل"
         htmlFor="email"
         error={errors.email?.message}
         required
@@ -71,6 +71,7 @@ export function LoginForm() {
         <AppInput
           id="email"
           type="email"
+          dir="ltr"
           autoComplete="email"
           placeholder="you@example.com"
           invalid={Boolean(errors.email)}
@@ -79,7 +80,7 @@ export function LoginForm() {
       </AppFormField>
 
       <AppFormField
-        label="Password"
+        label="رمز عبور"
         htmlFor="password"
         error={errors.password?.message}
         required
@@ -100,7 +101,7 @@ export function LoginForm() {
       )}
 
       <AppButton type="submit" loading={isSubmitting} className="w-full">
-        Sign in
+        ورود
       </AppButton>
     </form>
   );

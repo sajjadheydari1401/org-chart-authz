@@ -13,7 +13,7 @@ export async function registerAccount(
     return {
       success: false,
       message:
-        "Registration service is not configured. Please contact support.",
+        "سرویس ثبت‌نام پیکربندی نشده است. لطفاً با پشتیبانی تماس بگیرید.",
     };
   }
 
@@ -44,12 +44,12 @@ export async function registerAccount(
 
     return {
       success: false,
-      message: "Unable to create your account. Please try again.",
+      message: "ایجاد حساب انجام نشد. لطفاً دوباره تلاش کنید.",
     };
   } catch (err) {
     return {
       success: false,
-      message: "Registration is currently unavailable. Please try again.",
+      message: "سرویس ثبت‌نام در حال حاضر در دسترس نیست. لطفاً دوباره تلاش کنید.",
     };
   }
 }

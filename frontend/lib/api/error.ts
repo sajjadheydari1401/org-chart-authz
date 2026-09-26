@@ -11,17 +11,17 @@ export class ApiError extends Error {
 }
 
 const errorMessages: Record<number, string> = {
-  400: "The request is invalid.",
-  401: "Your session has expired. Please sign in again.",
-  403: "You don't have permission to perform this action.",
-  404: "The requested resource was not found.",
-  409: "This resource already exists.",
-  422: "The provided information is invalid.",
-  429: "Too many requests. Please try again later.",
-  500: "Something went wrong. Please try again later.",
-  502: "The service is currently unavailable. Please try again.",
-  503: "The service is currently unavailable. Please try again later.",
-  504: "The request timed out. Please try again.",
+  400: "درخواست نامعتبر است.",
+  401: "نشست شما منقضی شده است. لطفاً دوباره وارد شوید.",
+  403: "شما مجوز انجام این عملیات را ندارید.",
+  404: "مورد درخواستی یافت نشد.",
+  409: "این مورد قبلاً ثبت شده است.",
+  422: "اطلاعات واردشده نامعتبر است.",
+  429: "تعداد درخواست‌ها بیش از حد مجاز است. لطفاً کمی بعد دوباره تلاش کنید.",
+  500: "خطایی رخ داده است. لطفاً کمی بعد دوباره تلاش کنید.",
+  502: "سرویس در حال حاضر در دسترس نیست. لطفاً دوباره تلاش کنید.",
+  503: "سرویس در حال حاضر در دسترس نیست. لطفاً کمی بعد دوباره تلاش کنید.",
+  504: "مهلت پاسخ‌گویی به درخواست به پایان رسید. لطفاً دوباره تلاش کنید.",
 };
 
 export function createApiError(
@@ -29,7 +29,7 @@ export function createApiError(
   error?: ApiErrorResponse | null,
 ): ApiError {
   const message =
-    errorMessages[status] ?? "Something went wrong. Please try again.";
+    errorMessages[status] ?? "خطایی رخ داده است. لطفاً دوباره تلاش کنید.";
 
   return new ApiError(status, message);
 }

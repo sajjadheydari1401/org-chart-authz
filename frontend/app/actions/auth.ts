@@ -44,7 +44,7 @@ export async function signupAction(
 
     return {
       success: false,
-      message: "Please check the form",
+      message: "لطفاً فرم را بررسی کنید",
       fieldErrors: {
         ...(errors.properties?.email?.errors[0] && {
           email: errors.properties.email.errors[0],
@@ -86,7 +86,7 @@ export async function loginAction(
 
     return {
       success: false,
-      message: "Please check the form",
+      message: "لطفاً فرم را بررسی کنید",
       fieldErrors: {
         ...(errors.properties?.email?.errors[0] && {
           email: errors.properties.email.errors[0],
@@ -122,7 +122,7 @@ export async function loginAction(
 
     return {
       success: false,
-      message: "Unable to sign in",
+      message: "ورود به حساب کاربری امکان‌پذیر نیست",
     };
   }
 
@@ -148,7 +148,7 @@ export async function verifySmsAction(
 
     return {
       success: false,
-      message: "Please check the verification code",
+      message: "لطفاً کد تأیید را بررسی کنید",
       fieldErrors: {
         ...(errors.properties?.code?.errors[0] && {
           code: errors.properties.code.errors[0],
@@ -162,7 +162,7 @@ export async function verifySmsAction(
   if (!uName) {
     return {
       success: false,
-      message: "Your verification session has expired. Please sign up again.",
+      message: "جلسه تأیید شما منقضی شده است. لطفاً دوباره ثبت‌نام کنید.",
     };
   }
 
@@ -189,7 +189,7 @@ export async function verifySmsAction(
 
     return {
       success: false,
-      message: "Unable to verify the SMS code",
+      message: "تأیید کد پیامکی امکان‌پذیر نیست",
     };
   }
 

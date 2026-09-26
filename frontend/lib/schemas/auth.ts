@@ -12,15 +12,15 @@ function normalizeDigits(value: string): string {
 }
 
 export const signupSchema = z.object({
-  email: z.string().trim().email("Enter a valid email address"),
+  email: z.string().trim().email("لطفاً یک آدرس ایمیل معتبر وارد کنید"),
 
   username: z
     .string()
     .trim()
-    .min(2, "Username must be at least 2 characters")
-    .max(40, "Username must be at most 40 characters"),
+    .min(2, "نام کاربری باید حداقل ۲ کاراکتر باشد")
+    .max(40, "نام کاربری باید حداکثر ۴۰ کاراکتر باشد"),
 
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: z.string().min(8, "رمز عبور باید حداقل ۸ کاراکتر باشد"),
 
   mobile: z
     .string()
@@ -28,14 +28,14 @@ export const signupSchema = z.object({
     .transform(normalizeDigits)
     .refine(
       (value) => /^09\d{9}$/.test(value),
-      "Enter a valid Iranian mobile number",
+      "لطفاً یک شماره موبایل ایرانی معتبر وارد کنید",
     ),
 });
 
 export const loginSchema = z.object({
-  email: z.string().trim().email("Enter a valid email address"),
+  email: z.string().trim().email("لطفاً یک آدرس ایمیل معتبر وارد کنید"),
 
-  password: z.string().min(1, "Password is required"),
+  password: z.string().min(1, "وارد کردن رمز عبور الزامی است"),
 });
 
 export const verifySmsSchema = z.object({
@@ -45,7 +45,7 @@ export const verifySmsSchema = z.object({
     .transform(normalizeDigits)
     .refine(
       (value) => /^\d{6}$/.test(value),
-      "Enter the 6-digit verification code",
+      "لطفاً کد تأیید ۶ رقمی را وارد کنید",
     ),
 });
 

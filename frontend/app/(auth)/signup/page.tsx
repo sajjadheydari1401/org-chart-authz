@@ -5,17 +5,16 @@ import { AppLink } from "@/components/common/ui/app-link";
 export default function SignupPage() {
   return (
     <AuthCard
-      eyebrow="Create account"
-      title="Get started"
+      eyebrow="ایجاد حساب"
+      title="ثبت‌نام"
       description={
         <>
-          Enter your details. We&apos;ll verify your mobile number before
-          activating your account.
+          اطلاعات خود را وارد کنید. پیش از فعال‌سازی حساب، شماره همراه شما را تأیید می‌کنیم.
         </>
       }
       footer={
         <p className="text-center text-sm text-muted-foreground">
-          Already have an account? <AppLink href="/login">Sign in</AppLink>
+          قبلاً ثبت‌نام کرده‌اید؟ <AppLink href="/login">ورود</AppLink>
         </p>
       }
     >

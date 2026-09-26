@@ -13,7 +13,7 @@ export async function verifyPhoneNumber(
     return {
       success: false,
       message:
-        "Registration service is not configured. Please contact support.",
+        "سرویس ثبت‌نام پیکربندی نشده است. لطفاً با پشتیبانی تماس بگیرید.",
     };
   }
 
@@ -48,12 +48,12 @@ export async function verifyPhoneNumber(
 
     return {
       success: false,
-      message: "Unable to verify your phone. Please try again.",
+      message: "تأیید شماره همراه انجام نشد. لطفاً دوباره تلاش کنید.",
     };
   } catch (err) {
     return {
       success: false,
-      message: "Verification is currently unavailable. Please try again.",
+      message: "سرویس تأیید شماره همراه در حال حاضر در دسترس نیست. لطفاً دوباره تلاش کنید.",
     };
   }
 }

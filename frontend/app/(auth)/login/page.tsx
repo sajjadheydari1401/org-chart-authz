@@ -5,13 +5,13 @@ import { AppLink } from "@/components/common/ui/app-link";
 export default function LoginPage() {
   return (
     <AuthCard
-      eyebrow="Welcome back"
-      title="Sign in"
-      description="Enter your account details to continue to your workspace."
+      eyebrow="خوش آمدید"
+      title="ورود"
+      description="برای ورود به فضای کاری، اطلاعات حساب خود را وارد کنید."
       footer={
         <p className="text-center text-sm text-muted-foreground">
-          Don&apos;t have an account?{" "}
-          <AppLink href="/signup">Create account</AppLink>
+          حساب کاربری ندارید؟{" "}
+          <AppLink href="/signup">ایجاد حساب</AppLink>
         </p>
       }
     >

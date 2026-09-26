@@ -13,13 +13,12 @@ export default async function VerifySmsPage() {
 
   return (
     <AuthCard
-      eyebrow="SMS verification"
-      title="Check your phone"
-      description={<>We sent a verification code to your phone.</>}
+      eyebrow="تأیید پیامکی"
+      title="تأیید شماره همراه"
+      description={<>کد تأیید به شماره همراه شما ارسال شد.</>}
       footer={
         <p className="text-sm leading-6 text-muted-foreground">
-          The verification code is temporary. If it expires, return to sign up
-          and request a new code.
+          کد تأیید مدت محدودی اعتبار دارد. اگر منقضی شد، به صفحه ثبت‌نام برگردید و کد جدیدی درخواست کنید.
         </p>
       }
     >

@@ -1,43 +1,40 @@
-import "server-only";
-
+﻿import "server-only";
+import type { AxiosRequestConfig } from "axios";
+import { API } from "./client";
 import { getAccessToken } from "@/lib/auth/session";
-import type { ApiErrorResponse } from "@/types/api";
-import { createApiError } from "./error";
+import { ApiError } from "./error";
+import { apiErrorSchema, apiSuccessSchema } from "./response";
+import { TRANSPORT_ERROR_MESSAGE } from "./transport-error";
 
-const API_URL = process.env.API_URL;
+type ApiRequestConfig = AxiosRequestConfig & { authenticated?: boolean };
 
-if (!API_URL) {
-  throw new Error("API_URL environment variable is not configured");
-}
+export async function AppApi<T>(
+  path: string,
+  { authenticated = true, ...config }: ApiRequestConfig = {},
+): Promise<T> {
+  if (!API.defaults.baseURL) throw new Error("API_URL is not configured");
 
-export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const token = await getAccessToken();
-
-  const headers = new Headers(init.headers);
-
-  headers.set("Content-Type", "application/json");
-
-  if (token) {
-    headers.set("Authorization", `Bearer ${token}`);
-  }
-
-  const response = await fetch(`${API_URL}${path}`, {
-    ...init,
-    headers,
-    cache: "no-store",
+  const token = authenticated ? await getAccessToken() : null;
+  const response = await API.request<unknown>({
+    ...config,
+    url: path,
+    headers: {
+      ...config.headers,
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    validateStatus: () => true,
   });
 
-  if (!response.ok) {
-    const error = (await response
-      .json()
-      .catch(() => null)) as ApiErrorResponse | null;
-
-    throw createApiError(response.status, error);
+  const failure = apiErrorSchema.safeParse(response.data);
+  if (failure.success) {
+    throw new ApiError(failure.data.statusCode, failure.data.message);
   }
-
-  if (response.status === 204) {
-    return undefined as T;
+  if (response.status < 200 || response.status >= 300) {
+    throw new ApiError(response.status, TRANSPORT_ERROR_MESSAGE);
   }
+  if (response.status === 204) return undefined as T;
 
-  return response.json() as Promise<T>;
+  const success = apiSuccessSchema.safeParse(response.data);
+  if (!success.success) throw new ApiError(502, TRANSPORT_ERROR_MESSAGE);
+  return success.data.data as T;
 }

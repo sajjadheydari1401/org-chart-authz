@@ -1,12 +1,12 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { showError } from "@/lib/api/show-error";
+import { TRANSPORT_ERROR_MESSAGE } from "@/lib/api/transport-error";
 
 import { verifySmsAction } from "@/app/actions/auth";
 import { AppButton } from "@/components/common/ui/app-button";
-import { AppFormError } from "@/components/common/ui/app-form-error";
 import { AppFormField } from "@/components/common/ui/app-form-field";
 import { AppInput } from "@/components/common/ui/app-input";
 import {
@@ -16,8 +16,6 @@ import {
 } from "@/lib/schemas/auth";
 
 export function VerifySmsForm() {
-  const [formError, setFormError] = useState<string | undefined>();
-
   const {
     register,
     handleSubmit,
@@ -32,9 +30,11 @@ export function VerifySmsForm() {
   });
 
   async function onSubmit(data: VerifySmsFormData) {
-    setFormError(undefined);
-
-    const result = await verifySmsAction(data);
+    const result = await verifySmsAction(data).catch(() => ({
+      success: false as const,
+      message: TRANSPORT_ERROR_MESSAGE,
+      fieldErrors: undefined,
+    }));
 
     if (result.success) {
       return;
@@ -47,7 +47,7 @@ export function VerifySmsForm() {
       });
     }
 
-    setFormError(result.message);
+    showError(result.message);
   }
 
   return (
@@ -73,11 +73,6 @@ export function VerifySmsForm() {
         />
       </AppFormField>
 
-      {formError && (
-        <div className="rounded-lg border border-destructive bg-destructive-subtle px-4 py-3">
-          <AppFormError message={formError} />
-        </div>
-      )}
 
       <AppButton type="submit" loading={isSubmitting} className="w-full">
         تأیید شماره همراه

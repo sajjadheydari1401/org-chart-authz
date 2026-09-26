@@ -2,10 +2,11 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { showError } from "@/lib/api/show-error";
+import { TRANSPORT_ERROR_MESSAGE } from "@/lib/api/transport-error";
 
 import { signupAction } from "@/app/actions/auth";
 import { AppButton } from "@/components/common/ui/app-button";
-import { AppFormError } from "@/components/common/ui/app-form-error";
 import { AppFormField } from "@/components/common/ui/app-form-field";
 import { AppInput } from "@/components/common/ui/app-input";
 import {
@@ -31,7 +32,11 @@ export function SignupForm() {
   });
 
   async function onSubmit(data: SignupFormData) {
-    const result = await signupAction(data);
+    const result = await signupAction(data).catch(() => ({
+      success: false as const,
+      message: TRANSPORT_ERROR_MESSAGE,
+      fieldErrors: undefined,
+    }));
 
     if (result.success) {
       return;
@@ -67,10 +72,7 @@ export function SignupForm() {
       });
     }
 
-    setError("root", {
-      type: "server",
-      message: result.message,
-    });
+    showError(result.message);
   }
 
   return (
@@ -143,11 +145,6 @@ export function SignupForm() {
         />
       </AppFormField>
 
-      {errors.root?.message && (
-        <div className="rounded-lg border border-destructive bg-destructive-subtle px-4 py-3">
-          <AppFormError message={errors.root.message} />
-        </div>
-      )}
 
       <AppButton type="submit" loading={isSubmitting} className="w-full">
         ایجاد حساب

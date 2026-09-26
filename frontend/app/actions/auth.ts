@@ -3,9 +3,10 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-import { api } from "@/lib/api/server";
-import { ApiError } from "@/lib/api/error";
+import { AppApi } from "@/lib/api/server";
+import { toActionError } from "@/lib/api/error";
 import { registerAccount } from "@/services/auth/signup";
+import { verifyPhoneNumber } from "@/services/auth/confirm";
 import {
   clearPendingUsername,
   clearSession,
@@ -25,7 +26,6 @@ import type {
   AuthActionResult,
   AuthTokenResponse,
   LoginRequest,
-  VerifySmsRequest,
 } from "@/types/auth";
 
 /*
@@ -65,7 +65,7 @@ export async function signupAction(
   const result = await registerAccount(parsed.data);
   if (!result.success) return result;
 
-  await setPendingUsername(parsed.data.mobile);
+  await setPendingUsername(parsed.data.username);
 
   redirect("/verify-sms");
 }
@@ -106,24 +106,13 @@ export async function loginAction(
   let result: AuthTokenResponse;
 
   try {
-    result = await api<AuthTokenResponse>("/auth/login", {
+    result = await AppApi<AuthTokenResponse>("/auth/login", {
       method: "POST",
-      body: JSON.stringify(body),
+      data: body,
+      authenticated: false,
     });
   } catch (error) {
-    if (error instanceof ApiError) {
-      return {
-        success: false,
-        message: error.message,
-      };
-    }
-
-    console.error("Login failed:", error);
-
-    return {
-      success: false,
-      message: "ورود به حساب کاربری امکان‌پذیر نیست",
-    };
+    return toActionError(error);
   }
 
   await setAccessToken(result.accessToken);
@@ -158,7 +147,6 @@ export async function verifySmsAction(
   }
 
   const uName = await getPendingUsername();
-
   if (!uName) {
     return {
       success: false,
@@ -166,37 +154,12 @@ export async function verifySmsAction(
     };
   }
 
-  const body: VerifySmsRequest = {
-    code: parsed.data.code,
-  };
+  const result = await verifyPhoneNumber(parsed.data);
+  if (!result.success) return result;
 
-  let result: AuthTokenResponse;
-
-  try {
-    result = await api<AuthTokenResponse>("/confirm-sms", {
-      method: "POST",
-      body: JSON.stringify(body),
-    });
-  } catch (error) {
-    if (error instanceof ApiError) {
-      return {
-        success: false,
-        message: error.message,
-      };
-    }
-
-    console.error("SMS verification failed:", error);
-
-    return {
-      success: false,
-      message: "تأیید کد پیامکی امکان‌پذیر نیست",
-    };
-  }
-
-  await setAccessToken(result.accessToken);
   await clearPendingUsername();
 
-  redirect("/dashboard");
+  redirect("/login");
 }
 
 /*

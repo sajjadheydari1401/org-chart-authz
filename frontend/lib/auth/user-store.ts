@@ -1,7 +1,7 @@
 "use client";
 
 import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
+import { createJSONStorage, devtools, persist } from "zustand/middleware";
 import type { AuthUser } from "@/types/auth";
 
 interface AuthUserState {
@@ -11,16 +11,22 @@ interface AuthUserState {
 }
 
 export const useAuthUserStore = create<AuthUserState>()(
-  persist(
-    (set) => ({
-      user: null,
-      setUser: (user) => set({ user }),
-      clearUser: () => set({ user: null }),
-    }),
+  devtools(
+    persist(
+      (set) => ({
+        user: null,
+        setUser: (user) => set({ user }, false, "auth/setUser"),
+        clearUser: () => set({ user: null }, false, "auth/clearUser"),
+      }),
+      {
+        name: "auth-user",
+        storage: createJSONStorage(() => localStorage),
+        partialize: (state) => ({ user: state.user }),
+      },
+    ),
     {
-      name: "auth-user",
-      storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ user: state.user }) as AuthUserState,
+      name: "AuthUserStore",
+      enabled: process.env.NODE_ENV === "development",
     },
   ),
 );

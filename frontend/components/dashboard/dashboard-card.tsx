@@ -14,7 +14,13 @@ export function DashboardCard({
   description,
 }: DashboardCardProps) {
   return (
-    <AppLink href={href} variant="unstyled" className="group block rounded-xl">
+    <AppLink
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      variant="unstyled"
+      className="group block rounded-xl"
+    >
       <AppCard className="h-full transition-colors group-hover:bg-muted">
         <AppCardContent className="flex h-full flex-col">
           <div
@@ -31,7 +37,7 @@ export function DashboardCard({
           </p>
 
           <p className="mt-4 text-sm font-medium text-primary group-hover:text-primary-hover">
-            Open
+            مشاهده
             <span aria-hidden="true"> →</span>
           </p>
         </AppCardContent>

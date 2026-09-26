@@ -47,12 +47,12 @@
   --color-destructive-subtle: var(--destructive-subtle);
   --color-info: var(--info);
   --color-info-subtle: var(--info-subtle);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  --font-peyda: var(--font-peyda-local);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-peyda);
 }

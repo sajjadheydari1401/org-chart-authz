@@ -9,7 +9,23 @@ export const appLogger = winston.createLogger({
     winston.format.json(),
   ),
   transports: [
-    new winston.transports.Console(),
+    new winston.transports.Console({
+      format: winston.format.combine(
+        winston.format.colorize({ all: true }),
+        winston.format.printf(
+          ({ timestamp, level, message, optionalParams, ...metadata }) => {
+            const context = Array.isArray(optionalParams)
+              ? optionalParams.join(' ')
+              : '';
+            const details = Object.keys(metadata).length
+              ? ` ${JSON.stringify(metadata)}`
+              : '';
+
+            return `${timestamp} ${level}: ${message}${context ? ` [${context}]` : ''}${details}`;
+          },
+        ),
+      ),
+    }),
     new winston.transports.File({ filename: 'app.log' }),
   ],
 });

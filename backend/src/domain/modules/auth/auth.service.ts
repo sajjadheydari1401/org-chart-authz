@@ -4,11 +4,11 @@
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import axios from 'axios';
 
 import { SignupDto } from './dto/signup.dto.js';
 import { ConfirmSMSDto } from './dto/confirm-sms.dto.js';
 import { ProviderError } from '../../../common/filter/provider-error.js';
+import { AppApi } from '../../../common/utils/api/AppApi.js';
 
 interface ProviderResponse {
   success?: boolean;
@@ -59,14 +59,7 @@ export class AuthService {
       throw new ServiceUnavailableException();
     }
 
-    const { data } = await axios.post<ProviderResponse>(url, body, {
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      timeout: 15_000,
-      maxRedirects: 0,
-    });
+    const { data } = await AppApi.post<ProviderResponse>(url, body);
 
     if (data?.success === false) throw new ProviderError(data);
     if (data?.success !== true) throw new BadGatewayException();

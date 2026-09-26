@@ -18,26 +18,43 @@ const messages: Record<number, string> = {
 
 function record(value: unknown): Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
-    ? value as Record<string, unknown> : {};
+    ? (value as Record<string, unknown>)
+    : {};
 }
 
 function messageText(value: unknown): string | undefined {
   if (typeof value === 'string' && value.trim()) return value;
   if (Array.isArray(value)) {
-    return value.filter((item): item is string => typeof item === 'string').join('\n') || undefined;
+    return (
+      value
+        .filter((item): item is string => typeof item === 'string')
+        .join('\n') || undefined
+    );
   }
   const translated = record(value);
-  if (typeof translated.fa === 'string' && translated.fa.trim()) return translated.fa;
-  if (typeof translated.en === 'string' && translated.en.trim()) return translated.en;
+  if (typeof translated.fa === 'string' && translated.fa.trim())
+    return translated.fa;
+  if (typeof translated.en === 'string' && translated.en.trim())
+    return translated.en;
 }
 
 function validStatus(value: unknown, fallback: number): number {
-  return typeof value === 'number' && Number.isInteger(value) && value >= 400 && value <= 599
-    ? value : fallback;
+  return typeof value === 'number' &&
+    Number.isInteger(value) &&
+    value >= 400 &&
+    value <= 599
+    ? value
+    : fallback;
 }
 
 function failure(statusCode: number, message?: string) {
-  return { status: 'fail' as const, statusCode, message: message ?? messages[statusCode] ?? messages[500] };
+  const fallback =
+    statusCode >= 500 ? messages[500] : 'درخواست قابل پردازش نیست.';
+  return {
+    status: 'fail' as const,
+    statusCode,
+    message: message ?? messages[statusCode] ?? fallback,
+  };
 }
 
 function providerFailure(body: unknown, httpStatus: number) {
@@ -47,15 +64,21 @@ function providerFailure(body: unknown, httpStatus: number) {
   // Provider credentials are ours; their 401 is not an expired user session.
   if (httpStatus === 401 || status === 401) return failure(503);
   if (status >= 500) return failure(502);
-  return failure(status, messageText(result.message_developer) ?? messageText(data.message));
+  return failure(
+    status,
+    messageText(result.message_developer) ?? messageText(data.message),
+  );
 }
 
 /** The only place that selects public error messages and HTTP status codes. */
 export function normalizeError(error: unknown) {
-  if (error instanceof ProviderError) return providerFailure(error.body, error.status);
+  if (error instanceof ProviderError)
+    return providerFailure(error.body, error.status);
   if (axios.isAxiosError(error)) {
-    if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') return failure(504);
-    if (error.response) return providerFailure(error.response.data, error.response.status);
+    if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT')
+      return failure(504);
+    if (error.response)
+      return providerFailure(error.response.data, error.response.status);
     return failure(503);
   }
   if (error instanceof HttpException) {
@@ -64,7 +87,14 @@ export function normalizeError(error: unknown) {
     // Server failures never expose raw exceptions or internal details.
     if (status >= 500) return failure(status);
     const data = record(body);
-    return failure(status, messageText(typeof body === 'string' ? body : data.message ?? data.message_developer));
+    return failure(
+      status,
+      messageText(
+        typeof body === 'string'
+          ? body
+          : (data.message ?? data.message_developer),
+      ),
+    );
   }
   return failure(500);
 }

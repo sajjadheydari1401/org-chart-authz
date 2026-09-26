@@ -6,8 +6,8 @@
   BadGatewayException,
 } from '@nestjs/common';
 import type { Request } from 'express';
-import axios from 'axios';
 import { ProviderError } from '../filter/provider-error.js';
+import { AppApi } from '../utils/api/AppApi.js';
 
 @Injectable()
 export class AccessGuard implements CanActivate {
@@ -23,7 +23,7 @@ export class AccessGuard implements CanActivate {
       request.headers.authorization?.match(/^Bearer (.+)$/i)?.[1];
     if (!token) throw new UnauthorizedException();
 
-    const { data } = await axios.post(
+    const { data } = await AppApi.post(
       `${process.env.AUTH_SERVICE_URL}/api/v1/auth/authorization`,
       {
         systemUsername: process.env.AUTH_SERVICE_USERNAME,
@@ -32,7 +32,6 @@ export class AccessGuard implements CanActivate {
         route: request.route.path,
         method: request.method,
       },
-      { timeout: 15_000, maxRedirects: 0 },
     );
     if (data?.success === false) throw new ProviderError(data, 403);
     if (data?.success !== true || !data.result?.userId)

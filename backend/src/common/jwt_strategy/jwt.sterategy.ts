@@ -1,23 +1,21 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
-import * as dotenv from 'dotenv';
-
-dotenv.config();
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor() {
+  constructor(@Inject(ConfigService) config: ConfigService) {
     super({
       /*AuthHeaderAsBearerToken تنظیم استخراج توکن از*/
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
 
       /* jwt کلید امضای  */
-      secretOrKey: process.env.JWT_SECRET as string,
+      secretOrKey: config.getOrThrow<string>('JWT_SECRET'),
 
       /*زمان انقضای توکن*/
-      expiresIn: process.env.JWT_EXPIRES_IN,
+      expiresIn: config.getOrThrow<string>('JWT_EXPIRES_IN'),
     } as any);
   }
 

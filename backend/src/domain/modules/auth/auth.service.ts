@@ -24,7 +24,7 @@ export class AuthService {
   constructor(private readonly config: ConfigService) {}
 
   async signup(input: SignupDto): Promise<{ success: true }> {
-    const url = this.config.getOrThrow<string>('AUTH_SIGNUP_URL');
+    const url = this.providerUrl('/auth/2FA_register_UP');
 
     return this.postToProvider(url, {
       systemUsername: this.config.getOrThrow<string>('AUTH_SYSTEM_USERNAME'),
@@ -41,7 +41,7 @@ export class AuthService {
   }
 
   async confirmSms(input: ConfirmSMSDto): Promise<{ success: true }> {
-    const url = this.config.getOrThrow<string>('AUTH_SIGNUP_URL');
+    const url = this.providerUrl('/auth/register/confirm');
 
     return this.postToProvider(url, {
       systemUsername: this.config.getOrThrow<string>('AUTH_SYSTEM_USERNAME'),
@@ -65,5 +65,10 @@ export class AuthService {
     if (data?.success !== true) throw new BadGatewayException();
 
     return { success: true };
+  }
+
+  private providerUrl(path: string): string {
+    const baseUrl = this.config.getOrThrow<string>('AUTH_BASE_URL');
+    return `${baseUrl.replace(/\/+$/, '')}${path}`;
   }
 }

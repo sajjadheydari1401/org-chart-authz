@@ -6,7 +6,7 @@ export interface SignupRequest {
 }
 
 export interface LoginRequest {
-  email: string;
+  username: string;
   password: string;
 }
 
@@ -16,11 +16,19 @@ export interface VerifySmsRequest {
 
 export interface AuthTokenResponse {
   accessToken: string;
+  username: string;
+  userId: string;
+}
+
+export interface AuthUser {
+  username: string;
+  userId: string;
 }
 
 export interface AuthActionSuccess {
   success: true;
   message?: string;
+  user?: AuthUser;
 }
 
 export interface AuthActionError {

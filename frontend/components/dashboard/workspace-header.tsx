@@ -1,5 +1,4 @@
-import { logoutAction } from "@/app/actions/auth";
-import { AppButton } from "@/components/common/ui/app-button";
+import { LogoutButton } from "@/components/auth/logout-button";
 import { AppLink } from "@/components/common/ui/app-link";
 import { routes } from "@/lib/routes";
 
@@ -38,11 +37,7 @@ export function WorkspaceHeader() {
           ))}
         </nav>
 
-        <form action={logoutAction}>
-          <AppButton type="submit" variant="secondary" size="sm">
-            خروج
-          </AppButton>
-        </form>
+        <LogoutButton />
       </div>
     </header>
   );

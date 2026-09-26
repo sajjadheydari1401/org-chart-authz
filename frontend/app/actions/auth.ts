@@ -1,6 +1,5 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { AppApi } from "@/lib/api/server";
@@ -88,8 +87,8 @@ export async function loginAction(
       success: false,
       message: "لطفاً فرم را بررسی کنید",
       fieldErrors: {
-        ...(errors.properties?.email?.errors[0] && {
-          email: errors.properties.email.errors[0],
+        ...(errors.properties?.username?.errors[0] && {
+          username: errors.properties.username.errors[0],
         }),
         ...(errors.properties?.password?.errors[0] && {
           password: errors.properties.password.errors[0],
@@ -99,7 +98,7 @@ export async function loginAction(
   }
 
   const body: LoginRequest = {
-    email: parsed.data.email,
+    username: parsed.data.username,
     password: parsed.data.password,
   };
 
@@ -121,6 +120,10 @@ export async function loginAction(
   return {
     success: true,
     ...(result.message ? { message: result.message } : {}),
+    user: {
+      username: result.data.username,
+      userId: result.data.userId,
+    },
   };
 }
 
@@ -173,6 +176,4 @@ export async function verifySmsAction(
 
 export async function logoutAction(): Promise<void> {
   await clearSession();
-
-  redirect("/login");
 }

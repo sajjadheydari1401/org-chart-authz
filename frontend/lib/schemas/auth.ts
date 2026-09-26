@@ -28,7 +28,11 @@ export const signupSchema = z.object({
 });
 
 export const loginSchema = z.object({
-  email: z.string().trim().email("لطفاً یک آدرس ایمیل معتبر وارد کنید"),
+  username: z
+    .string()
+    .trim()
+    .min(2, "نام کاربری باید حداقل ۲ کاراکتر باشد")
+    .max(40, "نام کاربری باید حداکثر ۴۰ کاراکتر باشد"),
 
   password: z.string().min(1, "وارد کردن رمز عبور الزامی است"),
 });

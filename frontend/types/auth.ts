@@ -11,7 +11,6 @@ export interface LoginRequest {
 }
 
 export interface VerifySmsRequest {
-  mobile: string;
   code: string;
 }
 

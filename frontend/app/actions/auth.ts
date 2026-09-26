@@ -5,13 +5,13 @@ import { z } from "zod";
 
 import { api } from "@/lib/api/server";
 import { ApiError } from "@/lib/api/error";
-import { registerAccount } from "@/lib/auth/signup";
+import { registerAccount } from "@/services/auth/signup";
 import {
-  clearPendingMobile,
+  clearPendingUsername,
   clearSession,
-  getPendingMobile,
+  getPendingUsername,
   setAccessToken,
-  setPendingMobile,
+  setPendingUsername,
 } from "@/lib/auth/session";
 import {
   loginSchema,
@@ -65,7 +65,7 @@ export async function signupAction(
   const result = await registerAccount(parsed.data);
   if (!result.success) return result;
 
-  await setPendingMobile(parsed.data.mobile);
+  await setPendingUsername(parsed.data.mobile);
 
   redirect("/verify-sms");
 }
@@ -127,7 +127,7 @@ export async function loginAction(
   }
 
   await setAccessToken(result.accessToken);
-  await clearPendingMobile();
+  await clearPendingUsername();
 
   redirect("/dashboard");
 }
@@ -157,9 +157,9 @@ export async function verifySmsAction(
     };
   }
 
-  const mobile = await getPendingMobile();
+  const uName = await getPendingUsername();
 
-  if (!mobile) {
+  if (!uName) {
     return {
       success: false,
       message: "Your verification session has expired. Please sign up again.",
@@ -167,14 +167,13 @@ export async function verifySmsAction(
   }
 
   const body: VerifySmsRequest = {
-    mobile,
     code: parsed.data.code,
   };
 
   let result: AuthTokenResponse;
 
   try {
-    result = await api<AuthTokenResponse>("/auth/verify-sms", {
+    result = await api<AuthTokenResponse>("/confirm-sms", {
       method: "POST",
       body: JSON.stringify(body),
     });
@@ -195,7 +194,7 @@ export async function verifySmsAction(
   }
 
   await setAccessToken(result.accessToken);
-  await clearPendingMobile();
+  await clearPendingUsername();
 
   redirect("/dashboard");
 }

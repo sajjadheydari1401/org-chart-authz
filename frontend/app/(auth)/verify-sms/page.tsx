@@ -2,13 +2,12 @@ import { redirect } from "next/navigation";
 
 import { VerifySmsForm } from "@/components/auth/verify-sms-form";
 import { AuthCard } from "@/components/auth/auth-card";
-import { getPendingMobile } from "@/lib/auth/session";
-import { maskMobile } from "@/lib/auth/session";
+import { getPendingUsername } from "@/lib/auth/session";
 
 export default async function VerifySmsPage() {
-  const mobile = await getPendingMobile();
+  const username = await getPendingUsername();
 
-  if (!mobile) {
+  if (!username) {
     redirect("/signup");
   }
 
@@ -16,15 +15,7 @@ export default async function VerifySmsPage() {
     <AuthCard
       eyebrow="SMS verification"
       title="Check your phone"
-      description={
-        <>
-          We sent a verification code to{" "}
-          <span className="font-medium text-foreground" dir="ltr">
-            {maskMobile(mobile)}
-          </span>
-          .
-        </>
-      }
+      description={<>We sent a verification code to your phone.</>}
       footer={
         <p className="text-sm leading-6 text-muted-foreground">
           The verification code is temporary. If it expires, return to sign up

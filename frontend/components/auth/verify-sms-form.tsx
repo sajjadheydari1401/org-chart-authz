@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-// import { verifySmsAction } from "@/app/actions/auth";
+import { verifySmsAction } from "@/app/actions/auth";
 import { AppButton } from "@/components/common/ui/app-button";
 import { AppFormError } from "@/components/common/ui/app-form-error";
 import { AppFormField } from "@/components/common/ui/app-form-field";
@@ -32,22 +32,22 @@ export function VerifySmsForm() {
   });
 
   async function onSubmit(data: VerifySmsFormData) {
-    // setFormError(undefined);
+    setFormError(undefined);
 
-    // const result = await verifySmsAction(data);
+    const result = await verifySmsAction(data);
 
-    // if (result.success) {
-    //   return;
-    // }
+    if (result.success) {
+      return;
+    }
 
-    // if (result.fieldErrors?.code) {
-    //   setError("code", {
-    //     type: "server",
-    //     message: result.fieldErrors.code,
-    //   });
-    // }
+    if (result.fieldErrors?.code) {
+      setError("code", {
+        type: "server",
+        message: result.fieldErrors.code,
+      });
+    }
 
-    // setFormError(result.message);
+    setFormError(result.message);
   }
 
   return (

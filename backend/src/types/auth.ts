@@ -11,6 +11,8 @@ export type SignupSuccessResult = {
   roleName: string;
 };
 
+export type ConfirmSmsSuccessResult = {};
+
 export type AuthErrorResult = {
   success: boolean;
   status_code: number;

@@ -1,13 +1,7 @@
 ﻿import "server-only";
 
-import { z } from "zod";
-import type { SignupFormData } from "@/lib/schemas/auth";
+import { responseSchema, type SignupFormData } from "@/lib/schemas/auth";
 import type { AuthActionResult, SignupRequest } from "@/types/auth";
-
-const responseSchema = z.discriminatedUnion("success", [
-  z.object({ success: z.literal(true) }),
-  z.object({ success: z.literal(false), message: z.string() }),
-]);
 
 /** Sends only user-entered fields to our NestJS backend. */
 export async function registerAccount(

@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+export const responseSchema = z.discriminatedUnion("success", [
+  z.object({ success: z.literal(true) }),
+  z.object({ success: z.literal(false), message: z.string() }),
+]);
+
 function normalizeDigits(value: string): string {
   return value
     .replace(/[۰-۹]/g, (digit) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)))

@@ -1,7 +1,7 @@
 ﻿import "server-only";
 import type { AxiosRequestConfig } from "axios";
 import { API } from "./client";
-import { getAccessToken } from "@/lib/auth/session";
+import { clearSession, getAccessToken } from "@/lib/auth/session";
 import { ApiError } from "./error";
 import { apiErrorSchema, apiSuccessSchema } from "./response";
 import { TRANSPORT_ERROR_MESSAGE } from "./transport-error";
@@ -32,10 +32,24 @@ export async function AppApi<T>(
 
   const failure = apiErrorSchema.safeParse(response.data);
   if (failure.success) {
-    throw new ApiError(failure.data.statusCode, failure.data.message);
+    const sessionExpired =
+      authenticated &&
+      (response.status === 401 || failure.data.statusCode === 401);
+    if (sessionExpired) await clearSession();
+    throw new ApiError(
+      failure.data.statusCode,
+      failure.data.message,
+      sessionExpired,
+    );
   }
   if (response.status < 200 || response.status >= 300) {
-    throw new ApiError(response.status, TRANSPORT_ERROR_MESSAGE);
+    const sessionExpired = authenticated && response.status === 401;
+    if (sessionExpired) await clearSession();
+    throw new ApiError(
+      response.status,
+      TRANSPORT_ERROR_MESSAGE,
+      sessionExpired,
+    );
   }
   if (response.status === 204) return { data: undefined as T };
 

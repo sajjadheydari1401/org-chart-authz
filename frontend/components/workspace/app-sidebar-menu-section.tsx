@@ -31,7 +31,7 @@ export function AppSidebarMenuSection({
           aria-expanded={expanded}
           aria-controls={itemsId}
           onClick={() => setExpanded((value) => !value)}
-          className="flex min-h-10 w-full items-center justify-between gap-3 rounded-lg px-3 text-start text-xs font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          className="cursor-pointer flex min-h-10 w-full items-center justify-between gap-3 rounded-lg px-3 text-start text-xs font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
         >
           <span className="min-w-0 [overflow-wrap:anywhere]">
             {section.label}

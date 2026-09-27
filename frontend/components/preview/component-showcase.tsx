@@ -15,6 +15,7 @@ import { AppFormField } from "@/components/common/ui/app-form-field";
 import { AppInput } from "@/components/common/ui/app-input";
 import { AppLink } from "@/components/common/ui/app-link";
 import { AppMultiSelect } from "@/components/common/ui/app-multi-select/app-multi-select";
+import { AppPagination } from "@/components/common/ui/app-pagination";
 import { AppRadioGroup } from "@/components/common/ui/app-radio-group";
 import {
   AppSelect,
@@ -130,6 +131,8 @@ export function ComponentShowcase() {
   const [inputValue, setInputValue] = useState("Simorgh workspace");
   const [selectValue, setSelectValue] = useState("engineering");
   const [comboboxValue, setComboboxValue] = useState("engineering");
+  const [paginationPage, setPaginationPage] = useState(4);
+  const [paginationPageSize, setPaginationPageSize] = useState(10);
   const [radioValue, setRadioValue] = useState("design");
   const [multiValue, setMultiValue] = useState(["engineering", "design"]);
   const [tabValue, setTabValue] = useState<"overview" | "members" | "locked">(
@@ -203,6 +206,7 @@ export function ComponentShowcase() {
               ["navigation", "تب‌ها"],
               ["overlays", "دیالوگ‌ها"],
               ["data", "داده"],
+              ["pagination", "صفحه‌بندی"],
               ["feedback", "بازخورد"],
             ].map(([href, label]) => (
               <AppLink
@@ -809,6 +813,30 @@ export function ComponentShowcase() {
               </AppCard>
             </Sample>
           </div>
+        </DemoSection>
+
+        <DemoSection
+          id="pagination"
+          title="AppPagination"
+          parts={["AppPagination"]}
+          description="صفحه‌بندی کنترل‌شده برای فهرست‌هایی که داده را از سرور دریافت می‌کنند."
+        >
+          <Sample title="فهرست اعضا · ۹۷ نتیجه">
+            <AppPagination
+              pagination={{
+                total: 97,
+                current: paginationPage,
+                pageSize: paginationPageSize,
+                skip: (paginationPage - 1) * paginationPageSize,
+                nextPage:
+                  paginationPage < Math.ceil(97 / paginationPageSize)
+                    ? paginationPage + 1
+                    : null,
+              }}
+              onPageChange={setPaginationPage}
+              onPageSizeChange={setPaginationPageSize}
+            />
+          </Sample>
         </DemoSection>
 
         <DemoSection

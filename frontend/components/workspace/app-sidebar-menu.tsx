@@ -5,8 +5,12 @@ import { Building2, X } from "lucide-react";
 
 import { AppButton } from "@/components/common/ui/app-button";
 import { AppLink } from "@/components/common/ui/app-link";
-import { workspaceNavigation } from "@/lib/workspace-navigation";
+import {
+  workspaceDashboardItem,
+  workspaceNavigation,
+} from "@/lib/workspace-navigation";
 import { cn } from "@/lib/cn";
+import { AppSidebarMenuItem } from "./app-sidebar-menu-item";
 import { AppSidebarMenuSection } from "./app-sidebar-menu-section";
 
 interface AppSideBarMenuProps {
@@ -61,12 +65,22 @@ export function AppSideBarMenu({ mobileOpen, onClose }: AppSideBarMenuProps) {
           aria-label="منوی اصلی"
           className="min-h-0 flex-1 overflow-y-auto px-3 pb-5"
         >
-          {workspaceNavigation.map((section) => (
+          <ul className="space-y-1 border-b border-border pb-3">
+            <li>
+              <AppSidebarMenuItem
+                item={workspaceDashboardItem}
+                pathname={pathname}
+                onNavigate={onClose}
+              />
+            </li>
+          </ul>
+          {workspaceNavigation.map((section, index) => (
             <AppSidebarMenuSection
               key={section.label}
               section={section}
               pathname={pathname}
               onNavigate={onClose}
+              defaultExpanded={index === 0}
             />
           ))}
         </nav>

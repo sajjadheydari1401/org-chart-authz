@@ -26,11 +26,13 @@ export interface WorkspaceNavigationSection {
   items: readonly WorkspaceNavigationItem[];
 }
 
+export const workspaceDashboardItem: WorkspaceNavigationItem = {
+  href: "/dashboard",
+  label: "داشبورد",
+  icon: "dashboard",
+};
+
 export const workspaceNavigation: readonly WorkspaceNavigationSection[] = [
-  {
-    label: "نمای کلی",
-    items: [{ href: "/dashboard", label: "داشبورد", icon: "dashboard" }],
-  },
   {
     label: "مدیریت مجتمع",
     items: [
@@ -114,9 +116,10 @@ export const workspaceNavigation: readonly WorkspaceNavigationSection[] = [
 ];
 
 const workspacePageTitles = new Map(
-  workspaceNavigation.flatMap((section) =>
-    section.items.map((item) => [item.href, item.label] as const),
-  ),
+  [
+    workspaceDashboardItem,
+    ...workspaceNavigation.flatMap((section) => section.items),
+  ].map((item) => [item.href, item.label] as const),
 );
 
 export function getWorkspacePageTitle(path: string): string | undefined {

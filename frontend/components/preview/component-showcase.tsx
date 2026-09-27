@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 
 import { AppButton } from "@/components/common/ui/app-button";
 import { AppCheckbox } from "@/components/common/ui/app-checkbox";
+import { AppCombobox } from "@/components/common/ui/app-combobox/app-combobox";
 import { AppFormError } from "@/components/common/ui/app-form-error";
 import { AppFormField } from "@/components/common/ui/app-form-field";
 import { AppInput } from "@/components/common/ui/app-input";
@@ -123,9 +124,12 @@ function Sample({ title, children }: { title: string; children: ReactNode }) {
 export function ComponentShowcase() {
   const [inputValue, setInputValue] = useState("Simorgh workspace");
   const [selectValue, setSelectValue] = useState("engineering");
+  const [comboboxValue, setComboboxValue] = useState("engineering");
   const [radioValue, setRadioValue] = useState("design");
   const [multiValue, setMultiValue] = useState(["engineering", "design"]);
-  const [tabValue, setTabValue] = useState<"overview" | "members" | "locked">("overview");
+  const [tabValue, setTabValue] = useState<"overview" | "members" | "locked">(
+    "overview",
+  );
   const [selectedMembers, setSelectedMembers] = useState<number[]>([2]);
   const [showEmptyTable, setShowEmptyTable] = useState(false);
   const [checkboxChecked, setCheckboxChecked] = useState(true);
@@ -420,18 +424,19 @@ export function ComponentShowcase() {
 
         <DemoSection
           id="choices"
-          title="AppCheckbox · AppSwitch · AppSelect · AppRadioGroup · AppMultiSelect"
+          title="AppCheckbox · AppSwitch · AppSelect · AppCombobox · AppRadioGroup · AppMultiSelect"
           parts={[
             "AppCheckbox",
             "AppSwitch",
             "AppSelect",
+            "AppCombobox",
             "AppRadioGroup",
             "AppMultiSelect",
             "AppMultiSelectTrigger",
             "AppMultiSelectPanel",
             "AppMultiSelectTags",
           ]}
-          description="کنترل‌های انتخابی با حالت کنترل‌شده، گزینه‌ی غیرفعال، خطا و disabled؛ چندانتخابی را باز کنید تا جست‌وجو، انتخاب و برچسب‌ها را ببینید."
+          description="کنترل‌های انتخابی با حالت کنترل‌شده، گزینه‌ی غیرفعال، خطا و disabled؛ جست‌وجوی تک‌انتخابی و چندانتخابی را باز کنید تا نتیجه‌ها را فیلتر کنید."
         >
           <div className="grid gap-x-8 gap-y-8 md:grid-cols-2">
             <Sample title="AppCheckbox · روشن، خاموش و غیرفعال">
@@ -506,6 +511,47 @@ export function ComponentShowcase() {
                 value="finance"
                 disabled
               />
+            </Sample>
+            <Sample title="AppCombobox · جست‌وجو و انتخاب کنترل‌شده">
+              <AppFormField
+                label="واحد سازمانی"
+                htmlFor="preview-combobox"
+                hint="نام واحد را جست‌وجو کنید؛ با کلیدهای جهت‌نما و Enter هم قابل انتخاب است."
+              >
+                <AppCombobox
+                  id="preview-combobox"
+                  options={options}
+                  value={comboboxValue}
+                  onChange={setComboboxValue}
+                  placeholder="جست‌وجو یا انتخاب واحد"
+                />
+              </AppFormField>
+              <AppFormField
+                label="انتخاب نامعتبر"
+                htmlFor="preview-invalid-combobox"
+                error="یک واحد معتبر انتخاب کنید."
+              >
+                <AppCombobox
+                  id="preview-invalid-combobox"
+                  options={options}
+                  value=""
+                  onChange={() => undefined}
+                  invalid
+                  placeholder="انتخاب واحد"
+                />
+              </AppFormField>
+              <AppFormField
+                label="واحد غیرفعال"
+                htmlFor="preview-disabled-combobox"
+              >
+                <AppCombobox
+                  id="preview-disabled-combobox"
+                  options={options}
+                  value="finance"
+                  onChange={() => undefined}
+                  disabled
+                />
+              </AppFormField>
             </Sample>
             <Sample title="AppRadioGroup · جهت افقی و عمودی">
               <AppRadioGroup

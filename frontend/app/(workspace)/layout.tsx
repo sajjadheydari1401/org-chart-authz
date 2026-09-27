@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 
-import { WorkspaceHeader } from "@/components/dashboard/workspace-header";
+import { AppWorkspaceShell } from "@/components/workspace/app-workspace-shell";
 import { getAccessToken } from "@/lib/auth/session";
 
 export default async function WorkspaceLayout({
@@ -15,11 +15,5 @@ export default async function WorkspaceLayout({
     redirect("/login");
   }
 
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      <WorkspaceHeader />
-
-      <main className="mx-auto w-full max-w-7xl px-6 py-8">{children}</main>
-    </div>
-  );
+  return <AppWorkspaceShell>{children}</AppWorkspaceShell>;
 }

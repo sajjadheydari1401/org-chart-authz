@@ -26,6 +26,11 @@ export interface WorkspaceNavigationSection {
   items: readonly WorkspaceNavigationItem[];
 }
 
+export interface WorkspaceBreadcrumb {
+  label: string;
+  href?: string;
+}
+
 export const workspaceDashboardItem: WorkspaceNavigationItem = {
   href: "/dashboard",
   label: "داشبورد",
@@ -124,4 +129,27 @@ const workspacePageTitles = new Map(
 
 export function getWorkspacePageTitle(path: string): string | undefined {
   return workspacePageTitles.get(path);
+}
+
+export function getWorkspaceBreadcrumbs(path: string): WorkspaceBreadcrumb[] {
+  if (path === workspaceDashboardItem.href) {
+    return [{ label: workspaceDashboardItem.label }];
+  }
+
+  const section = workspaceNavigation.find((group) =>
+    group.items.some((item) => item.href === path),
+  );
+  const currentItem = section?.items.find((item) => item.href === path);
+  if (!section || !currentItem) return [];
+
+  const parentItems = section.items
+    .filter((item) => item.href !== path && path.startsWith(`${item.href}/`))
+    .sort((left, right) => left.href.length - right.href.length);
+
+  return [
+    { label: workspaceDashboardItem.label, href: workspaceDashboardItem.href },
+    { label: section.label },
+    ...parentItems.map(({ label, href }) => ({ label, href })),
+    { label: currentItem.label },
+  ];
 }

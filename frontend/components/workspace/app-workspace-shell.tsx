@@ -2,14 +2,19 @@
 
 import { useState, type ReactNode } from "react";
 import { Building2, Menu } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 import { LogoutButton } from "@/components/auth/logout-button";
 import { AppButton } from "@/components/common/ui/app-button";
+import { AppBreadCrumbs } from "@/components/common/ui/app-breadcrumbs";
 import { AppLink } from "@/components/common/ui/app-link";
+import { getWorkspaceBreadcrumbs } from "@/lib/workspace-navigation";
 import { AppSideBarMenu } from "./app-sidebar-menu";
 
 export function AppWorkspaceShell({ children }: { children: ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const breadcrumbs = getWorkspaceBreadcrumbs(pathname);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -47,6 +52,7 @@ export function AppWorkspaceShell({ children }: { children: ReactNode }) {
           onClose={() => setMobileMenuOpen(false)}
         />
         <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+          <AppBreadCrumbs items={breadcrumbs} />
           {children}
         </main>
       </div>

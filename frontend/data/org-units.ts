@@ -1,18 +1,17 @@
 import { IOrgUnit } from "@/types/org-unit";
 
 export const rawUnits: IOrgUnit[] = [
-  { id: 100, name: "مجتمع تجاری سیمرغ", parentId: null, type: "root" },
+  { id: 101, name: "مدیریت مجتمع", parentId: null, type: "root" },
 
-  { id: 101, name: "مدیریت مجتمع", parentId: 100, type: "department" },
-  { id: 102, name: "بهره‌برداری و نگهداری", parentId: 100, type: "department" },
-  { id: 103, name: "امور مالی و حسابداری", parentId: 100, type: "department" },
+  { id: 102, name: "بهره‌برداری و نگهداری", parentId: 101, type: "department" },
+  { id: 103, name: "امور مالی و حسابداری", parentId: 101, type: "department" },
   {
     id: 104,
     name: "واحدهای تجاری و قراردادها",
-    parentId: 100,
+    parentId: 101,
     type: "department",
   },
-  { id: 105, name: "خدمات عمومی و پارکینگ", parentId: 100, type: "department" },
+  { id: 105, name: "خدمات عمومی و پارکینگ", parentId: 101, type: "department" },
 
   { id: 1, name: "تعمیر و نگهداری تأسیسات", parentId: 102, type: "team" },
   { id: 2, name: "پشتیبانی قرارداد و اجاره", parentId: 104, type: "team" },

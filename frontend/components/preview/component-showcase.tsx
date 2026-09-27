@@ -7,6 +7,8 @@ import { toast } from "react-toastify";
 import { AppButton } from "@/components/common/ui/app-button";
 import { AppCheckbox } from "@/components/common/ui/app-checkbox";
 import { AppCombobox } from "@/components/common/ui/app-combobox/app-combobox";
+import { AppConfirmDialog } from "@/components/common/ui/app-confirm-dialog";
+import { AppDialog } from "@/components/common/ui/app-dialog";
 import { AppFormError } from "@/components/common/ui/app-form-error";
 import { AppFormField } from "@/components/common/ui/app-form-field";
 import { AppInput } from "@/components/common/ui/app-input";
@@ -122,6 +124,8 @@ function Sample({ title, children }: { title: string; children: ReactNode }) {
 }
 
 export function ComponentShowcase() {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [inputValue, setInputValue] = useState("Simorgh workspace");
   const [selectValue, setSelectValue] = useState("engineering");
   const [comboboxValue, setComboboxValue] = useState("engineering");
@@ -198,6 +202,7 @@ export function ComponentShowcase() {
               ["forms", "فرم"],
               ["choices", "انتخاب"],
               ["navigation", "تب‌ها"],
+              ["overlays", "دیالوگ‌ها"],
               ["data", "داده"],
               ["feedback", "بازخورد"],
             ].map(([href, label]) => (
@@ -644,6 +649,71 @@ export function ComponentShowcase() {
               ),
             }}
           />
+        </DemoSection>
+
+        <DemoSection
+          id="overlays"
+          title="AppDialog · AppConfirmDialog"
+          parts={["AppDialog", "AppConfirmDialog"]}
+          description="دیالوگ کنترل‌شده و تأیید عملیات مخرب با حالت درحال‌انجام."
+        >
+          <div className="grid gap-x-8 gap-y-7 md:grid-cols-2">
+            <Sample title="AppDialog · جزئیات">
+              <AppButton type="button" onClick={() => setDialogOpen(true)}>
+                مشاهده جزئیات
+              </AppButton>
+              <AppDialog
+                open={dialogOpen}
+                onOpenChange={setDialogOpen}
+                title="واحد مهندسی"
+                description="اطلاعات کلی واحد سازمانی"
+                footer={
+                  <div className="flex justify-end">
+                    <AppButton
+                      type="button"
+                      variant="secondary"
+                      onClick={() => setDialogOpen(false)}
+                    >
+                      بستن
+                    </AppButton>
+                  </div>
+                }
+              >
+                <dl className="grid gap-4 text-sm sm:grid-cols-2">
+                  <div>
+                    <dt className="text-muted-foreground">شناسه</dt>
+                    <dd className="mt-1 font-medium">ORG-2048</dd>
+                  </div>
+                  <div>
+                    <dt className="text-muted-foreground">تعداد تیم‌ها</dt>
+                    <dd className="mt-1 font-medium">۳ تیم</dd>
+                  </div>
+                </dl>
+              </AppDialog>
+            </Sample>
+            <Sample title="AppConfirmDialog · حذف">
+              <AppButton
+                type="button"
+                variant="destructive"
+                onClick={() => setConfirmDialogOpen(true)}
+              >
+                حذف عضو
+              </AppButton>
+              <AppConfirmDialog
+                open={confirmDialogOpen}
+                onOpenChange={setConfirmDialogOpen}
+                title="حذف عضو سازمان"
+                description="این عملیات قابل بازگشت نیست."
+                confirmLabel="حذف عضو"
+                onConfirm={() => {
+                  toast.success("عضو حذف شد.");
+                  setConfirmDialogOpen(false);
+                }}
+              >
+                آیا از حذف حساب سارا کریمی مطمئن هستید؟
+              </AppConfirmDialog>
+            </Sample>
+          </div>
         </DemoSection>
 
         <DemoSection

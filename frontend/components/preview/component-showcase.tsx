@@ -5,6 +5,7 @@ import { ArrowLeft, Check, Sparkles } from "lucide-react";
 import { toast } from "react-toastify";
 
 import { AppButton } from "@/components/common/ui/app-button";
+import { AppBadge } from "@/components/common/ui/app-badge";
 import { AppCheckbox } from "@/components/common/ui/app-checkbox";
 import { AppCombobox } from "@/components/common/ui/app-combobox/app-combobox";
 import { AppConfirmDialog } from "@/components/common/ui/app-confirm-dialog";
@@ -147,15 +148,12 @@ export function ComponentShowcase() {
       key: "status",
       header: "وضعیت",
       render: (member) => (
-        <span
-          className={
-            member.status === "فعال"
-              ? "font-medium text-success"
-              : "font-medium text-warning"
-          }
+        <AppBadge
+          variant={member.status === "فعال" ? "success" : "warning"}
+          dot
         >
           {member.status}
-        </span>
+        </AppBadge>
       ),
     },
     {
@@ -201,6 +199,7 @@ export function ComponentShowcase() {
               ["actions", "اقدام‌ها"],
               ["forms", "فرم"],
               ["choices", "انتخاب"],
+              ["badges", "نشان‌ها"],
               ["navigation", "تب‌ها"],
               ["overlays", "دیالوگ‌ها"],
               ["data", "داده"],
@@ -612,6 +611,39 @@ export function ComponentShowcase() {
                 onChange={() => undefined}
                 disabled
               />
+            </Sample>
+          </div>
+        </DemoSection>
+
+        <DemoSection
+          id="badges"
+          title="AppBadge"
+          parts={["AppBadge"]}
+          description="نشان‌های وضعیت با رنگ‌های معنایی، اندازه‌های مختلف و نشانگر نقطه‌ای."
+        >
+          <div className="grid gap-x-8 gap-y-7 md:grid-cols-2">
+            <Sample title="گونه‌های معنایی">
+              <div className="flex flex-wrap items-center gap-2">
+                <AppBadge>پیش‌نویس</AppBadge>
+                <AppBadge variant="primary">مدیر</AppBadge>
+                <AppBadge variant="success">فعال</AppBadge>
+                <AppBadge variant="warning">در انتظار</AppBadge>
+                <AppBadge variant="destructive">مسدود</AppBadge>
+                <AppBadge variant="info">اطلاع‌رسانی</AppBadge>
+              </div>
+            </Sample>
+            <Sample title="اندازه و نقطه وضعیت">
+              <div className="flex flex-wrap items-center gap-2">
+                <AppBadge variant="success" size="sm" dot>
+                  کوچک
+                </AppBadge>
+                <AppBadge variant="warning" size="md" dot>
+                  نیازمند بررسی
+                </AppBadge>
+                <AppBadge variant="neutral" size="md">
+                  بدون نقطه
+                </AppBadge>
+              </div>
             </Sample>
           </div>
         </DemoSection>

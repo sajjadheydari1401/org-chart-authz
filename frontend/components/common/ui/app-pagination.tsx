@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/cn";
+import type { PaginationMeta } from "@/types/api";
 import { AppButton } from "./app-button";
 import { AppSelect } from "./app-select";
 
@@ -47,13 +48,7 @@ function getPageItems(currentPage: number, totalPages: number): PageItem[] {
 }
 
 export interface AppPaginationProps {
-  pagination: {
-    total: number;
-    current: number;
-    pageSize: number;
-    skip: number;
-    nextPage: number | null;
-  };
+  pagination: PaginationMeta;
   onPageChange: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
   pageSizeOptions?: readonly number[];

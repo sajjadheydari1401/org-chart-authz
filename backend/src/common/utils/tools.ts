@@ -1,18 +1,37 @@
 import { BadRequestException } from '@nestjs/common';
 import slugify from 'slugify';
+import type { PaginatedResponse, PaginationMeta } from '../types/pagination.js';
 
-export const pagination = (size = 15, page = 1, total: number) => {
-  const pageSize = parseInt(String(size), 10);
-  const totalPages = Math.ceil(total / pageSize);
-  const currentPage = Math.max(
-    1,
-    Math.min(parseInt(String(page), 10), totalPages),
-  );
-  const skip = (currentPage - 1) * pageSize;
-  const nextPage = currentPage < totalPages ? currentPage + 1 : null;
+const DEFAULT_PAGE_SIZE = 15;
 
-  return { total, current: currentPage, pageSize, skip, nextPage };
+export const pagination = (
+  size = DEFAULT_PAGE_SIZE,
+  page = 1,
+  total: number,
+): PaginationMeta => {
+  const parsedSize = Number.parseInt(String(size), 10);
+  const pageSize =
+    Number.isFinite(parsedSize) && parsedSize > 0
+      ? parsedSize
+      : DEFAULT_PAGE_SIZE;
+  const safeTotal = Number.isFinite(total) ? Math.max(0, Math.trunc(total)) : 0;
+  const totalPages = Math.ceil(safeTotal / pageSize);
+  const parsedPage = Number.parseInt(String(page), 10);
+  const requestedPage =
+    Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+  const current = Math.min(requestedPage, Math.max(1, totalPages));
+  const skip = (current - 1) * pageSize;
+  const nextPage = current < totalPages ? current + 1 : null;
+
+  return { total: safeTotal, current, pageSize, skip, nextPage };
 };
+
+export function paginatedResponse<T>(
+  items: readonly T[],
+  metadata: PaginationMeta,
+): PaginatedResponse<T> {
+  return { items: [...items], pagination: metadata };
+}
 
 export const validateIdParam = (id: number) => {
   const Id = +id;

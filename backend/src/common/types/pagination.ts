@@ -1,9 +1,3 @@
-export interface ApiErrorResponse {
-  message?: string | string[];
-  error?: string;
-  statusCode?: number;
-}
-
 export interface PaginationMeta {
   total: number;
   current: number;

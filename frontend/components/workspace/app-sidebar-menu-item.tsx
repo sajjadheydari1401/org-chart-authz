@@ -11,6 +11,7 @@ import {
   HandCoins,
   Inbox,
   KeyRound,
+  Network,
   UsersRound,
   Warehouse,
   Wrench,
@@ -27,6 +28,7 @@ import { cn } from "@/lib/cn";
 const icons: Record<WorkspaceIconKey, LucideIcon> = {
   dashboard: Gauge,
   building: Building2,
+  orgChart: Network,
   users: UsersRound,
   contract: FileText,
   vacancy: Warehouse,
@@ -63,7 +65,7 @@ export function AppSidebarMenuItem({
       aria-current={active ? "page" : undefined}
       onClick={onNavigate}
       className={cn(
-        "flex min-h-11 min-w-0 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
+        "cursor-pointer flex min-h-11 min-w-0 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
         active && "bg-accent text-accent-foreground hover:bg-accent",
       )}
     >

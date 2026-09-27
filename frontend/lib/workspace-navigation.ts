@@ -1,6 +1,7 @@
 export type WorkspaceIconKey =
   | "dashboard"
   | "building"
+  | "orgChart"
   | "users"
   | "contract"
   | "vacancy"
@@ -42,6 +43,7 @@ export const workspaceNavigation: readonly WorkspaceNavigationSection[] = [
     label: "مدیریت مجتمع",
     items: [
       { href: "/org-units", label: "واحدهای مجتمع", icon: "building" },
+      { href: "/organization-chart", label: "چارت مجتمع", icon: "orgChart" },
       { href: "/owners-tenants", label: "مالکان و مستأجران", icon: "users" },
       { href: "/vacancies", label: "واحدهای خالی", icon: "vacancy" },
     ],

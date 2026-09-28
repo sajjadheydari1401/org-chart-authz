@@ -14,6 +14,10 @@ export class AccessesService {
     private readonly authorizationProvider: AuthorizationProviderService,
   ) {}
 
+  getAllAccesses(): Promise<Access[]> {
+    return this.accesses.find();
+  }
+
   async createAccess(input: CreateAccessDto): Promise<Access> {
     const resource = await this.resourcesService.getSingleResource(
       input.resourceId,

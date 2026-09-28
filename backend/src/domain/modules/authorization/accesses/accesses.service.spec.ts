@@ -16,6 +16,7 @@ describe('AccessesService', () => {
     providerId: 'provider-resource-id',
   };
   let repository: {
+    find: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
     save: ReturnType<typeof vi.fn>;
   };
@@ -25,6 +26,7 @@ describe('AccessesService', () => {
 
   beforeEach(() => {
     repository = {
+      find: vi.fn(),
       create: vi.fn((value) => value),
       save: vi.fn(async (value) => ({ id: 1, ...value })),
     };
@@ -41,6 +43,39 @@ describe('AccessesService', () => {
       resources as unknown as ResourcesService,
       provider as unknown as AuthorizationProviderService,
     );
+  });
+
+  it('returns accesses from the local repository without calling the provider', async () => {
+    const accesses = [
+      {
+        id: 1,
+        methodName: 'POST',
+        description: 'create',
+        providerId: 'access-1',
+      },
+      { id: 2, methodName: 'GET', description: 'read', providerId: 'access-2' },
+    ];
+    repository.find.mockResolvedValue(accesses);
+
+    await expect(service.getAllAccesses()).resolves.toBe(accesses);
+    expect(repository.find).toHaveBeenCalledExactlyOnceWith();
+    expect(provider.createAccess).not.toHaveBeenCalled();
+    expect(resources.getSingleResource).not.toHaveBeenCalled();
+  });
+
+  it('returns an empty list when there are no local accesses', async () => {
+    repository.find.mockResolvedValue([]);
+
+    await expect(service.getAllAccesses()).resolves.toEqual([]);
+    expect(provider.createAccess).not.toHaveBeenCalled();
+  });
+
+  it('propagates local listing failures without calling the provider', async () => {
+    const error = new Error('database unavailable');
+    repository.find.mockRejectedValue(error);
+
+    await expect(service.getAllAccesses()).rejects.toBe(error);
+    expect(provider.createAccess).not.toHaveBeenCalled();
   });
 
   it('uses the provider resource ID and saves provider values with the local relation after success', async () => {

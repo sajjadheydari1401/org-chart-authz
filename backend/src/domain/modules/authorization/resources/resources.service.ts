@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { AuthorizationProviderService } from './authorization-provider.service.js';
+import { AuthorizationProviderService } from '../authorization-provider.service.js';
 import { CreateResourceDto } from './dto/create-resource.dto.js';
-import { Resource } from './accesses/entities/resource.entity.js';
+import { Resource } from './entities/resource.entity.js';
 
 @Injectable()
 export class ResourcesService {

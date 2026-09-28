@@ -12,7 +12,7 @@ import { RenameUserIdToSystemId20260928000006 } from '../database/migrations/202
 import { DropSystemIdFromUsers20260928000007 } from '../database/migrations/20260928000007-DropSystemIdFromUsers.js';
 import { AddProviderIdToResources20260928000008 } from '../database/migrations/20260928000008-AddProviderIdToResources.js';
 import { Access } from '../domain/modules/authorization/accesses/entities/access.entity.js';
-import { Resource } from '../domain/modules/authorization/accesses/entities/resource.entity.js';
+import { Resource } from '../domain/modules/authorization/resources/entities/resource.entity.js';
 import { RoleAssignment } from '../domain/modules/authorization/roles/entities/role-assignment.entity.js';
 import { RoleAccess } from '../domain/modules/authorization/roles/entities/role-access.entity.js';
 import { Role } from '../domain/modules/authorization/roles/entities/role.entity.js';

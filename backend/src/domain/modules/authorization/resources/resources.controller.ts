@@ -1,5 +1,5 @@
 import { Body, Controller, Post, UseInterceptors } from '@nestjs/common';
-import { FormatResponseInterceptor } from '../../../common/utils/interceptor/format-response.interceptor.js';
+import { FormatResponseInterceptor } from '../../../../common/utils/interceptor/format-response.interceptor.js';
 import { CreateResourceDto } from './dto/create-resource.dto.js';
 import { ResourcesService } from './resources.service.js';
 

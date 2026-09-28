@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { AuthorizationProviderService } from './authorization-provider.service.js';
-import { Resource } from './accesses/entities/resource.entity.js';
+import { AuthorizationProviderService } from '../authorization-provider.service.js';
 import { ResourcesService } from './resources.service.js';
 
 describe('ResourcesService', () => {

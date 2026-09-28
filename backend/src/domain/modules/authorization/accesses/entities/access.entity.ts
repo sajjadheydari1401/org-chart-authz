@@ -5,7 +5,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Resource } from './resource.entity.js';
+import { Resource } from '../../resources/entities/resource.entity.js';
 
 @Entity({ name: 'accesses' })
 export class Access {

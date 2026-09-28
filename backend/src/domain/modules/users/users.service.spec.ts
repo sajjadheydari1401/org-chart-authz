@@ -63,7 +63,10 @@ describe('UsersService', () => {
     await expect(
       service.updateUser(7, { username: 'renamed' } as UpdateUserDto),
     ).resolves.toMatchObject({ id: 7, username: 'renamed' });
-    expect(repository.save).toHaveBeenCalledWith(user);
+    expect(repository.save).toHaveBeenCalledWith({
+      id: 7,
+      username: 'renamed',
+    });
   });
 
   it('rejects a username already owned by another local user', async () => {

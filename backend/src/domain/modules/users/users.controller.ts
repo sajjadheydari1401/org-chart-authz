@@ -1,4 +1,10 @@
-import { Controller, Get, UseInterceptors } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  UseInterceptors,
+} from '@nestjs/common';
 import { FormatResponseInterceptor } from '../../../common/utils/interceptor/format-response.interceptor.js';
 import { UsersService } from './users.service.js';
 
@@ -10,5 +16,10 @@ export class UsersController {
   @Get()
   getAllUsers() {
     return this.usersService.getAllUsers();
+  }
+
+  @Get(':id')
+  getSingleUser(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.getSingleUser(id);
   }
 }

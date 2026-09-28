@@ -18,12 +18,25 @@ export class ResourcesService {
     return this.resources.find();
   }
 
+  async deleteResource(id: number): Promise<void> {
+    const resource = await this.getSingleResource(id);
+    await this.authorizationProvider.deleteResource(resource.providerId);
+
+    const result = await this.resources.delete(id);
+    if (!result.affected) throw new NotFoundException();
+  }
+
+  private async getSingleResource(id: number): Promise<Resource> {
+    const resource = await this.resources.findOneBy({ id });
+    if (!resource) throw new NotFoundException();
+    return resource;
+  }
+
   async updateResource(
     id: number,
     input: UpdateResourceDto,
   ): Promise<Resource> {
-    const resource = await this.resources.findOneBy({ id });
-    if (!resource) throw new NotFoundException();
+    const resource = await this.getSingleResource(id);
 
     const updatedResource = await this.authorizationProvider.updateResource(
       resource.providerId,

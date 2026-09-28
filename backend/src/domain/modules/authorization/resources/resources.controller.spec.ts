@@ -5,6 +5,7 @@ import { ResourcesService } from './resources.service.js';
 
 describe('ResourcesController', () => {
   const resourcesService = {
+    deleteResource: vi.fn(),
     updateResource: vi.fn(),
     getAllResources: vi.fn(),
     createResource: vi.fn(),
@@ -15,6 +16,12 @@ describe('ResourcesController', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  it('delegates resource deletion with the local ID', async () => {
+    resourcesService.deleteResource.mockResolvedValue(undefined);
+    await expect(controller.deleteResource(7)).resolves.toBeUndefined();
+    expect(resourcesService.deleteResource).toHaveBeenCalledExactlyOnceWith(7);
   });
 
   it('delegates resource updates with the local ID and input', async () => {

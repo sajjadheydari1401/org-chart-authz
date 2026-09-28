@@ -5,24 +5,28 @@ import { ResourcesService } from './resources.service.js';
 describe('ResourcesService', () => {
   let service: ResourcesService;
   let repository: {
+    delete: ReturnType<typeof vi.fn>;
     findOneBy: ReturnType<typeof vi.fn>;
     find: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
     save: ReturnType<typeof vi.fn>;
   };
   let provider: {
+    deleteResource: ReturnType<typeof vi.fn>;
     createResource: ReturnType<typeof vi.fn>;
     updateResource: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
     repository = {
+      delete: vi.fn().mockResolvedValue({ affected: 1 }),
       findOneBy: vi.fn(),
       find: vi.fn(),
       create: vi.fn((input) => input),
       save: vi.fn(async (resource) => ({ id: 1, ...resource })),
     };
     provider = {
+      deleteResource: vi.fn().mockResolvedValue(undefined),
       updateResource: vi.fn(),
       createResource: vi.fn().mockResolvedValue({
         id: 'provider-resource-id',
@@ -36,6 +40,71 @@ describe('ResourcesService', () => {
       repository as never,
       provider as unknown as AuthorizationProviderService,
     );
+  });
+
+  it('waits for provider deletion before deleting the local resource', async () => {
+    repository.findOneBy.mockResolvedValue({
+      id: 7,
+      providerId: 'provider-id',
+    });
+    const calls: string[] = [];
+    provider.deleteResource.mockImplementation(async () => {
+      await Promise.resolve();
+      calls.push('provider');
+    });
+    repository.delete.mockImplementation(async () => {
+      calls.push('local');
+      return { affected: 1 };
+    });
+
+    await expect(service.deleteResource(7)).resolves.toBeUndefined();
+    expect(repository.findOneBy).toHaveBeenCalledWith({ id: 7 });
+    expect(provider.deleteResource).toHaveBeenCalledExactlyOnceWith(
+      'provider-id',
+    );
+    expect(repository.delete).toHaveBeenCalledExactlyOnceWith(7);
+    expect(calls).toEqual(['provider', 'local']);
+  });
+
+  it('does not delete locally when provider deletion fails', async () => {
+    repository.findOneBy.mockResolvedValue({
+      id: 7,
+      providerId: 'provider-id',
+    });
+    const error = new Error('provider deletion failed');
+    provider.deleteResource.mockRejectedValue(error);
+    await expect(service.deleteResource(7)).rejects.toBe(error);
+    expect(repository.delete).not.toHaveBeenCalled();
+  });
+
+  it('does not call provider deletion when the local resource is missing', async () => {
+    repository.findOneBy.mockResolvedValue(null);
+    await expect(service.deleteResource(404)).rejects.toMatchObject({
+      status: 404,
+    });
+    expect(provider.deleteResource).not.toHaveBeenCalled();
+    expect(repository.delete).not.toHaveBeenCalled();
+  });
+
+  it('returns not found if local deletion affects no rows', async () => {
+    repository.findOneBy.mockResolvedValue({
+      id: 7,
+      providerId: 'provider-id',
+    });
+    repository.delete.mockResolvedValue({ affected: 0 });
+    await expect(service.deleteResource(7)).rejects.toMatchObject({
+      status: 404,
+    });
+  });
+
+  it('propagates local deletion failures', async () => {
+    repository.findOneBy.mockResolvedValue({
+      id: 7,
+      providerId: 'provider-id',
+    });
+    const error = new Error('database deletion failed');
+    repository.delete.mockRejectedValue(error);
+    await expect(service.deleteResource(7)).rejects.toBe(error);
   });
 
   it('updates the provider first and saves only its returned route locally', async () => {

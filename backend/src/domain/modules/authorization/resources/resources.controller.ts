@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -17,6 +18,11 @@ import { ResourcesService } from './resources.service.js';
 @Controller('resources')
 export class ResourcesController {
   constructor(private readonly resourcesService: ResourcesService) {}
+
+  @Delete(':id')
+  deleteResource(@Param('id', ParseIntPipe) id: number) {
+    return this.resourcesService.deleteResource(id);
+  }
 
   @Get()
   getAllResources() {

@@ -43,6 +43,70 @@ describe('AuthorizationProviderService', () => {
     } as ConfigService);
   });
 
+  it('posts deleteResource with environment credentials and the provider ID', async () => {
+    providerPost.mockResolvedValueOnce({
+      data: {
+        success: true,
+        result: {
+          id: 'provider-id',
+          route: '/updated/v1',
+          created_at: '2026-09-28T11:37:58.322Z',
+          updated_at: '2026-09-28T12:01:13.022Z',
+          deleted_at: '2026-09-28T12:01:13.022Z',
+        },
+      },
+    } as never);
+    await expect(
+      service.deleteResource('provider-id'),
+    ).resolves.toBeUndefined();
+    expect(providerPost).toHaveBeenCalledExactlyOnceWith(
+      `${PROVIDER_BASE_URL}/admin/deleteResource`,
+      {
+        username: 'system-user',
+        password: 'system-password',
+        resourceId: 'provider-id',
+      },
+    );
+  });
+
+  it('propagates provider rejection of deletion', async () => {
+    providerPost.mockResolvedValueOnce({
+      data: { success: false, message: 'rejected' },
+    } as never);
+    await expect(service.deleteResource('provider-id')).rejects.toBeInstanceOf(
+      ProviderError,
+    );
+  });
+
+  it.each([undefined, {}, { success: 'true' }])(
+    'rejects invalid deletion success response %j',
+    async (data) => {
+      providerPost.mockResolvedValueOnce({ data } as never);
+      await expect(
+        service.deleteResource('provider-id'),
+      ).rejects.toBeInstanceOf(BadGatewayException);
+    },
+  );
+
+  it('propagates deletion transport failures', async () => {
+    const error = new Error('connection failed');
+    providerPost.mockRejectedValueOnce(error);
+    await expect(service.deleteResource('provider-id')).rejects.toBe(error);
+  });
+
+  it('rejects non-HTTPS deletion URLs before making a request', async () => {
+    const insecureService = new AuthorizationProviderService({
+      getOrThrow: (key: string) =>
+        key === 'AUTH_BASE_URL'
+          ? 'http://auth.example.test/api/v1'
+          : configuration[key],
+    } as ConfigService);
+    await expect(
+      insecureService.deleteResource('provider-id'),
+    ).rejects.toBeInstanceOf(ServiceUnavailableException);
+    expect(providerPost).not.toHaveBeenCalled();
+  });
+
   it('posts updateResource with environment credentials and the provider resource ID', async () => {
     await expect(
       service.updateResource('provider-resource-id', '/example/v1'),

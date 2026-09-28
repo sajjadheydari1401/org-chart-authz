@@ -12,6 +12,15 @@ import {
 export class AuthorizationProviderService {
   constructor(private readonly config: ConfigService) {}
 
+  async deleteResource(resourceId: string): Promise<void> {
+    const { systemUsername, systemPassword } = systemCredentials(this.config);
+    await postToProvider(providerUrl(this.config, '/admin/deleteResource'), {
+      username: systemUsername,
+      password: systemPassword,
+      resourceId,
+    });
+  }
+
   async updateResource(
     resourceId: string,
     route: string,

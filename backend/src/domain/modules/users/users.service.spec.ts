@@ -11,11 +11,22 @@ describe('UsersService', () => {
     find: ReturnType<typeof vi.fn>;
     findOneBy: ReturnType<typeof vi.fn>;
     save: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
   };
+  let authProvider: { deleteUser: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
-    repository = { find: vi.fn(), findOneBy: vi.fn(), save: vi.fn() };
-    service = new UsersService(repository as never, {} as AuthProviderService);
+    repository = {
+      find: vi.fn(),
+      findOneBy: vi.fn(),
+      save: vi.fn(),
+      delete: vi.fn().mockResolvedValue({ affected: 1 }),
+    };
+    authProvider = { deleteUser: vi.fn().mockResolvedValue(undefined) };
+    service = new UsersService(
+      repository as never,
+      authProvider as unknown as AuthProviderService,
+    );
   });
 
   it('returns users from the local repository', async () => {
@@ -64,5 +75,51 @@ describe('UsersService', () => {
       service.updateUser(7, { username: 'renamed' } as UpdateUserDto),
     ).rejects.toMatchObject({ status: 409 });
     expect(repository.save).not.toHaveBeenCalled();
+  });
+
+  it('deletes the provider account before deleting the local user', async () => {
+    repository.findOneBy.mockResolvedValue({
+      id: 7,
+      username: 'person',
+    });
+    const calls: string[] = [];
+    authProvider.deleteUser.mockImplementation(async () => {
+      calls.push('provider');
+    });
+    repository.delete.mockImplementation(async () => {
+      calls.push('local');
+      return { affected: 1 };
+    });
+
+    await expect(service.deleteUser(7)).resolves.toBeUndefined();
+
+    expect(calls).toEqual(['provider', 'local']);
+    expect(authProvider.deleteUser).toHaveBeenCalledWith('person');
+    expect(repository.delete).toHaveBeenCalledWith(7);
+  });
+
+  it('keeps the local user if provider deletion fails', async () => {
+    repository.findOneBy.mockResolvedValue({
+      id: 7,
+      username: 'person',
+    });
+    authProvider.deleteUser.mockRejectedValue(
+      new Error('provider delete failed'),
+    );
+
+    await expect(service.deleteUser(7)).rejects.toThrow(
+      'provider delete failed',
+    );
+    expect(repository.delete).not.toHaveBeenCalled();
+  });
+
+  it('does not call provider deletion when the local user is missing', async () => {
+    repository.findOneBy.mockResolvedValue(null);
+
+    await expect(service.deleteUser(404)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
+    expect(authProvider.deleteUser).not.toHaveBeenCalled();
+    expect(repository.delete).not.toHaveBeenCalled();
   });
 });

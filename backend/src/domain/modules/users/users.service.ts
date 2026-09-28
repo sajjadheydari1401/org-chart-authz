@@ -40,6 +40,14 @@ export class UsersService {
     return this.users.save(updatedUser);
   }
 
+  async deleteUser(id: number): Promise<void> {
+    const user = await this.getSingleUser(id);
+    await this.authProvider.deleteUser(user.username);
+
+    const result = await this.users.delete(id);
+    if (!result.affected) throw new NotFoundException();
+  }
+
   async createLocalUser(username: string): Promise<void> {
     const existingUser = await this.users.findOneBy({ username });
 

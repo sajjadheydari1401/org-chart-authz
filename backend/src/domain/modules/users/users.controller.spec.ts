@@ -7,6 +7,7 @@ describe('UsersController', () => {
     getAllUsers: vi.fn(),
     getSingleUser: vi.fn(),
     updateUser: vi.fn(),
+    deleteUser: vi.fn(),
   };
   const controller = new UsersController(
     usersService as unknown as UsersService,
@@ -39,5 +40,12 @@ describe('UsersController', () => {
 
     await expect(controller.updateUser(7, input)).resolves.toBe(user);
     expect(usersService.updateUser).toHaveBeenCalledWith(7, input);
+  });
+
+  it('delegates local user deletion with the parsed ID', async () => {
+    usersService.deleteUser.mockResolvedValue(undefined);
+
+    await expect(controller.deleteUser(7)).resolves.toBeUndefined();
+    expect(usersService.deleteUser).toHaveBeenCalledWith(7);
   });
 });

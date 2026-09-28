@@ -43,6 +43,65 @@ describe('AuthorizationProviderService', () => {
     } as ConfigService);
   });
 
+  it('posts addAccess with system credentials and returns provider values', async () => {
+    const result = {
+      id: 'access-id',
+      methodName: 'POST',
+      description: 'description',
+      created_at: '2026-09-28T12:16:24.217Z',
+      updated_at: '2026-09-28T12:16:24.217Z',
+      deleted_at: null,
+    };
+    providerPost.mockResolvedValueOnce({
+      data: { success: true, result },
+    } as never);
+    await expect(
+      service.createAccess('resource-id', 'post', 'description'),
+    ).resolves.toEqual(result);
+    expect(providerPost).toHaveBeenCalledExactlyOnceWith(
+      `${PROVIDER_BASE_URL}/admin/addAccess`,
+      {
+        username: 'system-user',
+        password: 'system-password',
+        resourceId: 'resource-id',
+        methodName: 'post',
+        description: 'description',
+      },
+    );
+  });
+
+  it('propagates addAccess rejection', async () => {
+    providerPost.mockResolvedValueOnce({
+      data: { success: false, message: 'rejected' },
+    } as never);
+    await expect(
+      service.createAccess('resource-id', 'post', 'description'),
+    ).rejects.toBeInstanceOf(ProviderError);
+  });
+
+  it.each([
+    undefined,
+    {},
+    { id: '', methodName: 'POST', description: '' },
+    { id: 'id', methodName: '', description: '' },
+    { id: 'id', methodName: 'POST' },
+  ])('rejects malformed addAccess result %j', async (result) => {
+    providerPost.mockResolvedValueOnce({
+      data: { success: true, result },
+    } as never);
+    await expect(
+      service.createAccess('resource-id', 'post', 'description'),
+    ).rejects.toBeInstanceOf(BadGatewayException);
+  });
+
+  it('propagates addAccess transport failures', async () => {
+    const error = new Error('network failure');
+    providerPost.mockRejectedValueOnce(error);
+    await expect(
+      service.createAccess('resource-id', 'post', 'description'),
+    ).rejects.toBe(error);
+  });
+
   it('posts deleteResource with environment credentials and the provider ID', async () => {
     providerPost.mockResolvedValueOnce({
       data: {

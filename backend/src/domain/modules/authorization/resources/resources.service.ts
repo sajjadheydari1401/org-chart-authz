@@ -26,7 +26,7 @@ export class ResourcesService {
     if (!result.affected) throw new NotFoundException();
   }
 
-  private async getSingleResource(id: number): Promise<Resource> {
+  async getSingleResource(id: number): Promise<Resource> {
     const resource = await this.resources.findOneBy({ id });
     if (!resource) throw new NotFoundException();
     return resource;

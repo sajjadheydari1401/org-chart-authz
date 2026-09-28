@@ -1,6 +1,7 @@
 import { BadGatewayException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { AddResourceResult } from '../../../common/types/add-resource-result.js';
+import type { AddAccessResult } from '../../../common/types/add-access-result.js';
 import type { UpdateResourceResult } from '../../../common/types/update-resource-result.js';
 import { postToProvider } from '../../../common/utils/api/post-to-provider.js';
 import {
@@ -11,6 +12,36 @@ import {
 @Injectable()
 export class AuthorizationProviderService {
   constructor(private readonly config: ConfigService) {}
+
+  async createAccess(
+    resourceId: string,
+    methodName: string,
+    description: string,
+  ): Promise<AddAccessResult> {
+    const { systemUsername, systemPassword } = systemCredentials(this.config);
+    const data = await postToProvider<AddAccessResult>(
+      providerUrl(this.config, '/admin/addAccess'),
+      {
+        username: systemUsername,
+        password: systemPassword,
+        resourceId,
+        methodName,
+        description,
+      },
+    );
+    const result = data.result;
+    if (
+      !result ||
+      typeof result.id !== 'string' ||
+      !result.id.trim() ||
+      typeof result.methodName !== 'string' ||
+      !result.methodName.trim() ||
+      typeof result.description !== 'string'
+    ) {
+      throw new BadGatewayException();
+    }
+    return result;
+  }
 
   async deleteResource(resourceId: string): Promise<void> {
     const { systemUsername, systemPassword } = systemCredentials(this.config);

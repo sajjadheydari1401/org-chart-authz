@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { AppTab } from "@/components/common/ui/app-tab/app-tab";
-import { BackendTabContent } from "./backend/backend-tab-content";
-import { FrontendTabContent } from "./frontend/frontend-tab-content";
-import { DevopsTabContent } from "./devops/devops-tab-content";
+import { useState } from 'react';
+import { AppTab } from '@/components/common/ui/app-tab/app-tab';
+import { BackendTabContent } from './backend/backend-tab-content';
+import { FrontendTabContent } from './frontend/frontend-tab-content';
+import { DevopsTabContent } from './devops/devops-tab-content';
 
 const TAB_NAMES = [
-  { value: "backend", label: "بک‌اند" },
-  { value: "frontend", label: "فرانت‌اند" },
-  { value: "devops", label: "دواپس" },
+  { value: 'backend', label: 'بک‌اند' },
+  { value: 'frontend', label: 'فرانت‌اند' },
+  { value: 'devops', label: 'دواپس' },
 ] as const;
 
 const TAB_CONTENTS = {
@@ -19,7 +19,8 @@ const TAB_CONTENTS = {
 };
 
 export function EngineeringTabs() {
-  const [value, setValue] = useState<(typeof TAB_NAMES)[number]["value"]>("backend");
+  const [value, setValue] =
+    useState<(typeof TAB_NAMES)[number]['value']>('backend');
 
   return (
     <AppTab

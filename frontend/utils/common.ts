@@ -1,4 +1,4 @@
-import { AppTableRowKey } from "@/components/common/ui/app-table/app-table";
+import { AppTableRowKey } from '@/components/common/ui/app-table/app-table';
 
 // Log the actual table rows that are selected.
 export const logSelectedRows = <Row, Key extends AppTableRowKey>(
@@ -8,5 +8,5 @@ export const logSelectedRows = <Row, Key extends AppTableRowKey>(
 ) => {
   const selectedRows = data.filter((row) => keys.has(rowKey(row)));
 
-  console.log("Selected rows:", selectedRows);
+  console.log('Selected rows:', selectedRows);
 };

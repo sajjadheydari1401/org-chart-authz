@@ -1,6 +1,6 @@
-import type { ReactNode } from "react";
-import { AppCard } from "./ui/card/app-card";
-import { AppCardContent } from "./ui/card/app-card-content";
+import type { ReactNode } from 'react';
+import { AppCard } from './ui/card/app-card';
+import { AppCardContent } from './ui/card/app-card-content';
 
 export interface InfoCardProps {
   title: string;

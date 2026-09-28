@@ -1,9 +1,9 @@
-import type { ReactNode } from "react";
-import { AppCard } from "../common/ui/card/app-card";
-import { AppCardContent } from "../common/ui/card/app-card-content";
-import { AppCardDescription } from "../common/ui/card/app-card-description";
-import { AppCardHeader } from "../common/ui/card/app-card-header";
-import { AppCardTitle } from "../common/ui/card/app-card-title";
+import type { ReactNode } from 'react';
+import { AppCard } from '../common/ui/card/app-card';
+import { AppCardContent } from '../common/ui/card/app-card-content';
+import { AppCardDescription } from '../common/ui/card/app-card-description';
+import { AppCardHeader } from '../common/ui/card/app-card-header';
+import { AppCardTitle } from '../common/ui/card/app-card-title';
 
 export interface AuthCardProps {
   eyebrow?: string;

@@ -1,5 +1,5 @@
-import { logSelectedRows } from "@/utils/common";
-import type { AppTableRowKey } from "./app-table";
+import { logSelectedRows } from '@/utils/common';
+import type { AppTableRowKey } from './app-table';
 
 type Options<Row, Key extends AppTableRowKey> = {
   data: readonly Row[];

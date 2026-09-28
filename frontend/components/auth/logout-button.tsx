@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { logoutAction } from "@/app/actions/auth";
-import { AppButton } from "@/components/common/ui/app-button";
-import { useAuthUserStore } from "@/lib/auth/user-store";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { logoutAction } from '@/app/actions/auth';
+import { AppButton } from '@/components/common/ui/app-button';
+import { useAuthUserStore } from '@/lib/auth/user-store';
 
 export function LogoutButton() {
   const router = useRouter();
@@ -15,7 +15,7 @@ export function LogoutButton() {
     setIsLoggingOut(true);
     await logoutAction();
     clearUser();
-    router.replace("/login");
+    router.replace('/login');
     router.refresh();
   }
 

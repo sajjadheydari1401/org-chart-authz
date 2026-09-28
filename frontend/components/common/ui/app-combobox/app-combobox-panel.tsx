@@ -1,6 +1,6 @@
-import { Check } from "lucide-react";
-import { cn } from "@/lib/cn";
-import type { AppSelectOption } from "../app-select";
+import { Check } from 'lucide-react';
+import { cn } from '@/lib/cn';
+import type { AppSelectOption } from '../app-select';
 
 interface AppComboboxPanelProps {
   options: readonly AppSelectOption[];
@@ -29,12 +29,12 @@ export function AppComboboxPanel({
             onMouseDown={(event) => event.preventDefault()}
             onClick={() => onSelect(option)}
             className={cn(
-              "flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm",
+              'flex min-h-11 w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm',
               option.disabled
-                ? "cursor-not-allowed text-muted-foreground"
-                : "cursor-pointer text-foreground",
-              active && !option.disabled && "bg-accent text-accent-foreground",
-              selected && !active && "bg-muted",
+                ? 'cursor-not-allowed text-muted-foreground'
+                : 'cursor-pointer text-foreground',
+              active && !option.disabled && 'bg-accent text-accent-foreground',
+              selected && !active && 'bg-muted',
             )}
           >
             <span className="min-w-0 [overflow-wrap:anywhere]">

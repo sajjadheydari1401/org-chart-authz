@@ -1,18 +1,18 @@
-"use server";
+'use server';
 
-import { z } from "zod";
+import { z } from 'zod';
 
-import { toActionError } from "@/lib/api/error";
-import { loginWithUsernamePassword } from "@/services/auth/login-with-username-password";
-import { registerWithUsernamePassword } from "@/services/auth/register-with-username-password";
-import { confirmRegistrationBySms } from "@/services/auth/confirm-registration-by-sms";
+import { toActionError } from '@/lib/api/error';
+import { loginWithUsernamePassword } from '@/services/auth/login-with-username-password';
+import { registerWithUsernamePassword } from '@/services/auth/register-with-username-password';
+import { confirmRegistrationBySms } from '@/services/auth/confirm-registration-by-sms';
 import {
   clearPendingUsername,
   clearSession,
   getPendingUsername,
   setAccessToken,
   setPendingUsername,
-} from "@/lib/auth/session";
+} from '@/lib/auth/session';
 import {
   loginSchema,
   signupSchema,
@@ -20,12 +20,12 @@ import {
   type LoginFormData,
   type SignupFormData,
   type VerifySmsFormData,
-} from "@/lib/schemas/auth";
+} from '@/lib/schemas/auth';
 import type {
   AuthActionResult,
   AuthTokenResponse,
   LoginWithUsernamePasswordRequest,
-} from "@/types/auth";
+} from '@/types/auth';
 
 /*
 |--------------------------------------------------------------------------
@@ -43,7 +43,7 @@ export async function registerWithUsernamePasswordAction(
 
     return {
       success: false,
-      message: "لطفاً فرم را بررسی کنید",
+      message: 'لطفاً فرم را بررسی کنید',
       fieldErrors: {
         ...(errors.properties?.email?.errors[0] && {
           email: errors.properties.email.errors[0],
@@ -85,7 +85,7 @@ export async function loginWithUsernamePasswordAction(
 
     return {
       success: false,
-      message: "لطفاً فرم را بررسی کنید",
+      message: 'لطفاً فرم را بررسی کنید',
       fieldErrors: {
         ...(errors.properties?.username?.errors[0] && {
           username: errors.properties.username.errors[0],
@@ -138,7 +138,7 @@ export async function verifySmsAction(
 
     return {
       success: false,
-      message: "لطفاً کد تأیید را بررسی کنید",
+      message: 'لطفاً کد تأیید را بررسی کنید',
       fieldErrors: {
         ...(errors.properties?.code?.errors[0] && {
           code: errors.properties.code.errors[0],
@@ -151,7 +151,7 @@ export async function verifySmsAction(
   if (!uName) {
     return {
       success: false,
-      message: "جلسه تأیید شما منقضی شده است. لطفاً دوباره ثبت‌نام کنید.",
+      message: 'جلسه تأیید شما منقضی شده است. لطفاً دوباره ثبت‌نام کنید.',
     };
   }
 

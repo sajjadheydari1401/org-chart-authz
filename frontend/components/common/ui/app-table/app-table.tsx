@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import type { ReactNode } from "react";
-import { cn } from "@/lib/cn";
-import { AppTableHeader } from "./app-table-header";
-import { AppTableBody } from "./app-table-body";
-import { useTableSelection } from "./use-table-selection";
+import type { ReactNode } from 'react';
+import { cn } from '@/lib/cn';
+import { AppTableHeader } from './app-table-header';
+import { AppTableBody } from './app-table-body';
+import { useTableSelection } from './use-table-selection';
 
 export type AppTableRowKey = string | number;
 
@@ -13,7 +13,8 @@ export type AppTableColumn<Row> = {
   className?: string;
 } &
   // A key that exists on the row can use the default renderer.
-  (| {
+  (
+    | {
         key: Extract<keyof Row, string>;
         render?: (row: Row) => ReactNode;
       }
@@ -43,7 +44,7 @@ export function AppTable<Row, Key extends AppTableRowKey>({
   rowKey,
   rowLabel,
   caption,
-  emptyMessage = "No results found.",
+  emptyMessage = 'No results found.',
   className,
   selectedKeys,
   onSelectionChange,
@@ -58,10 +59,10 @@ export function AppTable<Row, Key extends AppTableRowKey>({
   return (
     <div
       role="region"
-      aria-label={caption ?? "Table"}
+      aria-label={caption ?? 'Table'}
       tabIndex={0}
       className={cn(
-        "w-full min-w-0 overflow-x-auto rounded-xl border border-border bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
+        'w-full min-w-0 overflow-x-auto rounded-xl border border-border bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
         className,
       )}
     >

@@ -1,27 +1,33 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 import {
   AppTable,
   AppTableColumn,
-} from "@/components/common/ui/app-table/app-table";
-import { rawUnits } from "@/data/org-units";
-import type { IOrgUnit } from "@/types/org-unit";
+} from '@/components/common/ui/app-table/app-table';
+import { rawUnits } from '@/data/org-units';
+import type { IOrgUnit } from '@/types/org-unit';
 
 const unitNames = new Map(rawUnits.map((unit) => [unit.id, unit.name]));
 
 const columns: AppTableColumn<IOrgUnit>[] = [
-  { key: "id", header: "شناسه" },
-  { key: "name", header: "نام" },
+  { key: 'id', header: 'شناسه' },
+  { key: 'name', header: 'نام' },
   {
-    key: "parentId",
-    header: "واحد بالادست",
+    key: 'parentId',
+    header: 'واحد بالادست',
     render: (unit) =>
-      unit.parentId === null ? "—" : (unitNames.get(unit.parentId) ?? "—"),
+      unit.parentId === null ? '—' : (unitNames.get(unit.parentId) ?? '—'),
   },
 ];
 
-export function OrgUnitsTable({ units, caption }: { units: readonly IOrgUnit[]; caption: string }) {
+export function OrgUnitsTable({
+  units,
+  caption,
+}: {
+  units: readonly IOrgUnit[];
+  caption: string;
+}) {
   const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
 
   return (

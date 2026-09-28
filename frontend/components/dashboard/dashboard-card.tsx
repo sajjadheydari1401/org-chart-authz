@@ -1,6 +1,6 @@
-import { AppCard } from "../common/ui/card/app-card";
-import { AppCardContent } from "../common/ui/card/app-card-content";
-import { AppLink } from "../common/ui/app-link";
+import { AppCard } from '../common/ui/card/app-card';
+import { AppCardContent } from '../common/ui/card/app-card-content';
+import { AppLink } from '../common/ui/app-link';
 
 export interface DashboardCardProps {
   href: string;

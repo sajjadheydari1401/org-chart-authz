@@ -1,4 +1,4 @@
-import { OrgUnitsTabs } from "@/components/org-units/org-units-tabs";
+import { OrgUnitsTabs } from '@/components/org-units/org-units-tabs';
 
 export default function OrgUnitsPage() {
   return (

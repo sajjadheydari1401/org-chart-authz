@@ -1,8 +1,11 @@
-import type { InputHTMLAttributes, Ref } from "react";
+import type { InputHTMLAttributes, Ref } from 'react';
 
-import { cn } from "@/lib/cn";
+import { cn } from '@/lib/cn';
 
-export interface AppSwitchProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
+export interface AppSwitchProps extends Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  'type'
+> {
   ref?: Ref<HTMLInputElement>;
 }
 

@@ -6,47 +6,47 @@ import {
   FileText,
   HandCoins,
   Wrench,
-} from "lucide-react";
+} from 'lucide-react';
 
-import { AppBadge } from "@/components/common/ui/app-badge";
-import { AppLink } from "@/components/common/ui/app-link";
-import { AppCard } from "@/components/common/ui/card/app-card";
-import { AppCardContent } from "@/components/common/ui/card/app-card-content";
+import { AppBadge } from '@/components/common/ui/app-badge';
+import { AppLink } from '@/components/common/ui/app-link';
+import { AppCard } from '@/components/common/ui/card/app-card';
+import { AppCardContent } from '@/components/common/ui/card/app-card-content';
 
 const metrics = [
   {
-    label: "واحدهای مجتمع",
-    detail: "ظرفیت و وضعیت بهره‌برداری",
-    href: "/org-units",
+    label: 'واحدهای مجتمع',
+    detail: 'ظرفیت و وضعیت بهره‌برداری',
+    href: '/org-units',
     icon: Building2,
   },
   {
-    label: "قراردادهای جاری",
-    detail: "تمدیدها و سررسیدهای نزدیک",
-    href: "/contracts",
+    label: 'قراردادهای جاری',
+    detail: 'تمدیدها و سررسیدهای نزدیک',
+    href: '/contracts',
     icon: FileText,
   },
   {
-    label: "شارژ و مطالبات",
-    detail: "مانده حساب و پرداخت‌های معوق",
-    href: "/finance/charges",
+    label: 'شارژ و مطالبات',
+    detail: 'مانده حساب و پرداخت‌های معوق',
+    href: '/finance/charges',
     icon: HandCoins,
   },
   {
-    label: "درخواست‌های نگهداری",
-    detail: "خرابی‌ها و کارهای در جریان",
-    href: "/operations/work-orders",
+    label: 'درخواست‌های نگهداری',
+    detail: 'خرابی‌ها و کارهای در جریان',
+    href: '/operations/work-orders',
     icon: Wrench,
   },
 ];
 
 const quickLinks = [
-  { label: "واحدهای مجتمع", href: "/org-units", icon: Building2 },
-  { label: "مالکان و مستأجران", href: "/owners-tenants", icon: Activity },
-  { label: "پارکینگ", href: "/operations/parking", icon: CarFront },
+  { label: 'واحدهای مجتمع', href: '/org-units', icon: Building2 },
+  { label: 'مالکان و مستأجران', href: '/owners-tenants', icon: Activity },
+  { label: 'پارکینگ', href: '/operations/parking', icon: CarFront },
   {
-    label: "تقویم قراردادها",
-    href: "/contracts/renewals",
+    label: 'تقویم قراردادها',
+    href: '/contracts/renewals',
     icon: CalendarClock,
   },
 ];

@@ -1,10 +1,10 @@
-﻿import "server-only";
-import type { AxiosRequestConfig } from "axios";
-import { API } from "./client";
-import { clearSession, getAccessToken } from "@/lib/auth/session";
-import { ApiError } from "./error";
-import { apiErrorSchema, apiSuccessSchema } from "./response";
-import { TRANSPORT_ERROR_MESSAGE } from "./transport-error";
+﻿import 'server-only';
+import type { AxiosRequestConfig } from 'axios';
+import { API } from './client';
+import { clearSession, getAccessToken } from '@/lib/auth/session';
+import { ApiError } from './error';
+import { apiErrorSchema, apiSuccessSchema } from './response';
+import { TRANSPORT_ERROR_MESSAGE } from './transport-error';
 
 type ApiRequestConfig = AxiosRequestConfig & { authenticated?: boolean };
 
@@ -17,7 +17,7 @@ export async function AppApi<T>(
   path: string,
   { authenticated = true, ...config }: ApiRequestConfig = {},
 ): Promise<AppApiResponse<T>> {
-  if (!API.defaults.baseURL) throw new Error("API_URL is not configured");
+  if (!API.defaults.baseURL) throw new Error('API_URL is not configured');
 
   const token = authenticated ? await getAccessToken() : null;
   const response = await API.request<unknown>({
@@ -57,7 +57,7 @@ export async function AppApi<T>(
   if (!success.success) throw new ApiError(502, TRANSPORT_ERROR_MESSAGE);
   const backendMessage = success.data.message;
   const message =
-    typeof backendMessage === "string"
+    typeof backendMessage === 'string'
       ? backendMessage
       : backendMessage?.fa?.trim() || backendMessage?.en?.trim() || undefined;
 

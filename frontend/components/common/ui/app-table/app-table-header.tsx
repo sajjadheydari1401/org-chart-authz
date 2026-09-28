@@ -1,6 +1,6 @@
-import { AppCheckbox } from "../app-checkbox";
-import { cn } from "@/lib/cn";
-import { AppTableColumn } from "./app-table";
+import { AppCheckbox } from '../app-checkbox';
+import { cn } from '@/lib/cn';
+import { AppTableColumn } from './app-table';
 
 interface AppTableHeaderProps<Row> {
   columns: readonly AppTableColumn<Row>[];
@@ -41,7 +41,7 @@ export function AppTableHeader<Row>({
             key={column.key}
             scope="col"
             className={cn(
-              "px-4 py-3 text-start text-sm font-medium",
+              'px-4 py-3 text-start text-sm font-medium',
               column.className,
             )}
           >

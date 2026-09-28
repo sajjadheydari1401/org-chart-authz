@@ -1,4 +1,4 @@
-﻿import type { AppSelectOption } from "../app-select";
+﻿import type { AppSelectOption } from '../app-select';
 
 interface AppMultiSelectTagsProps {
   options: AppSelectOption[];
@@ -7,14 +7,23 @@ interface AppMultiSelectTagsProps {
 }
 
 /** Only renders selected options; lookup and removal logic stay in the hook. */
-export function AppMultiSelectTags({ options, disabled, onRemove }: AppMultiSelectTagsProps) {
+export function AppMultiSelectTags({
+  options,
+  disabled,
+  onRemove,
+}: AppMultiSelectTagsProps) {
   if (!options.length) return null;
 
   return (
     <ul className="mt-2 flex flex-wrap gap-2">
       {options.map((option) => (
-        <li key={option.value} className="flex min-w-0 max-w-full items-center rounded-lg bg-accent ps-3 text-sm text-accent-foreground">
-          <span className="min-w-0 [overflow-wrap:anywhere]">{option.label}</span>
+        <li
+          key={option.value}
+          className="flex min-w-0 max-w-full items-center rounded-lg bg-accent ps-3 text-sm text-accent-foreground"
+        >
+          <span className="min-w-0 [overflow-wrap:anywhere]">
+            {option.label}
+          </span>
           <button
             type="button"
             disabled={disabled || option.disabled}

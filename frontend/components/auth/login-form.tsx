@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { showError, showSuccess } from "@/lib/api/show-error";
-import { useAuthUserStore } from "@/lib/auth/user-store";
-import { TRANSPORT_ERROR_MESSAGE } from "@/lib/api/transport-error";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { showError, showSuccess } from '@/lib/api/show-error';
+import { useAuthUserStore } from '@/lib/auth/user-store';
+import { TRANSPORT_ERROR_MESSAGE } from '@/lib/api/transport-error';
 
-import { loginWithUsernamePasswordAction } from "@/app/actions/auth";
-import { AppButton } from "@/components/common/ui/app-button";
-import { AppFormField } from "@/components/common/ui/app-form-field";
-import { AppInput } from "@/components/common/ui/app-input";
+import { loginWithUsernamePasswordAction } from '@/app/actions/auth';
+import { AppButton } from '@/components/common/ui/app-button';
+import { AppFormField } from '@/components/common/ui/app-form-field';
+import { AppInput } from '@/components/common/ui/app-input';
 import {
   loginSchema,
   type LoginFormData,
   type LoginFormInput,
-} from "@/lib/schemas/auth";
+} from '@/lib/schemas/auth';
 
 export function LoginForm() {
   const router = useRouter();
@@ -29,8 +29,8 @@ export function LoginForm() {
     resolver: zodResolver(loginSchema),
 
     defaultValues: {
-      username: "",
-      password: "",
+      username: '',
+      password: '',
     },
   });
 
@@ -43,20 +43,20 @@ export function LoginForm() {
     if (result.success) {
       if (result.user) setUser(result.user);
       if (result.message) showSuccess(result.message);
-      router.push("/dashboard");
+      router.push('/dashboard');
       return;
     }
 
     if (result.fieldErrors?.username) {
-      setError("username", {
-        type: "server",
+      setError('username', {
+        type: 'server',
         message: result.fieldErrors.username,
       });
     }
 
     if (result.fieldErrors?.password) {
-      setError("password", {
-        type: "server",
+      setError('password', {
+        type: 'server',
         message: result.fieldErrors.password,
       });
     }
@@ -79,7 +79,7 @@ export function LoginForm() {
           autoComplete="username"
           placeholder="نام کاربری شما"
           invalid={Boolean(errors.username)}
-          {...register("username")}
+          {...register('username')}
         />
       </AppFormField>
 
@@ -94,7 +94,7 @@ export function LoginForm() {
           type="password"
           autoComplete="current-password"
           invalid={Boolean(errors.password)}
-          {...register("password")}
+          {...register('password')}
         />
       </AppFormField>
 

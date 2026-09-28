@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useState, type ReactNode } from "react";
-import { Building2, Menu } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { useState, type ReactNode } from 'react';
+import { Building2, Menu } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 
-import { LogoutButton } from "@/components/auth/logout-button";
-import { AppButton } from "@/components/common/ui/app-button";
-import { AppBreadCrumbs } from "@/components/common/ui/app-breadcrumbs";
-import { AppLink } from "@/components/common/ui/app-link";
-import { getWorkspaceBreadcrumbs } from "@/lib/workspace-navigation";
-import { AppSideBarMenu } from "./app-sidebar-menu";
+import { LogoutButton } from '@/components/auth/logout-button';
+import { AppButton } from '@/components/common/ui/app-button';
+import { AppBreadCrumbs } from '@/components/common/ui/app-breadcrumbs';
+import { AppLink } from '@/components/common/ui/app-link';
+import { getWorkspaceBreadcrumbs } from '@/lib/workspace-navigation';
+import { AppSideBarMenu } from './app-sidebar-menu';
 
 export function AppWorkspaceShell({ children }: { children: ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

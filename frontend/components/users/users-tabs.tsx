@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { AppTab, AppTabName } from "@/components/common/ui/app-tab/app-tab";
-import { Managers } from "./managers/managers";
-import { Employees } from "./employees/employees";
+import { useState } from 'react';
+import { AppTab, AppTabName } from '@/components/common/ui/app-tab/app-tab';
+import { Managers } from './managers/managers';
+import { Employees } from './employees/employees';
 
 const TAB_NAMES: AppTabName[] = [
-  { value: "employees", label: "کارمندان" },
-  { value: "managers", label: "مدیران" },
+  { value: 'employees', label: 'کارمندان' },
+  { value: 'managers', label: 'مدیران' },
 ];
 
 const TAB_CONTENTS = {
@@ -17,7 +17,7 @@ const TAB_CONTENTS = {
 
 export function UsersTabs() {
   const [value, setValue] =
-    useState<(typeof TAB_NAMES)[number]["value"]>("employees");
+    useState<(typeof TAB_NAMES)[number]['value']>('employees');
 
   return (
     <AppTab

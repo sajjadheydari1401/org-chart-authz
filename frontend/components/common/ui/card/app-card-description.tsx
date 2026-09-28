@@ -1,5 +1,5 @@
-import { cn } from "@/lib/cn";
-import { HTMLAttributes, ReactNode } from "react";
+import { cn } from '@/lib/cn';
+import { HTMLAttributes, ReactNode } from 'react';
 
 export interface AppCardDescriptionProps extends HTMLAttributes<HTMLParagraphElement> {
   children: ReactNode;
@@ -14,7 +14,7 @@ export function AppCardDescription({
     <p
       {...props}
       className={cn(
-        "text-sm leading-6 text-muted-foreground [overflow-wrap:anywhere]",
+        'text-sm leading-6 text-muted-foreground [overflow-wrap:anywhere]',
         className,
       )}
     >

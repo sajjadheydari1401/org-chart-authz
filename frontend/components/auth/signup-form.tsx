@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { showError, showSuccess } from "@/lib/api/show-error";
-import { TRANSPORT_ERROR_MESSAGE } from "@/lib/api/transport-error";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { showError, showSuccess } from '@/lib/api/show-error';
+import { TRANSPORT_ERROR_MESSAGE } from '@/lib/api/transport-error';
 
-import { registerWithUsernamePasswordAction } from "@/app/actions/auth";
-import { AppButton } from "@/components/common/ui/app-button";
-import { AppFormField } from "@/components/common/ui/app-form-field";
-import { AppInput } from "@/components/common/ui/app-input";
+import { registerWithUsernamePasswordAction } from '@/app/actions/auth';
+import { AppButton } from '@/components/common/ui/app-button';
+import { AppFormField } from '@/components/common/ui/app-form-field';
+import { AppInput } from '@/components/common/ui/app-input';
 import {
   signupSchema,
   type SignupFormData,
   type SignupFormInput,
-} from "@/lib/schemas/auth";
+} from '@/lib/schemas/auth';
 
 export function SignupForm() {
   const router = useRouter();
@@ -26,10 +26,10 @@ export function SignupForm() {
   } = useForm<SignupFormInput, unknown, SignupFormData>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
-      email: "",
-      username: "",
-      password: "",
-      mobile: "",
+      email: '',
+      username: '',
+      password: '',
+      mobile: '',
     },
   });
 
@@ -42,36 +42,36 @@ export function SignupForm() {
 
     if (result.success) {
       if (result.message) showSuccess(result.message);
-      router.push("/verify-sms");
+      router.push('/verify-sms');
       return;
     }
 
     const fieldErrors = result.fieldErrors;
 
     if (fieldErrors?.email) {
-      setError("email", {
-        type: "server",
+      setError('email', {
+        type: 'server',
         message: fieldErrors.email,
       });
     }
 
     if (fieldErrors?.username) {
-      setError("username", {
-        type: "server",
+      setError('username', {
+        type: 'server',
         message: fieldErrors.username,
       });
     }
 
     if (fieldErrors?.mobile) {
-      setError("mobile", {
-        type: "server",
+      setError('mobile', {
+        type: 'server',
         message: fieldErrors.mobile,
       });
     }
 
     if (fieldErrors?.password) {
-      setError("password", {
-        type: "server",
+      setError('password', {
+        type: 'server',
         message: fieldErrors.password,
       });
     }
@@ -94,7 +94,7 @@ export function SignupForm() {
           autoComplete="email"
           placeholder="you@example.com"
           invalid={Boolean(errors.email)}
-          {...register("email")}
+          {...register('email')}
         />
       </AppFormField>
 
@@ -110,7 +110,7 @@ export function SignupForm() {
           autoComplete="username"
           placeholder="نام کاربری شما"
           invalid={Boolean(errors.username)}
-          {...register("username")}
+          {...register('username')}
         />
       </AppFormField>
 
@@ -129,7 +129,7 @@ export function SignupForm() {
           placeholder="09123456789"
           dir="ltr"
           invalid={Boolean(errors.mobile)}
-          {...register("mobile")}
+          {...register('mobile')}
         />
       </AppFormField>
 
@@ -145,7 +145,7 @@ export function SignupForm() {
           type="password"
           autoComplete="new-password"
           invalid={Boolean(errors.password)}
-          {...register("password")}
+          {...register('password')}
         />
       </AppFormField>
 

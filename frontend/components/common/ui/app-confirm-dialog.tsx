@@ -1,26 +1,26 @@
-"use client";
+'use client';
 
-import type { ReactNode } from "react";
+import type { ReactNode } from 'react';
 
-import { AppButton } from "./app-button";
-import { AppDialog, type AppDialogProps } from "./app-dialog";
+import { AppButton } from './app-button';
+import { AppDialog, type AppDialogProps } from './app-dialog';
 
 export interface AppConfirmDialogProps extends Omit<
   AppDialogProps,
-  "children" | "footer"
+  'children' | 'footer'
 > {
   confirmLabel?: string;
   cancelLabel?: string;
-  confirmVariant?: "primary" | "destructive";
+  confirmVariant?: 'primary' | 'destructive';
   confirming?: boolean;
   onConfirm: () => void;
   children?: ReactNode;
 }
 
 export function AppConfirmDialog({
-  confirmLabel = "تأیید",
-  cancelLabel = "انصراف",
-  confirmVariant = "destructive",
+  confirmLabel = 'تأیید',
+  cancelLabel = 'انصراف',
+  confirmVariant = 'destructive',
   confirming = false,
   onConfirm,
   onOpenChange,

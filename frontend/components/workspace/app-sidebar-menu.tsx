@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { usePathname } from "next/navigation";
-import { Building2, X } from "lucide-react";
+import { usePathname } from 'next/navigation';
+import { Building2, X } from 'lucide-react';
 
-import { AppButton } from "@/components/common/ui/app-button";
-import { AppLink } from "@/components/common/ui/app-link";
+import { AppButton } from '@/components/common/ui/app-button';
+import { AppLink } from '@/components/common/ui/app-link';
 import {
   workspaceDashboardItem,
   workspaceNavigation,
-} from "@/lib/workspace-navigation";
-import { cn } from "@/lib/cn";
-import { AppSidebarMenuItem } from "./app-sidebar-menu-item";
-import { AppSidebarMenuSection } from "./app-sidebar-menu-section";
+} from '@/lib/workspace-navigation';
+import { cn } from '@/lib/cn';
+import { AppSidebarMenuItem } from './app-sidebar-menu-item';
+import { AppSidebarMenuSection } from './app-sidebar-menu-section';
 
 interface AppSideBarMenuProps {
   mobileOpen: boolean;
@@ -33,8 +33,8 @@ export function AppSideBarMenu({ mobileOpen, onClose }: AppSideBarMenuProps) {
       )}
       <aside
         className={cn(
-          "fixed inset-y-0 right-0 z-50 flex w-[min(19rem,calc(100vw-2rem))] flex-col border-l border-border bg-surface transition-transform motion-reduce:transition-none lg:sticky lg:top-16 lg:z-auto lg:h-[calc(100dvh-4rem)] lg:w-72 lg:translate-x-0",
-          mobileOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0",
+          'fixed inset-y-0 right-0 z-50 flex w-[min(19rem,calc(100vw-2rem))] flex-col border-l border-border bg-surface transition-transform motion-reduce:transition-none lg:sticky lg:top-16 lg:z-auto lg:h-[calc(100dvh-4rem)] lg:w-72 lg:translate-x-0',
+          mobileOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0',
         )}
       >
         <div className="flex min-h-16 items-center justify-between border-b border-border px-4 lg:hidden">

@@ -1,8 +1,8 @@
-import dagre from "@dagrejs/dagre";
-import type { Edge } from "@xyflow/react";
+import dagre from '@dagrejs/dagre';
+import type { Edge } from '@xyflow/react';
 
-import type { UnitNode } from "@/components/units-chart/unit-card";
-import type { IOrgUnit } from "@/types/org-unit";
+import type { UnitNode } from '@/components/units-chart/unit-card';
+import type { IOrgUnit } from '@/types/org-unit';
 
 const NODE_WIDTH = 220;
 const NODE_HEIGHT = 60;
@@ -17,7 +17,7 @@ export function createGraph(units: IOrgUnit[]) {
   // nodesep controls horizontal spacing between nodes.
   // ranksep controls vertical spacing between hierarchy levels.
   graph.setGraph({
-    rankdir: "TB",
+    rankdir: 'TB',
     nodesep: 50,
     ranksep: 80,
   });
@@ -26,7 +26,7 @@ export function createGraph(units: IOrgUnit[]) {
   // Dagre will calculate the actual coordinates later.
   const nodes: UnitNode[] = units.map((unit) => ({
     id: String(unit.id),
-    type: "unit",
+    type: 'unit',
     style: { width: NODE_WIDTH, height: NODE_HEIGHT },
     data: {
       label: unit.name,

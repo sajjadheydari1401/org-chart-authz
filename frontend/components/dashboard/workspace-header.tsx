@@ -1,13 +1,13 @@
-import { LogoutButton } from "@/components/auth/logout-button";
-import { AppLink } from "@/components/common/ui/app-link";
-import { routes } from "@/lib/routes";
+import { LogoutButton } from '@/components/auth/logout-button';
+import { AppLink } from '@/components/common/ui/app-link';
+import { routes } from '@/lib/routes';
 
 const navigation = [
-  { label: "کاربران", href: routes.users },
-  { label: "واحدهای سازمانی", href: routes.orgUnits },
-  { label: "نقش‌ها", href: routes.roles },
-  { label: "منابع", href: routes.resources },
-  { label: "دسترسی‌ها", href: routes.accesses },
+  { label: 'کاربران', href: routes.users },
+  { label: 'واحدهای سازمانی', href: routes.orgUnits },
+  { label: 'نقش‌ها', href: routes.roles },
+  { label: 'منابع', href: routes.resources },
+  { label: 'دسترسی‌ها', href: routes.accesses },
 ];
 
 export function WorkspaceHeader() {

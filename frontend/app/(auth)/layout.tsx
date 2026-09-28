@@ -1,7 +1,7 @@
-import type { ReactNode } from "react";
-import { redirect } from "next/navigation";
-import { ClearAuthUser } from "@/components/auth/clear-auth-user";
-import { getAccessToken } from "@/lib/auth/session";
+import type { ReactNode } from 'react';
+import { redirect } from 'next/navigation';
+import { ClearAuthUser } from '@/components/auth/clear-auth-user';
+import { getAccessToken } from '@/lib/auth/session';
 
 export default async function AuthLayout({
   children,
@@ -11,7 +11,7 @@ export default async function AuthLayout({
   const accessToken = await getAccessToken();
 
   if (accessToken) {
-    redirect("/dashboard");
+    redirect('/dashboard');
   }
 
   return (

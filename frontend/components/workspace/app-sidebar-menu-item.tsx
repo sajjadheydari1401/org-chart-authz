@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Archive,
@@ -16,14 +16,14 @@ import {
   Warehouse,
   Wrench,
   type LucideIcon,
-} from "lucide-react";
+} from 'lucide-react';
 
-import { AppLink } from "@/components/common/ui/app-link";
+import { AppLink } from '@/components/common/ui/app-link';
 import type {
   WorkspaceIconKey,
   WorkspaceNavigationItem,
-} from "@/lib/workspace-navigation";
-import { cn } from "@/lib/cn";
+} from '@/lib/workspace-navigation';
+import { cn } from '@/lib/cn';
 
 const icons: Record<WorkspaceIconKey, LucideIcon> = {
   dashboard: Gauge,
@@ -62,11 +62,11 @@ export function AppSidebarMenuItem({
     <AppLink
       href={item.href}
       variant="unstyled"
-      aria-current={active ? "page" : undefined}
+      aria-current={active ? 'page' : undefined}
       onClick={onNavigate}
       className={cn(
-        "cursor-pointer flex min-h-11 min-w-0 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
-        active && "bg-accent text-accent-foreground hover:bg-accent",
+        'cursor-pointer flex min-h-11 min-w-0 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground',
+        active && 'bg-accent text-accent-foreground hover:bg-accent',
       )}
     >
       <Icon className="size-4 shrink-0" aria-hidden="true" />

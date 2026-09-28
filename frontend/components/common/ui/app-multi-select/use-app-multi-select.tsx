@@ -5,8 +5,8 @@
   useState,
   type FocusEvent,
   type KeyboardEvent,
-} from "react";
-import type { AppSelectOption } from "../app-select";
+} from 'react';
+import type { AppSelectOption } from '../app-select';
 
 interface UseAppMultiSelectProps {
   id?: string;
@@ -20,7 +20,9 @@ interface UseAppMultiSelectProps {
 // Navigate only visible, enabled options. Wrap when reaching either end.
 function moveOptionFocus(panel: HTMLDivElement, backwards: boolean) {
   const inputs = Array.from(
-    panel.querySelectorAll<HTMLInputElement>('input[type="checkbox"]:not(:disabled)'),
+    panel.querySelectorAll<HTMLInputElement>(
+      'input[type="checkbox"]:not(:disabled)',
+    ),
   );
   if (!inputs.length) return;
 
@@ -33,14 +35,19 @@ function moveOptionFocus(panel: HTMLDivElement, backwards: boolean) {
 
 /** Keeps selection controlled by the caller; only search and open state are local. */
 export function useAppMultiSelect({
-  id, options, value, disabled, onChange, onBlur,
+  id,
+  options,
+  value,
+  disabled,
+  onChange,
+  onBlur,
 }: UseAppMultiSelectProps) {
   const generatedId = useId();
   const controlId = id ?? generatedId;
   const rootRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const expanded = open && !disabled;
 
   const selected = new Set(value);
@@ -49,7 +56,9 @@ export function useAppMultiSelect({
     option.label.toLocaleLowerCase().includes(search),
   );
   // Resolve selected values to their display labels.
-  const selectedOptions = options.filter((option) => value.includes(option.value));
+  const selectedOptions = options.filter((option) =>
+    value.includes(option.value),
+  );
 
   useEffect(() => {
     if (!expanded) return;
@@ -59,8 +68,9 @@ export function useAppMultiSelect({
       if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
     }
 
-    document.addEventListener("pointerdown", handleOutsideClick);
-    return () => document.removeEventListener("pointerdown", handleOutsideClick);
+    document.addEventListener('pointerdown', handleOutsideClick);
+    return () =>
+      document.removeEventListener('pointerdown', handleOutsideClick);
   }, [expanded]);
 
   function toggle(option: AppSelectOption) {
@@ -74,14 +84,14 @@ export function useAppMultiSelect({
   }
 
   function togglePanel() {
-    setQuery("");
+    setQuery('');
     setOpen(!expanded);
   }
 
   function handleTriggerKeys(event: KeyboardEvent<HTMLButtonElement>) {
-    if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+    if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
     event.preventDefault();
-    setQuery("");
+    setQuery('');
     setOpen(true);
   }
 
@@ -94,15 +104,15 @@ export function useAppMultiSelect({
 
   function handleKeys(event: KeyboardEvent<HTMLDivElement>) {
     switch (event.key) {
-      case "Escape":
+      case 'Escape':
         event.preventDefault();
         event.stopPropagation();
         setOpen(false);
         break;
-      case "ArrowDown":
-      case "ArrowUp":
+      case 'ArrowDown':
+      case 'ArrowUp':
         event.preventDefault();
-        moveOptionFocus(event.currentTarget, event.key === "ArrowUp");
+        moveOptionFocus(event.currentTarget, event.key === 'ArrowUp');
         break;
     }
   }

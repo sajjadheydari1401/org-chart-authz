@@ -1,11 +1,11 @@
-import "server-only";
-import { AppApi } from "@/lib/api/server";
-import { toActionError } from "@/lib/api/error";
-import type { SignupFormData } from "@/lib/schemas/auth";
+import 'server-only';
+import { AppApi } from '@/lib/api/server';
+import { toActionError } from '@/lib/api/error';
+import type { SignupFormData } from '@/lib/schemas/auth';
 import type {
   AuthActionResult,
   RegisterWithUsernamePasswordRequest,
-} from "@/types/auth";
+} from '@/types/auth';
 
 export async function registerWithUsernamePassword(
   input: SignupFormData,
@@ -18,8 +18,8 @@ export async function registerWithUsernamePassword(
   };
 
   try {
-    const response = await AppApi("/auth/register/username-password", {
-      method: "POST",
+    const response = await AppApi('/auth/register/username-password', {
+      method: 'POST',
       data: body,
       authenticated: false,
     });

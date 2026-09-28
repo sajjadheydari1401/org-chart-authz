@@ -1,6 +1,6 @@
-import type { Ref, TextareaHTMLAttributes } from "react";
+import type { Ref, TextareaHTMLAttributes } from 'react';
 
-import { cn } from "@/lib/cn";
+import { cn } from '@/lib/cn';
 
 export interface AppTextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   ref?: Ref<HTMLTextAreaElement>;
@@ -23,8 +23,8 @@ export function AppTextarea({
       {...props}
       rows={rows}
       className={cn(
-        "block min-h-11 w-full min-w-0 max-w-full resize-none rounded-lg border border-input bg-surface px-3 py-2 text-base text-foreground placeholder:text-muted-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-transparent disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground read-only:bg-muted",
-        invalid && "border-destructive",
+        'block min-h-11 w-full min-w-0 max-w-full resize-none rounded-lg border border-input bg-surface px-3 py-2 text-base text-foreground placeholder:text-muted-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-transparent disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground read-only:bg-muted',
+        invalid && 'border-destructive',
         className,
       )}
     />

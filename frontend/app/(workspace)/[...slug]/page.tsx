@@ -1,6 +1,6 @@
-import { notFound } from "next/navigation";
+import { notFound } from 'next/navigation';
 
-import { getWorkspacePageTitle } from "@/lib/workspace-navigation";
+import { getWorkspacePageTitle } from '@/lib/workspace-navigation';
 
 export default async function WorkspacePlaceholderPage({
   params,
@@ -8,7 +8,7 @@ export default async function WorkspacePlaceholderPage({
   params: Promise<{ slug: string[] }>;
 }) {
   const { slug } = await params;
-  const title = getWorkspacePageTitle(`/${slug.join("/")}`);
+  const title = getWorkspacePageTitle(`/${slug.join('/')}`);
 
   if (!title) notFound();
 

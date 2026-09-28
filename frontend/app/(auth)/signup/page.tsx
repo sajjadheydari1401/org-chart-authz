@@ -1,6 +1,6 @@
-import { AuthCard } from "@/components/auth/auth-card";
-import { SignupForm } from "@/components/auth/signup-form";
-import { AppLink } from "@/components/common/ui/app-link";
+import { AuthCard } from '@/components/auth/auth-card';
+import { SignupForm } from '@/components/auth/signup-form';
+import { AppLink } from '@/components/common/ui/app-link';
 
 export default function SignupPage() {
   return (
@@ -9,7 +9,8 @@ export default function SignupPage() {
       title="ثبت‌نام"
       description={
         <>
-          اطلاعات خود را وارد کنید. پیش از فعال‌سازی حساب، شماره همراه شما را تأیید می‌کنیم.
+          اطلاعات خود را وارد کنید. پیش از فعال‌سازی حساب، شماره همراه شما را
+          تأیید می‌کنیم.
         </>
       }
       footer={

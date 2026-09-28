@@ -1,5 +1,5 @@
-import { AppCard } from "./ui/card/app-card";
-import { AppCardContent } from "./ui/card/app-card-content";
+import { AppCard } from './ui/card/app-card';
+import { AppCardContent } from './ui/card/app-card-content';
 
 export interface FeatureCardProps {
   title: string;

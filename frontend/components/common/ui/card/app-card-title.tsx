@@ -1,5 +1,5 @@
-import { cn } from "@/lib/cn";
-import { HTMLAttributes, ReactNode } from "react";
+import { cn } from '@/lib/cn';
+import { HTMLAttributes, ReactNode } from 'react';
 
 export interface AppCardTitleProps extends HTMLAttributes<HTMLHeadingElement> {
   children: ReactNode;
@@ -14,7 +14,7 @@ export function AppCardTitle({
     <h3
       {...props}
       className={cn(
-        "font-semibold leading-none tracking-tight text-foreground",
+        'font-semibold leading-none tracking-tight text-foreground',
         className,
       )}
     >

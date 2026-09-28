@@ -1,7 +1,7 @@
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft } from 'lucide-react';
 
-import { AppLink } from "@/components/common/ui/app-link";
-import { cn } from "@/lib/cn";
+import { AppLink } from '@/components/common/ui/app-link';
+import { cn } from '@/lib/cn';
 
 export interface AppBreadCrumbItem {
   label: string;
@@ -17,14 +17,14 @@ export function AppBreadCrumbs({ items, className }: AppBreadCrumbsProps) {
   if (!items.length) return null;
 
   return (
-    <nav aria-label="مسیر صفحه" className={cn("mb-5 min-w-0", className)}>
+    <nav aria-label="مسیر صفحه" className={cn('mb-5 min-w-0', className)}>
       <ol className="flex min-w-0 flex-wrap items-center gap-2 text-sm">
         {items.map((item, index) => {
           const current = index === items.length - 1;
 
           return (
             <li
-              key={`${item.label}-${item.href ?? "current"}`}
+              key={`${item.label}-${item.href ?? 'current'}`}
               className="flex min-w-0 items-center gap-2"
             >
               {index > 0 && (
@@ -42,12 +42,12 @@ export function AppBreadCrumbs({ items, className }: AppBreadCrumbsProps) {
                 </AppLink>
               ) : (
                 <span
-                  aria-current={current ? "page" : undefined}
+                  aria-current={current ? 'page' : undefined}
                   className={cn(
-                    "min-w-0 [overflow-wrap:anywhere]",
+                    'min-w-0 [overflow-wrap:anywhere]',
                     current
-                      ? "font-medium text-foreground"
-                      : "text-muted-foreground",
+                      ? 'font-medium text-foreground'
+                      : 'text-muted-foreground',
                   )}
                 >
                   {item.label}

@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { AppTab } from "@/components/common/ui/app-tab/app-tab";
-import { EngineeringTabContent } from "./engineering/engineering-tab-content";
-import { FinanceTabContent } from "./finance/finance-tab-content";
-import { HrTabContent } from "./hr/hr-tab-content";
+import { useState } from 'react';
+import { AppTab } from '@/components/common/ui/app-tab/app-tab';
+import { EngineeringTabContent } from './engineering/engineering-tab-content';
+import { FinanceTabContent } from './finance/finance-tab-content';
+import { HrTabContent } from './hr/hr-tab-content';
 
 const TAB_NAMES = [
-  { value: "engineering", label: "فنی و مهندسی" },
-  { value: "finance", label: "مالی" },
-  { value: "hr", label: "منابع انسانی" },
+  { value: 'engineering', label: 'فنی و مهندسی' },
+  { value: 'finance', label: 'مالی' },
+  { value: 'hr', label: 'منابع انسانی' },
 ] as const;
 
 const TAB_CONTENTS = {
@@ -20,7 +20,7 @@ const TAB_CONTENTS = {
 
 export function EmployeeTabs() {
   const [value, setValue] =
-    useState<(typeof TAB_NAMES)[number]["value"]>("engineering");
+    useState<(typeof TAB_NAMES)[number]['value']>('engineering');
 
   return (
     <AppTab

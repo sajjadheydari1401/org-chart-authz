@@ -1,4 +1,4 @@
-﻿import { UsersTabs } from "@/components/users/users-tabs";
+﻿import { UsersTabs } from '@/components/users/users-tabs';
 
 export default function UsersPage() {
   return (

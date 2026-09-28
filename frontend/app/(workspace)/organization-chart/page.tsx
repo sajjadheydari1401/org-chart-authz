@@ -1,4 +1,4 @@
-import { OrganizationGraph } from "@/components/units-chart/organization-graph";
+import { OrganizationGraph } from '@/components/units-chart/organization-graph';
 
 export default function OrganizationChartPage() {
   return (

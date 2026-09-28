@@ -1,10 +1,10 @@
-import { cn } from "@/lib/cn";
-import { AppCheckbox } from "../app-checkbox";
-import { AppTableProps, AppTableRowKey } from "./app-table";
+import { cn } from '@/lib/cn';
+import { AppCheckbox } from '../app-checkbox';
+import { AppTableProps, AppTableRowKey } from './app-table';
 
 type AppTableBodyProps<Row, Key extends AppTableRowKey> = Pick<
   AppTableProps<Row, Key>,
-  "columns" | "data" | "rowKey" | "rowLabel" | "emptyMessage"
+  'columns' | 'data' | 'rowKey' | 'rowLabel' | 'emptyMessage'
 > & {
   selection?: { keys: ReadonlySet<Key>; onToggle: (key: Key) => void };
 };
@@ -37,8 +37,8 @@ export function AppTableBody<Row, Key extends AppTableRowKey>({
             <tr
               key={key}
               className={cn(
-                "text-sm text-foreground",
-                selected ? "bg-accent" : "hover:bg-muted",
+                'text-sm text-foreground',
+                selected ? 'bg-accent' : 'hover:bg-muted',
               )}
             >
               {selection && (
@@ -56,13 +56,13 @@ export function AppTableBody<Row, Key extends AppTableRowKey>({
                 <td
                   key={column.key}
                   className={cn(
-                    "px-4 py-3 text-start align-middle",
+                    'px-4 py-3 text-start align-middle',
                     column.className,
                   )}
                 >
                   {column.render
                     ? column.render(row)
-                    : String(row[column.key as keyof Row] ?? "")}
+                    : String(row[column.key as keyof Row] ?? '')}
                 </td>
               ))}
             </tr>

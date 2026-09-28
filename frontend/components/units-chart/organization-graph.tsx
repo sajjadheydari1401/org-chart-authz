@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { Panel, ReactFlow, useReactFlow, type NodeTypes } from "@xyflow/react";
-import "@xyflow/react/dist/style.css";
+import { Panel, ReactFlow, useReactFlow, type NodeTypes } from '@xyflow/react';
+import '@xyflow/react/dist/style.css';
 
-import { AppButton } from "@/components/common/ui/app-button";
-import { rawUnits } from "@/data/org-units";
-import { createGraph } from "@/utils/create-graph";
-import { UnitCard } from "./unit-card";
+import { AppButton } from '@/components/common/ui/app-button';
+import { rawUnits } from '@/data/org-units';
+import { createGraph } from '@/utils/create-graph';
+import { UnitCard } from './unit-card';
 
 const nodeTypes = { unit: UnitCard } satisfies NodeTypes;
 

@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { showError, showSuccess } from "@/lib/api/show-error";
-import { TRANSPORT_ERROR_MESSAGE } from "@/lib/api/transport-error";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { showError, showSuccess } from '@/lib/api/show-error';
+import { TRANSPORT_ERROR_MESSAGE } from '@/lib/api/transport-error';
 
-import { verifySmsAction } from "@/app/actions/auth";
-import { AppButton } from "@/components/common/ui/app-button";
-import { AppFormField } from "@/components/common/ui/app-form-field";
-import { AppInput } from "@/components/common/ui/app-input";
+import { verifySmsAction } from '@/app/actions/auth';
+import { AppButton } from '@/components/common/ui/app-button';
+import { AppFormField } from '@/components/common/ui/app-form-field';
+import { AppInput } from '@/components/common/ui/app-input';
 import {
   verifySmsSchema,
   type VerifySmsFormData,
   type VerifySmsFormInput,
-} from "@/lib/schemas/auth";
+} from '@/lib/schemas/auth';
 
 export function VerifySmsForm() {
   const router = useRouter();
@@ -27,7 +27,7 @@ export function VerifySmsForm() {
     resolver: zodResolver(verifySmsSchema),
 
     defaultValues: {
-      code: "",
+      code: '',
     },
   });
 
@@ -40,13 +40,13 @@ export function VerifySmsForm() {
 
     if (result.success) {
       if (result.message) showSuccess(result.message);
-      router.push("/login");
+      router.push('/login');
       return;
     }
 
     if (result.fieldErrors?.code) {
-      setError("code", {
-        type: "server",
+      setError('code', {
+        type: 'server',
         message: result.fieldErrors.code,
       });
     }
@@ -73,7 +73,7 @@ export function VerifySmsForm() {
           dir="ltr"
           className="text-center text-lg tracking-[0.3em]"
           invalid={Boolean(errors.code)}
-          {...register("code")}
+          {...register('code')}
         />
       </AppFormField>
 

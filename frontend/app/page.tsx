@@ -7,53 +7,53 @@ import {
   LayoutDashboard,
   UsersRound,
   Wrench,
-} from "lucide-react";
+} from 'lucide-react';
 
-import { AppBadge } from "@/components/common/ui/app-badge";
-import { AppLink } from "@/components/common/ui/app-link";
-import { AppCard } from "@/components/common/ui/card/app-card";
-import { AppCardContent } from "@/components/common/ui/card/app-card-content";
+import { AppBadge } from '@/components/common/ui/app-badge';
+import { AppLink } from '@/components/common/ui/app-link';
+import { AppCard } from '@/components/common/ui/card/app-card';
+import { AppCardContent } from '@/components/common/ui/card/app-card-content';
 
 const currentAreas = [
   {
-    title: "واحدهای مجتمع",
-    description: "مشاهده و مدیریت ساختار واحدها و رابطه‌ی آن‌ها با مجموعه.",
-    href: "/org-units",
+    title: 'واحدهای مجتمع',
+    description: 'مشاهده و مدیریت ساختار واحدها و رابطه‌ی آن‌ها با مجموعه.',
+    href: '/org-units',
     icon: <Building2 className="size-5" aria-hidden="true" />,
   },
   {
-    title: "کاربران",
-    description: "دسترسی به فهرست کاربران و مدیران مجموعه.",
-    href: "/users",
+    title: 'کاربران',
+    description: 'دسترسی به فهرست کاربران و مدیران مجموعه.',
+    href: '/users',
     icon: <UsersRound className="size-5" aria-hidden="true" />,
   },
   {
-    title: "نمای کلی سامانه",
-    description: "ورود به داشبورد و مشاهده‌ی چارت ساختار موجود.",
-    href: "/dashboard",
+    title: 'نمای کلی سامانه',
+    description: 'ورود به داشبورد و مشاهده‌ی چارت ساختار موجود.',
+    href: '/dashboard',
     icon: <LayoutDashboard className="size-5" aria-hidden="true" />,
   },
 ];
 
 const plannedAreas = [
   {
-    title: "قراردادها و اجاره",
+    title: 'قراردادها و اجاره',
     icon: <FileText className="size-4" aria-hidden="true" />,
   },
   {
-    title: "درآمد، هزینه و شارژ",
+    title: 'درآمد، هزینه و شارژ',
     icon: <HandCoins className="size-4" aria-hidden="true" />,
   },
   {
-    title: "پارکینگ",
+    title: 'پارکینگ',
     icon: <CarFront className="size-4" aria-hidden="true" />,
   },
   {
-    title: "تأسیسات و تعمیرات",
+    title: 'تأسیسات و تعمیرات',
     icon: <Wrench className="size-4" aria-hidden="true" />,
   },
   {
-    title: "بایگانی اسناد",
+    title: 'بایگانی اسناد',
     icon: <FolderArchive className="size-4" aria-hidden="true" />,
   },
 ];

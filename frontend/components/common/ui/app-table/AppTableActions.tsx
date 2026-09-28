@@ -1,4 +1,4 @@
-import { Eye, Pencil, Trash2 } from "lucide-react";
+import { Eye, Pencil, Trash2 } from 'lucide-react';
 
 interface AppTableActionsProps {
   onView?: () => void;

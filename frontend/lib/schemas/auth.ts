@@ -1,22 +1,22 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 function normalizeDigits(value: string): string {
   return value
-    .replace(/[۰-۹]/g, (digit) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)))
-    .replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)));
+    .replace(/[۰-۹]/g, (digit) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(digit)))
+    .replace(/[٠-٩]/g, (digit) => String('٠١٢٣٤٥٦٧٨٩'.indexOf(digit)));
 }
 
 export const signupSchema = z.object({
-  email: z.string().trim().email("لطفاً یک آدرس ایمیل معتبر وارد کنید"),
+  email: z.string().trim().email('لطفاً یک آدرس ایمیل معتبر وارد کنید'),
 
   username: z
     .string()
     .trim()
-    .min(2, "نام کاربری باید حداقل ۲ کاراکتر باشد")
-    .max(40, "نام کاربری باید حداکثر ۴۰ کاراکتر باشد")
-    .regex(/^\S+$/, "نام کاربری نباید شامل فاصله باشد"),
+    .min(2, 'نام کاربری باید حداقل ۲ کاراکتر باشد')
+    .max(40, 'نام کاربری باید حداکثر ۴۰ کاراکتر باشد')
+    .regex(/^\S+$/, 'نام کاربری نباید شامل فاصله باشد'),
 
-  password: z.string().min(8, "رمز عبور باید حداقل ۸ کاراکتر باشد"),
+  password: z.string().min(8, 'رمز عبور باید حداقل ۸ کاراکتر باشد'),
 
   mobile: z
     .string()
@@ -24,7 +24,7 @@ export const signupSchema = z.object({
     .transform(normalizeDigits)
     .refine(
       (value) => /^09\d{9}$/.test(value),
-      "لطفاً یک شماره موبایل ایرانی معتبر وارد کنید",
+      'لطفاً یک شماره موبایل ایرانی معتبر وارد کنید',
     ),
 });
 
@@ -32,11 +32,11 @@ export const loginSchema = z.object({
   username: z
     .string()
     .trim()
-    .min(2, "نام کاربری باید حداقل ۲ کاراکتر باشد")
-    .max(40, "نام کاربری باید حداکثر ۴۰ کاراکتر باشد")
-    .regex(/^\S+$/, "نام کاربری نباید شامل فاصله باشد"),
+    .min(2, 'نام کاربری باید حداقل ۲ کاراکتر باشد')
+    .max(40, 'نام کاربری باید حداکثر ۴۰ کاراکتر باشد')
+    .regex(/^\S+$/, 'نام کاربری نباید شامل فاصله باشد'),
 
-  password: z.string().min(1, "وارد کردن رمز عبور الزامی است"),
+  password: z.string().min(1, 'وارد کردن رمز عبور الزامی است'),
 });
 
 export const verifySmsSchema = z.object({
@@ -46,7 +46,7 @@ export const verifySmsSchema = z.object({
     .transform(normalizeDigits)
     .refine(
       (value) => /^\d{6}$/.test(value),
-      "لطفاً کد تأیید ۶ رقمی را وارد کنید",
+      'لطفاً کد تأیید ۶ رقمی را وارد کنید',
     ),
 });
 

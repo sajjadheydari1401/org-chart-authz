@@ -1,6 +1,6 @@
-import type { InputHTMLAttributes, Ref } from "react";
+import type { InputHTMLAttributes, Ref } from 'react';
 
-import { cn } from "@/lib/cn";
+import { cn } from '@/lib/cn';
 
 export interface AppRadioOption {
   label: string;
@@ -10,14 +10,14 @@ export interface AppRadioOption {
 
 export interface AppRadioGroupProps extends Omit<
   InputHTMLAttributes<HTMLInputElement>,
-  "type" | "children" | "checked" | "defaultChecked" | "value" | "defaultValue"
+  'type' | 'children' | 'checked' | 'defaultChecked' | 'value' | 'defaultValue'
 > {
   name: string;
   options: readonly AppRadioOption[];
   label?: string;
   value?: string;
   defaultValue?: string;
-  orientation?: "vertical" | "horizontal";
+  orientation?: 'vertical' | 'horizontal';
   ref?: Ref<HTMLInputElement>;
 }
 
@@ -33,7 +33,7 @@ export function AppRadioGroup({
   label,
   value,
   defaultValue,
-  orientation = "vertical",
+  orientation = 'vertical',
   disabled = false,
   className,
   id,
@@ -41,9 +41,20 @@ export function AppRadioGroup({
   ...props
 }: AppRadioGroupProps) {
   return (
-    <fieldset id={id} disabled={disabled} className={cn("min-w-0 space-y-2", className)}>
-      {label && <legend className="text-sm font-medium text-foreground">{label}</legend>}
-      <div className={cn("flex gap-x-6 gap-y-1", orientation === "horizontal" ? "flex-wrap" : "flex-col")}>
+    <fieldset
+      id={id}
+      disabled={disabled}
+      className={cn('min-w-0 space-y-2', className)}
+    >
+      {label && (
+        <legend className="text-sm font-medium text-foreground">{label}</legend>
+      )}
+      <div
+        className={cn(
+          'flex gap-x-6 gap-y-1',
+          orientation === 'horizontal' ? 'flex-wrap' : 'flex-col',
+        )}
+      >
         {options.map((option) => {
           const isDisabled = disabled || option.disabled;
 
@@ -51,8 +62,10 @@ export function AppRadioGroup({
             <label
               key={option.value}
               className={cn(
-                "flex min-h-11 min-w-0 items-center gap-3 py-2 text-sm",
-                isDisabled ? "cursor-not-allowed text-muted-foreground" : "cursor-pointer text-foreground",
+                'flex min-h-11 min-w-0 items-center gap-3 py-2 text-sm',
+                isDisabled
+                  ? 'cursor-not-allowed text-muted-foreground'
+                  : 'cursor-pointer text-foreground',
               )}
             >
               <input
@@ -62,11 +75,19 @@ export function AppRadioGroup({
                 name={name}
                 value={option.value}
                 disabled={isDisabled}
-                checked={value === undefined ? undefined : value === option.value}
-                defaultChecked={value === undefined ? defaultValue === option.value : undefined}
+                checked={
+                  value === undefined ? undefined : value === option.value
+                }
+                defaultChecked={
+                  value === undefined
+                    ? defaultValue === option.value
+                    : undefined
+                }
                 className="size-5 shrink-0 cursor-pointer accent-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed"
               />
-              <span className="min-w-0 [overflow-wrap:anywhere]">{option.label}</span>
+              <span className="min-w-0 [overflow-wrap:anywhere]">
+                {option.label}
+              </span>
             </label>
           );
         })}

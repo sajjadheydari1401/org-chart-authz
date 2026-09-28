@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useId } from "react";
+import { useId } from 'react';
 
 export interface UseAppTabOptions<Value extends string = string> {
   tabNames: readonly { value: Value; disabled?: boolean }[];
@@ -15,7 +15,6 @@ export interface AppTabController {
   panelId: (value: string) => string;
 }
 
-
 export function useAppTab<Value extends string>({
   tabNames,
   value,
@@ -25,7 +24,9 @@ export function useAppTab<Value extends string>({
   const id = useId();
 
   function select(nextValue: string) {
-    const nextTab = tabNames.find((tab) => tab.value === nextValue && !tab.disabled);
+    const nextTab = tabNames.find(
+      (tab) => tab.value === nextValue && !tab.disabled,
+    );
     if (!nextTab || nextTab.value === value) return;
 
     onValueChange(nextTab.value);

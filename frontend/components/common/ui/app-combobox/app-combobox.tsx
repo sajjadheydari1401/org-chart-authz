@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { ChevronDown } from "lucide-react";
-import { cn } from "@/lib/cn";
-import type { AppSelectOption } from "../app-select";
-import { AppComboboxPanel } from "./app-combobox-panel";
-import { useAppCombobox } from "./use-app-combobox";
+import { ChevronDown } from 'lucide-react';
+import { cn } from '@/lib/cn';
+import type { AppSelectOption } from '../app-select';
+import { AppComboboxPanel } from './app-combobox-panel';
+import { useAppCombobox } from './use-app-combobox';
 
 export interface AppComboboxProps {
   options: readonly AppSelectOption[];
@@ -26,7 +26,7 @@ export function AppCombobox({
   onChange,
   onBlur,
   id,
-  placeholder = "Select an option",
+  placeholder = 'Select an option',
   emptyMessage,
   disabled = false,
   invalid = false,
@@ -49,13 +49,13 @@ export function AppCombobox({
 
   const noOptionsMessage =
     emptyMessage ??
-    (options.length ? "No matching options." : "No options available.");
+    (options.length ? 'No matching options.' : 'No options available.');
 
   return (
     <div
       ref={rootRef}
       onBlur={handleBlur}
-      className={cn("relative w-full min-w-0", className)}
+      className={cn('relative w-full min-w-0', className)}
     >
       <div className="relative">
         <input
@@ -63,7 +63,7 @@ export function AppCombobox({
           type="text"
           autoComplete="off"
           disabled={disabled}
-          value={expanded ? query : (selectedOption?.label ?? "")}
+          value={expanded ? query : (selectedOption?.label ?? '')}
           placeholder={placeholder}
           onFocus={openPanel}
           onClick={() => {
@@ -72,14 +72,14 @@ export function AppCombobox({
           onChange={(event) => handleInputChange(event.target.value)}
           onKeyDown={handleKeyDown}
           className={cn(
-            "block min-h-11 w-full min-w-0 rounded-lg border border-input bg-surface px-3 py-2 pe-10 text-base text-foreground placeholder:text-muted-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground",
-            invalid && "border-destructive",
+            'block min-h-11 w-full min-w-0 rounded-lg border border-input bg-surface px-3 py-2 pe-10 text-base text-foreground placeholder:text-muted-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground',
+            invalid && 'border-destructive',
           )}
         />
         <ChevronDown
           className={cn(
-            "pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground transition-transform motion-reduce:transition-none",
-            expanded && "rotate-180",
+            'pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground transition-transform motion-reduce:transition-none',
+            expanded && 'rotate-180',
           )}
         />
       </div>

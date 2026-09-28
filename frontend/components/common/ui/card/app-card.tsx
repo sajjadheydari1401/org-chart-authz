@@ -1,6 +1,6 @@
-import type { HTMLAttributes, ReactNode } from "react";
+import type { HTMLAttributes, ReactNode } from 'react';
 
-import { cn } from "@/lib/cn";
+import { cn } from '@/lib/cn';
 
 export interface AppCardProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
@@ -11,7 +11,7 @@ export function AppCard({ children, className, ...props }: AppCardProps) {
     <div
       {...props}
       className={cn(
-        "rounded-xl border border-border bg-surface text-foreground",
+        'rounded-xl border border-border bg-surface text-foreground',
         className,
       )}
     >

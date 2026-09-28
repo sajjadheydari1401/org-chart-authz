@@ -1,8 +1,8 @@
-import type { ReactNode } from "react";
-import { redirect } from "next/navigation";
+import type { ReactNode } from 'react';
+import { redirect } from 'next/navigation';
 
-import { AppWorkspaceShell } from "@/components/workspace/app-workspace-shell";
-import { getAccessToken } from "@/lib/auth/session";
+import { AppWorkspaceShell } from '@/components/workspace/app-workspace-shell';
+import { getAccessToken } from '@/lib/auth/session';
 
 export default async function WorkspaceLayout({
   children,
@@ -12,7 +12,7 @@ export default async function WorkspaceLayout({
   const accessToken = await getAccessToken();
 
   if (!accessToken) {
-    redirect("/login");
+    redirect('/login');
   }
 
   return <AppWorkspaceShell>{children}</AppWorkspaceShell>;

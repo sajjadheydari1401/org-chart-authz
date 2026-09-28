@@ -1,22 +1,22 @@
-"use client";
+'use client';
 
-import { useId } from "react";
+import { useId } from 'react';
 import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-} from "lucide-react";
+} from 'lucide-react';
 
-import { cn } from "@/lib/cn";
-import type { PaginationMeta } from "@/types/api";
-import { AppButton } from "./app-button";
-import { AppSelect } from "./app-select";
+import { cn } from '@/lib/cn';
+import type { PaginationMeta } from '@/types/api';
+import { AppButton } from './app-button';
+import { AppSelect } from './app-select';
 
-type PageItem = number | "ellipsis";
+type PageItem = number | 'ellipsis';
 
-const numberFormat = new Intl.NumberFormat("fa-IR");
+const numberFormat = new Intl.NumberFormat('fa-IR');
 
 function getPageItems(currentPage: number, totalPages: number): PageItem[] {
   if (totalPages <= 7) {
@@ -39,7 +39,7 @@ function getPageItems(currentPage: number, totalPages: number): PageItem[] {
     if (index > 0) {
       const gap = page - sortedPages[index - 1];
       if (gap === 2) items.push(page - 1);
-      if (gap > 2) items.push("ellipsis");
+      if (gap > 2) items.push('ellipsis');
     }
     items.push(page);
   });
@@ -82,12 +82,12 @@ export function AppPagination({
   return (
     <div
       className={cn(
-        "flex min-w-0 flex-wrap items-center justify-between gap-x-6 gap-y-3",
+        'flex min-w-0 flex-wrap items-center justify-between gap-x-6 gap-y-3',
         className,
       )}
     >
       <p className="text-sm text-muted-foreground">
-        نمایش {numberFormat.format(firstItem)} تا{" "}
+        نمایش {numberFormat.format(firstItem)} تا{' '}
         {numberFormat.format(lastItem)} از {numberFormat.format(safeTotalItems)}
       </p>
       <div className="flex min-w-0 flex-wrap items-center gap-4">
@@ -145,7 +145,7 @@ export function AppPagination({
             <ChevronRight className="size-4" aria-hidden="true" />
           </AppButton>
           {pageItems.map((item, index) =>
-            item === "ellipsis" ? (
+            item === 'ellipsis' ? (
               <span
                 key={`ellipsis-${index}`}
                 aria-hidden="true"
@@ -158,7 +158,7 @@ export function AppPagination({
                 key={item}
                 type="button"
                 size="sm"
-                variant={item === activePage ? "primary" : "secondary"}
+                variant={item === activePage ? 'primary' : 'secondary'}
                 disabled={disabled}
                 className="px-0"
                 onClick={() => onPageChange(item)}

@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useEffect, useId, useRef, type ReactNode } from "react";
-import { X } from "lucide-react";
+import { useEffect, useId, useRef, type ReactNode } from 'react';
+import { X } from 'lucide-react';
 
-import { cn } from "@/lib/cn";
-import { AppButton } from "./app-button";
+import { cn } from '@/lib/cn';
+import { AppButton } from './app-button';
 
 const dialogSizeStyles = {
-  sm: "max-w-sm",
-  md: "max-w-lg",
-  lg: "max-w-2xl",
+  sm: 'max-w-sm',
+  md: 'max-w-lg',
+  lg: 'max-w-2xl',
 } as const;
 
 export interface AppDialogProps {
@@ -31,7 +31,7 @@ export function AppDialog({
   description,
   children,
   footer,
-  size = "md",
+  size = 'md',
   dismissible = true,
   className,
 }: AppDialogProps) {
@@ -68,7 +68,7 @@ export function AppDialog({
     >
       <section
         className={cn(
-          "mx-auto flex max-h-[calc(100dvh-2rem)] min-w-0 flex-col overflow-hidden rounded-xl border border-border bg-surface shadow-2xl",
+          'mx-auto flex max-h-[calc(100dvh-2rem)] min-w-0 flex-col overflow-hidden rounded-xl border border-border bg-surface shadow-2xl',
           dialogSizeStyles[size],
           className,
         )}

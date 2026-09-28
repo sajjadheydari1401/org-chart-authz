@@ -1,45 +1,45 @@
-"use client";
+'use client';
 
-import { useState, type ReactNode } from "react";
-import { ArrowLeft, Check, Sparkles } from "lucide-react";
-import { toast } from "react-toastify";
+import { useState, type ReactNode } from 'react';
+import { ArrowLeft, Check, Sparkles } from 'lucide-react';
+import { toast } from 'react-toastify';
 
-import { AppButton } from "@/components/common/ui/app-button";
-import { AppBadge } from "@/components/common/ui/app-badge";
-import { AppCheckbox } from "@/components/common/ui/app-checkbox";
-import { AppCombobox } from "@/components/common/ui/app-combobox/app-combobox";
-import { AppConfirmDialog } from "@/components/common/ui/app-confirm-dialog";
-import { AppDialog } from "@/components/common/ui/app-dialog";
-import { AppFormError } from "@/components/common/ui/app-form-error";
-import { AppFormField } from "@/components/common/ui/app-form-field";
-import { AppInput } from "@/components/common/ui/app-input";
-import { AppLink } from "@/components/common/ui/app-link";
-import { AppMultiSelect } from "@/components/common/ui/app-multi-select/app-multi-select";
-import { AppPagination } from "@/components/common/ui/app-pagination";
-import { AppRadioGroup } from "@/components/common/ui/app-radio-group";
+import { AppButton } from '@/components/common/ui/app-button';
+import { AppBadge } from '@/components/common/ui/app-badge';
+import { AppCheckbox } from '@/components/common/ui/app-checkbox';
+import { AppCombobox } from '@/components/common/ui/app-combobox/app-combobox';
+import { AppConfirmDialog } from '@/components/common/ui/app-confirm-dialog';
+import { AppDialog } from '@/components/common/ui/app-dialog';
+import { AppFormError } from '@/components/common/ui/app-form-error';
+import { AppFormField } from '@/components/common/ui/app-form-field';
+import { AppInput } from '@/components/common/ui/app-input';
+import { AppLink } from '@/components/common/ui/app-link';
+import { AppMultiSelect } from '@/components/common/ui/app-multi-select/app-multi-select';
+import { AppPagination } from '@/components/common/ui/app-pagination';
+import { AppRadioGroup } from '@/components/common/ui/app-radio-group';
 import {
   AppSelect,
   type AppSelectOption,
-} from "@/components/common/ui/app-select";
-import { AppSpinner } from "@/components/common/ui/app-spinner";
-import { AppSwitch } from "@/components/common/ui/app-switch";
+} from '@/components/common/ui/app-select';
+import { AppSpinner } from '@/components/common/ui/app-spinner';
+import { AppSwitch } from '@/components/common/ui/app-switch';
 import {
   AppTable,
   type AppTableColumn,
-} from "@/components/common/ui/app-table/app-table";
-import { AppTableActions } from "@/components/common/ui/app-table/AppTableActions";
-import { AppTab } from "@/components/common/ui/app-tab/app-tab";
-import { AppTextarea } from "@/components/common/ui/app-textarea";
-import { AppCard } from "@/components/common/ui/card/app-card";
-import { AppCardContent } from "@/components/common/ui/card/app-card-content";
-import { AppCardDescription } from "@/components/common/ui/card/app-card-description";
-import { AppCardHeader } from "@/components/common/ui/card/app-card-header";
+} from '@/components/common/ui/app-table/app-table';
+import { AppTableActions } from '@/components/common/ui/app-table/AppTableActions';
+import { AppTab } from '@/components/common/ui/app-tab/app-tab';
+import { AppTextarea } from '@/components/common/ui/app-textarea';
+import { AppCard } from '@/components/common/ui/card/app-card';
+import { AppCardContent } from '@/components/common/ui/card/app-card-content';
+import { AppCardDescription } from '@/components/common/ui/card/app-card-description';
+import { AppCardHeader } from '@/components/common/ui/card/app-card-header';
 
 const options: AppSelectOption[] = [
-  { label: "مهندسی", value: "engineering" },
-  { label: "طراحی", value: "design" },
-  { label: "مالی", value: "finance" },
-  { label: "سایر", value: "other", disabled: true },
+  { label: 'مهندسی', value: 'engineering' },
+  { label: 'طراحی', value: 'design' },
+  { label: 'مالی', value: 'finance' },
+  { label: 'سایر', value: 'other', disabled: true },
 ];
 
 type PreviewMember = {
@@ -47,30 +47,30 @@ type PreviewMember = {
   name: string;
   role: string;
   unit: string;
-  status: "فعال" | "در انتظار";
+  status: 'فعال' | 'در انتظار';
 };
 
 const members: PreviewMember[] = [
   {
     id: 1,
-    name: "نسترن احمدی",
-    role: "مدیر تیم",
-    unit: "مهندسی",
-    status: "فعال",
+    name: 'نسترن احمدی',
+    role: 'مدیر تیم',
+    unit: 'مهندسی',
+    status: 'فعال',
   },
   {
     id: 2,
-    name: "آرمان رضایی",
-    role: "طراح محصول",
-    unit: "طراحی",
-    status: "فعال",
+    name: 'آرمان رضایی',
+    role: 'طراح محصول',
+    unit: 'طراحی',
+    status: 'فعال',
   },
   {
     id: 3,
-    name: "سارا کریمی",
-    role: "تحلیل‌گر",
-    unit: "مالی",
-    status: "در انتظار",
+    name: 'سارا کریمی',
+    role: 'تحلیل‌گر',
+    unit: 'مالی',
+    status: 'در انتظار',
   },
 ];
 
@@ -128,15 +128,15 @@ function Sample({ title, children }: { title: string; children: ReactNode }) {
 export function ComponentShowcase() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
-  const [inputValue, setInputValue] = useState("Simorgh workspace");
-  const [selectValue, setSelectValue] = useState("engineering");
-  const [comboboxValue, setComboboxValue] = useState("engineering");
+  const [inputValue, setInputValue] = useState('Simorgh workspace');
+  const [selectValue, setSelectValue] = useState('engineering');
+  const [comboboxValue, setComboboxValue] = useState('engineering');
   const [paginationPage, setPaginationPage] = useState(4);
   const [paginationPageSize, setPaginationPageSize] = useState(10);
-  const [radioValue, setRadioValue] = useState("design");
-  const [multiValue, setMultiValue] = useState(["engineering", "design"]);
-  const [tabValue, setTabValue] = useState<"overview" | "members" | "locked">(
-    "overview",
+  const [radioValue, setRadioValue] = useState('design');
+  const [multiValue, setMultiValue] = useState(['engineering', 'design']);
+  const [tabValue, setTabValue] = useState<'overview' | 'members' | 'locked'>(
+    'overview',
   );
   const [selectedMembers, setSelectedMembers] = useState<number[]>([2]);
   const [showEmptyTable, setShowEmptyTable] = useState(false);
@@ -144,15 +144,15 @@ export function ComponentShowcase() {
   const [switchChecked, setSwitchChecked] = useState(true);
 
   const memberColumns: AppTableColumn<PreviewMember>[] = [
-    { key: "name", header: "نام" },
-    { key: "role", header: "نقش" },
-    { key: "unit", header: "واحد" },
+    { key: 'name', header: 'نام' },
+    { key: 'role', header: 'نقش' },
+    { key: 'unit', header: 'واحد' },
     {
-      key: "status",
-      header: "وضعیت",
+      key: 'status',
+      header: 'وضعیت',
       render: (member) => (
         <AppBadge
-          variant={member.status === "فعال" ? "success" : "warning"}
+          variant={member.status === 'فعال' ? 'success' : 'warning'}
           dot
         >
           {member.status}
@@ -160,8 +160,8 @@ export function ComponentShowcase() {
       ),
     },
     {
-      key: "actions",
-      header: "عملیات",
+      key: 'actions',
+      header: 'عملیات',
       render: (member) => (
         <AppTableActions
           onView={() => toast.info(`نمایش ${member.name}`)}
@@ -198,16 +198,16 @@ export function ComponentShowcase() {
             className="mt-7 flex max-w-full gap-1 overflow-x-auto pb-1"
           >
             {[
-              ["theme", "رنگ‌ها"],
-              ["actions", "اقدام‌ها"],
-              ["forms", "فرم"],
-              ["choices", "انتخاب"],
-              ["badges", "نشان‌ها"],
-              ["navigation", "تب‌ها"],
-              ["overlays", "دیالوگ‌ها"],
-              ["data", "داده"],
-              ["pagination", "صفحه‌بندی"],
-              ["feedback", "بازخورد"],
+              ['theme', 'رنگ‌ها'],
+              ['actions', 'اقدام‌ها'],
+              ['forms', 'فرم'],
+              ['choices', 'انتخاب'],
+              ['badges', 'نشان‌ها'],
+              ['navigation', 'تب‌ها'],
+              ['overlays', 'دیالوگ‌ها'],
+              ['data', 'داده'],
+              ['pagination', 'صفحه‌بندی'],
+              ['feedback', 'بازخورد'],
             ].map(([href, label]) => (
               <AppLink
                 key={href}
@@ -230,16 +230,16 @@ export function ComponentShowcase() {
         >
           <div className="grid grid-cols-2 gap-x-5 gap-y-6 sm:grid-cols-3 lg:grid-cols-5">
             {[
-              ["primary", "Primary · #E05302", "bg-primary"],
-              ["hover", "Primary hover", "bg-primary-hover"],
-              ["pressed", "Primary active", "bg-primary-active"],
-              ["accent", "Accent", "bg-accent"],
-              ["surface", "Surface", "bg-surface"],
-              ["muted", "Muted", "bg-muted"],
-              ["success", "Success", "bg-success"],
-              ["warning", "Warning", "bg-warning"],
-              ["destructive", "Destructive", "bg-destructive"],
-              ["info", "Info", "bg-info"],
+              ['primary', 'Primary · #E05302', 'bg-primary'],
+              ['hover', 'Primary hover', 'bg-primary-hover'],
+              ['pressed', 'Primary active', 'bg-primary-active'],
+              ['accent', 'Accent', 'bg-accent'],
+              ['surface', 'Surface', 'bg-surface'],
+              ['muted', 'Muted', 'bg-muted'],
+              ['success', 'Success', 'bg-success'],
+              ['warning', 'Warning', 'bg-warning'],
+              ['destructive', 'Destructive', 'bg-destructive'],
+              ['info', 'Info', 'bg-info'],
             ].map(([key, label, colorClass]) => (
               <div key={key} className="min-w-0 space-y-2">
                 <div
@@ -256,7 +256,7 @@ export function ComponentShowcase() {
         <DemoSection
           id="actions"
           title="AppButton"
-          parts={["AppLink"]}
+          parts={['AppLink']}
           description="گونه‌ها، اندازه‌ها، آیکن‌ها، حالت غیرفعال و بارگذاری؛ لینک‌ها هم‌راستا با همان توکن‌ها هستند."
         >
           <div className="grid gap-x-8 gap-y-7 md:grid-cols-2">
@@ -323,7 +323,7 @@ export function ComponentShowcase() {
         <DemoSection
           id="forms"
           title="AppInput · AppTextarea · AppFormField · AppFormError"
-          parts={["AppInput", "AppTextarea", "AppFormField", "AppFormError"]}
+          parts={['AppInput', 'AppTextarea', 'AppFormField', 'AppFormError']}
           description="ورودی‌های متنی با مقدار قابل‌ویرایش، فقط‌خواندنی، غیرفعال و نامعتبر؛ فیلد فرم نیز برچسب، راهنما، الزام و خطا را نمایش می‌دهد."
         >
           <div className="grid gap-x-8 gap-y-7 md:grid-cols-2">
@@ -434,15 +434,15 @@ export function ComponentShowcase() {
           id="choices"
           title="AppCheckbox · AppSwitch · AppSelect · AppCombobox · AppRadioGroup · AppMultiSelect"
           parts={[
-            "AppCheckbox",
-            "AppSwitch",
-            "AppSelect",
-            "AppCombobox",
-            "AppRadioGroup",
-            "AppMultiSelect",
-            "AppMultiSelectTrigger",
-            "AppMultiSelectPanel",
-            "AppMultiSelectTags",
+            'AppCheckbox',
+            'AppSwitch',
+            'AppSelect',
+            'AppCombobox',
+            'AppRadioGroup',
+            'AppMultiSelect',
+            'AppMultiSelectTrigger',
+            'AppMultiSelectPanel',
+            'AppMultiSelectTags',
           ]}
           description="کنترل‌های انتخابی با حالت کنترل‌شده، گزینه‌ی غیرفعال، خطا و disabled؛ جست‌وجوی تک‌انتخابی و چندانتخابی را باز کنید تا نتیجه‌ها را فیلتر کنید."
         >
@@ -479,7 +479,7 @@ export function ComponentShowcase() {
                     checked={switchChecked}
                     onChange={(event) => setSwitchChecked(event.target.checked)}
                   />
-                  {switchChecked ? "فعال" : "خاموش"}
+                  {switchChecked ? 'فعال' : 'خاموش'}
                 </label>
                 <label className="flex min-h-11 items-center gap-3 text-sm text-muted-foreground">
                   <AppSwitch disabled />
@@ -611,7 +611,7 @@ export function ComponentShowcase() {
               <AppMultiSelect
                 id="preview-disabled-multi"
                 options={options}
-                value={["engineering"]}
+                value={['engineering']}
                 onChange={() => undefined}
                 disabled
               />
@@ -622,7 +622,7 @@ export function ComponentShowcase() {
         <DemoSection
           id="badges"
           title="AppBadge"
-          parts={["AppBadge"]}
+          parts={['AppBadge']}
           description="نشان‌های وضعیت با رنگ‌های معنایی، اندازه‌های مختلف و نشانگر نقطه‌ای."
         >
           <div className="grid gap-x-8 gap-y-7 md:grid-cols-2">
@@ -655,14 +655,14 @@ export function ComponentShowcase() {
         <DemoSection
           id="navigation"
           title="AppTab"
-          parts={["AppTabList", "AppTabTrigger", "AppTabContent"]}
+          parts={['AppTabList', 'AppTabTrigger', 'AppTabContent']}
           description="تب کنترل‌شده با تغییر مقدار، محتوای متناظر و یک گزینه‌ی غیرفعال."
         >
           <AppTab
             tabNames={[
-              { value: "overview", label: "نمای کلی" },
-              { value: "members", label: "اعضا" },
-              { value: "locked", label: "بایگانی", disabled: true },
+              { value: 'overview', label: 'نمای کلی' },
+              { value: 'members', label: 'اعضا' },
+              { value: 'locked', label: 'بایگانی', disabled: true },
             ]}
             value={tabValue}
             onValueChange={setTabValue}
@@ -690,7 +690,7 @@ export function ComponentShowcase() {
         <DemoSection
           id="overlays"
           title="AppDialog · AppConfirmDialog"
-          parts={["AppDialog", "AppConfirmDialog"]}
+          parts={['AppDialog', 'AppConfirmDialog']}
           description="دیالوگ کنترل‌شده و تأیید عملیات مخرب با حالت درحال‌انجام."
         >
           <div className="grid gap-x-8 gap-y-7 md:grid-cols-2">
@@ -742,7 +742,7 @@ export function ComponentShowcase() {
                 description="این عملیات قابل بازگشت نیست."
                 confirmLabel="حذف عضو"
                 onConfirm={() => {
-                  toast.success("عضو حذف شد.");
+                  toast.success('عضو حذف شد.');
                   setConfirmDialogOpen(false);
                 }}
               >
@@ -756,12 +756,12 @@ export function ComponentShowcase() {
           id="data"
           title="AppTable · AppTableActions · AppCard"
           parts={[
-            "AppTableHeader",
-            "AppTableBody",
-            "AppTableActions",
-            "AppCardHeader",
-            "AppCardContent",
-            "AppCardDescription",
+            'AppTableHeader',
+            'AppTableBody',
+            'AppTableActions',
+            'AppCardHeader',
+            'AppCardContent',
+            'AppCardDescription',
           ]}
           description="جدول با انتخاب ردیف، سرستون select-all، سلول سفارشی، حالت خالی و عملیات؛ کارت نمونه نیز تمام building blockهای کارت را ترکیب می‌کند."
         >
@@ -818,7 +818,7 @@ export function ComponentShowcase() {
         <DemoSection
           id="pagination"
           title="AppPagination"
-          parts={["AppPagination"]}
+          parts={['AppPagination']}
           description="صفحه‌بندی کنترل‌شده برای فهرست‌هایی که داده را از سرور دریافت می‌کنند."
         >
           <Sample title="فهرست اعضا · ۹۷ نتیجه">
@@ -842,7 +842,7 @@ export function ComponentShowcase() {
         <DemoSection
           id="feedback"
           title="AppSpinner · AppToast"
-          parts={["AppToast"]}
+          parts={['AppToast']}
           description="لودر در چند اندازه و اعلان‌های موفقیت، اطلاع‌رسانی و خطا. ظرف AppToast در ریشه‌ی برنامه mount شده است."
         >
           <div className="grid gap-x-8 gap-y-7 md:grid-cols-2">
@@ -858,21 +858,21 @@ export function ComponentShowcase() {
                 <AppButton
                   type="button"
                   variant="secondary"
-                  onClick={() => toast.success("تغییرات ذخیره شد.")}
+                  onClick={() => toast.success('تغییرات ذخیره شد.')}
                 >
                   موفقیت
                 </AppButton>
                 <AppButton
                   type="button"
                   variant="secondary"
-                  onClick={() => toast.info("این یک پیام اطلاع‌رسانی است.")}
+                  onClick={() => toast.info('این یک پیام اطلاع‌رسانی است.')}
                 >
                   اطلاع‌رسانی
                 </AppButton>
                 <AppButton
                   type="button"
                   variant="destructive"
-                  onClick={() => toast.error("ذخیره‌سازی انجام نشد.")}
+                  onClick={() => toast.error('ذخیره‌سازی انجام نشد.')}
                 >
                   خطا
                 </AppButton>
@@ -886,7 +886,7 @@ export function ComponentShowcase() {
         <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-5 text-xs text-muted-foreground sm:px-6">
           <span>Simorgh UI · Theme preview</span>
           <AppLink href="#theme" variant="default" className="font-medium">
-            بازگشت به رنگ‌ها{" "}
+            بازگشت به رنگ‌ها{' '}
             <Check aria-hidden="true" className="inline size-3.5" />
           </AppLink>
         </div>

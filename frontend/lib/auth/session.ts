@@ -1,18 +1,18 @@
-import "server-only";
+import 'server-only';
 
-import { cookies } from "next/headers";
+import { cookies } from 'next/headers';
 
-const ACCESS_TOKEN_COOKIE = "access_token";
-const PENDING_USERNAME_COOKIE = "pending_username";
+const ACCESS_TOKEN_COOKIE = 'access_token';
+const PENDING_USERNAME_COOKIE = 'pending_username';
 
 export async function setAccessToken(token: string): Promise<void> {
   const cookieStore = await cookies();
 
   cookieStore.set(ACCESS_TOKEN_COOKIE, token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
   });
 }
 
@@ -40,9 +40,9 @@ export async function setPendingUsername(username: string): Promise<void> {
 
   cookieStore.set(PENDING_USERNAME_COOKIE, username, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
 
     // Temporary verification state.
     maxAge: 10 * 60,

@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useId, useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { useId, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 
-import { cn } from "@/lib/cn";
-import { AppSidebarMenuItem } from "./app-sidebar-menu-item";
-import type { WorkspaceNavigationSection } from "@/lib/workspace-navigation";
+import { cn } from '@/lib/cn';
+import { AppSidebarMenuItem } from './app-sidebar-menu-item';
+import type { WorkspaceNavigationSection } from '@/lib/workspace-navigation';
 
 interface AppSidebarMenuSectionProps {
   section: WorkspaceNavigationSection;
@@ -39,8 +39,8 @@ export function AppSidebarMenuSection({
           <ChevronDown
             aria-hidden="true"
             className={cn(
-              "size-4 shrink-0 transition-transform motion-reduce:transition-none",
-              !expanded && "-rotate-90",
+              'size-4 shrink-0 transition-transform motion-reduce:transition-none',
+              !expanded && '-rotate-90',
             )}
           />
         </button>

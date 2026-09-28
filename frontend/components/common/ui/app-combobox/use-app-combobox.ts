@@ -5,8 +5,8 @@ import {
   useState,
   type FocusEvent,
   type KeyboardEvent,
-} from "react";
-import type { AppSelectOption } from "../app-select";
+} from 'react';
+import type { AppSelectOption } from '../app-select';
 
 interface UseAppComboboxOptions {
   id?: string;
@@ -29,7 +29,7 @@ export function useAppCombobox({
   const controlId = id ?? generatedId;
   const rootRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
   const expanded = open && !disabled;
   const selectedOption = options.find((option) => option.value === value);
@@ -47,14 +47,14 @@ export function useAppCombobox({
       if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
     }
 
-    document.addEventListener("pointerdown", handleOutsideClick);
+    document.addEventListener('pointerdown', handleOutsideClick);
     return () =>
-      document.removeEventListener("pointerdown", handleOutsideClick);
+      document.removeEventListener('pointerdown', handleOutsideClick);
   }, [expanded]);
 
   function openPanel() {
     if (disabled) return;
-    setQuery("");
+    setQuery('');
     setActiveIndex(0);
     setOpen(true);
   }
@@ -62,7 +62,7 @@ export function useAppCombobox({
   function selectOption(option: AppSelectOption) {
     if (disabled || option.disabled) return;
     onChange(option.value);
-    setQuery("");
+    setQuery('');
     setOpen(false);
   }
 
@@ -75,19 +75,19 @@ export function useAppCombobox({
   function handleBlur(event: FocusEvent<HTMLDivElement>) {
     if (event.currentTarget.contains(event.relatedTarget)) return;
     setOpen(false);
-    setQuery("");
+    setQuery('');
     onBlur?.();
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
     switch (event.key) {
-      case "ArrowDown":
-      case "ArrowUp": {
+      case 'ArrowDown':
+      case 'ArrowUp': {
         event.preventDefault();
         if (!expanded) {
           openPanel();
           setActiveIndex(
-            event.key === "ArrowDown"
+            event.key === 'ArrowDown'
               ? 0
               : Math.max(0, enabledOptions.length - 1),
           );
@@ -95,28 +95,28 @@ export function useAppCombobox({
         }
         if (!enabledOptions.length) return;
         setActiveIndex((current) =>
-          event.key === "ArrowDown"
+          event.key === 'ArrowDown'
             ? (current + 1) % enabledOptions.length
             : (current - 1 + enabledOptions.length) % enabledOptions.length,
         );
         break;
       }
-      case "Enter":
+      case 'Enter':
         if (expanded && activeOption) {
           event.preventDefault();
           selectOption(activeOption);
         }
         break;
-      case "Escape":
+      case 'Escape':
         if (expanded) {
           event.preventDefault();
           setOpen(false);
-          setQuery("");
+          setQuery('');
         }
         break;
-      case "Tab":
+      case 'Tab':
         setOpen(false);
-        setQuery("");
+        setQuery('');
         break;
     }
   }

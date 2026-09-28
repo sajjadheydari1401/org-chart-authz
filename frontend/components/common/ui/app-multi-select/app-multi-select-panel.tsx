@@ -1,7 +1,7 @@
-﻿import type { KeyboardEvent, RefObject } from "react";
-import { cn } from "@/lib/cn";
-import { AppCheckbox } from "../app-checkbox";
-import type { AppSelectOption } from "../app-select";
+﻿import type { KeyboardEvent, RefObject } from 'react';
+import { cn } from '@/lib/cn';
+import { AppCheckbox } from '../app-checkbox';
+import type { AppSelectOption } from '../app-select';
 
 interface AppMultiSelectPanelProps {
   id: string;
@@ -17,10 +17,22 @@ interface AppMultiSelectPanelProps {
 
 /** Renders search results. Selection and navigation are handled by the hook. */
 export function AppMultiSelectPanel({
-  id, searchRef, query, onSearch, options, selected, emptyMessage, onToggle, onKeyDown,
+  id,
+  searchRef,
+  query,
+  onSearch,
+  options,
+  selected,
+  emptyMessage,
+  onToggle,
+  onKeyDown,
 }: AppMultiSelectPanelProps) {
   return (
-    <div id={id} onKeyDown={onKeyDown} className="absolute start-0 z-20 mt-2 w-full min-w-0 rounded-xl border border-border bg-surface p-2 shadow-lg">
+    <div
+      id={id}
+      onKeyDown={onKeyDown}
+      className="absolute start-0 z-20 mt-2 w-full min-w-0 rounded-xl border border-border bg-surface p-2 shadow-lg"
+    >
       <input
         ref={searchRef}
         type="search"
@@ -28,7 +40,7 @@ export function AppMultiSelectPanel({
         onChange={(event) => onSearch(event.target.value)}
         onKeyDown={(event) => {
           // Searching must not submit the surrounding form.
-          if (event.key === "Enter") event.preventDefault();
+          if (event.key === 'Enter') event.preventDefault();
         }}
         aria-label="Search options"
         placeholder="Search options…"
@@ -43,16 +55,28 @@ export function AppMultiSelectPanel({
               event.preventDefault();
             }}
             className={cn(
-              "flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-2 text-sm",
-              option.disabled ? "cursor-not-allowed text-muted-foreground" : "cursor-pointer hover:bg-muted",
-              selected.has(option.value) && "bg-accent",
+              'flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-2 text-sm',
+              option.disabled
+                ? 'cursor-not-allowed text-muted-foreground'
+                : 'cursor-pointer hover:bg-muted',
+              selected.has(option.value) && 'bg-accent',
             )}
           >
-            <AppCheckbox checked={selected.has(option.value)} disabled={option.disabled} onChange={() => onToggle(option)} />
-            <span className="min-w-0 [overflow-wrap:anywhere]">{option.label}</span>
+            <AppCheckbox
+              checked={selected.has(option.value)}
+              disabled={option.disabled}
+              onChange={() => onToggle(option)}
+            />
+            <span className="min-w-0 [overflow-wrap:anywhere]">
+              {option.label}
+            </span>
           </label>
         ))}
-        {!options.length && <p className="px-3 py-4 text-sm text-muted-foreground">{emptyMessage}</p>}
+        {!options.length && (
+          <p className="px-3 py-4 text-sm text-muted-foreground">
+            {emptyMessage}
+          </p>
+        )}
       </div>
     </div>
   );

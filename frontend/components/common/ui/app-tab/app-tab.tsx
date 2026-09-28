@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import type { ComponentPropsWithRef, ReactNode } from "react";
-import { cn } from "@/lib/cn";
-import { useAppTab } from "./use-app-tab";
-import { AppTabList } from "./app-tab-list";
-import { AppTabTrigger } from "./app-tab-trigger";
-import { AppTabContent } from "./app-tab-content";
+import type { ComponentPropsWithRef, ReactNode } from 'react';
+import { cn } from '@/lib/cn';
+import { useAppTab } from './use-app-tab';
+import { AppTabList } from './app-tab-list';
+import { AppTabTrigger } from './app-tab-trigger';
+import { AppTabContent } from './app-tab-content';
 
 export interface AppTabName<Value extends string = string> {
   value: Value;
@@ -14,8 +14,8 @@ export interface AppTabName<Value extends string = string> {
 }
 
 export type AppTabProps<Value extends string = string> = Omit<
-  ComponentPropsWithRef<"div">,
-  "children" | "defaultValue"
+  ComponentPropsWithRef<'div'>,
+  'children' | 'defaultValue'
 > & {
   tabNames: readonly AppTabName<Value>[];
   tabContents: Record<NoInfer<Value>, ReactNode>;
@@ -29,7 +29,7 @@ export type AppTabProps<Value extends string = string> = Omit<
 export function AppTab<Value extends string>({
   tabNames,
   tabContents,
-  tabListLabel = "Sections",
+  tabListLabel = 'Sections',
   listClassName,
   contentClassName,
   value,
@@ -43,7 +43,7 @@ export function AppTab<Value extends string>({
     <div
       {...props}
       data-value={tabs.value}
-      className={cn("min-w-0 space-y-4", className)}
+      className={cn('min-w-0 space-y-4', className)}
     >
       <AppTabList aria-label={tabListLabel} className={listClassName}>
         {tabNames.map((tab) => (

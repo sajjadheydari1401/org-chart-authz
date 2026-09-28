@@ -1,36 +1,48 @@
-import {
-  BadGatewayException,
-  Injectable,
-  ServiceUnavailableException,
-} from '@nestjs/common';
+import { BadGatewayException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ProviderError } from '../../../common/filter/provider-error.js';
 import type { AddResourceResult } from '../../../common/types/add-resource-result.js';
-import type { ProviderResponse } from '../../../common/types/provider-response.js';
-import { AppApi } from '../../../common/utils/api/AppApi.js';
+import type { UpdateResourceResult } from '../../../common/types/update-resource-result.js';
+import { postToProvider } from '../../../common/utils/api/post-to-provider.js';
+import {
+  providerUrl,
+  systemCredentials,
+} from '../../../common/utils/api/provider-config.js';
 
 @Injectable()
 export class AuthorizationProviderService {
   constructor(private readonly config: ConfigService) {}
 
-  async createResource(route: string): Promise<AddResourceResult> {
-    const baseUrl = this.config.getOrThrow<string>('AUTH_BASE_URL');
-    const url = `${baseUrl.replace(/\/+$/, '')}/admin/addResource`;
-    if (!URL.canParse(url) || new URL(url).protocol !== 'https:') {
-      throw new ServiceUnavailableException();
-    }
-
-    const { data } = await AppApi.post<ProviderResponse<AddResourceResult>>(
-      url,
+  async updateResource(
+    resourceId: string,
+    route: string,
+  ): Promise<UpdateResourceResult> {
+    const { systemUsername, systemPassword } = systemCredentials(this.config);
+    const data = await postToProvider<UpdateResourceResult>(
+      providerUrl(this.config, '/admin/updateResource'),
       {
-        systemUsername: this.config.getOrThrow<string>('AUTH_SYSTEM_USERNAME'),
-        systemPassword: this.config.getOrThrow<string>('AUTH_SYSTEM_PASSWORD'),
+        username: systemUsername,
+        password: systemPassword,
+        resourceId,
         route,
       },
     );
 
-    if (data?.success === false) throw new ProviderError(data);
-    if (data?.success !== true) throw new BadGatewayException();
+    const result = data.result;
+    if (!result || typeof result.route !== 'string' || !result.route.trim()) {
+      throw new BadGatewayException();
+    }
+
+    return result;
+  }
+
+  async createResource(route: string): Promise<AddResourceResult> {
+    const data = await postToProvider<AddResourceResult>(
+      providerUrl(this.config, '/admin/addResource'),
+      {
+        ...systemCredentials(this.config),
+        route,
+      },
+    );
 
     const result = data.result;
     const providerId = result?.id;

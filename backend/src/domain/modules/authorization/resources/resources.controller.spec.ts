@@ -5,6 +5,7 @@ import { ResourcesService } from './resources.service.js';
 
 describe('ResourcesController', () => {
   const resourcesService = {
+    updateResource: vi.fn(),
     getAllResources: vi.fn(),
     createResource: vi.fn(),
   };
@@ -14,6 +15,15 @@ describe('ResourcesController', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  it('delegates resource updates with the local ID and input', async () => {
+    const input = { route: '/updated' };
+    const resource = { id: 7, route: input.route, providerId: 'provider-id' };
+    resourcesService.updateResource.mockResolvedValue(resource);
+
+    await expect(controller.updateResource(7, input)).resolves.toBe(resource);
+    expect(resourcesService.updateResource).toHaveBeenCalledWith(7, input);
   });
 
   it('delegates getAllResources to the service', async () => {

@@ -43,6 +43,66 @@ describe('AuthorizationProviderService', () => {
     } as ConfigService);
   });
 
+  it('posts updateResource with environment credentials and the provider resource ID', async () => {
+    await expect(
+      service.updateResource('provider-resource-id', '/example/v1'),
+    ).resolves.toMatchObject({
+      route: '/example/v1',
+    });
+    expect(providerPost).toHaveBeenCalledExactlyOnceWith(
+      `${PROVIDER_BASE_URL}/admin/updateResource`,
+      {
+        username: 'system-user',
+        password: 'system-password',
+        resourceId: 'provider-resource-id',
+        route: '/example/v1',
+      },
+    );
+  });
+
+  it('propagates provider rejection of an update', async () => {
+    providerPost.mockResolvedValueOnce({
+      data: { success: false, message: 'rejected' },
+    } as never);
+    await expect(
+      service.updateResource('provider-id', '/updated'),
+    ).rejects.toBeInstanceOf(ProviderError);
+  });
+
+  it.each([
+    undefined,
+    {},
+    { success: true },
+    { success: true, result: {} },
+    { success: true, result: { route: ' ' } },
+  ])('rejects malformed update response %j', async (data) => {
+    providerPost.mockResolvedValueOnce({ data } as never);
+    await expect(
+      service.updateResource('provider-id', '/updated'),
+    ).rejects.toBeInstanceOf(BadGatewayException);
+  });
+
+  it('propagates update transport failures', async () => {
+    const error = new Error('connection failed');
+    providerPost.mockRejectedValueOnce(error);
+    await expect(
+      service.updateResource('provider-id', '/updated'),
+    ).rejects.toBe(error);
+  });
+
+  it('rejects non-HTTPS update URLs before making a request', async () => {
+    const insecureService = new AuthorizationProviderService({
+      getOrThrow: (key: string) =>
+        key === 'AUTH_BASE_URL'
+          ? 'http://auth.example.test/api/v1'
+          : configuration[key],
+    } as ConfigService);
+    await expect(
+      insecureService.updateResource('provider-id', '/updated'),
+    ).rejects.toBeInstanceOf(ServiceUnavailableException);
+    expect(providerPost).not.toHaveBeenCalled();
+  });
+
   it('calls addResource with provider credentials and returns the provider result', async () => {
     await expect(service.createResource('/example/v1')).resolves.toMatchObject({
       id: 'provider-resource-id',

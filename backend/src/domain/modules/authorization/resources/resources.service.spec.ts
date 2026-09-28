@@ -5,19 +5,25 @@ import { ResourcesService } from './resources.service.js';
 describe('ResourcesService', () => {
   let service: ResourcesService;
   let repository: {
+    findOneBy: ReturnType<typeof vi.fn>;
     find: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
     save: ReturnType<typeof vi.fn>;
   };
-  let provider: { createResource: ReturnType<typeof vi.fn> };
+  let provider: {
+    createResource: ReturnType<typeof vi.fn>;
+    updateResource: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(() => {
     repository = {
+      findOneBy: vi.fn(),
       find: vi.fn(),
       create: vi.fn((input) => input),
       save: vi.fn(async (resource) => ({ id: 1, ...resource })),
     };
     provider = {
+      updateResource: vi.fn(),
       createResource: vi.fn().mockResolvedValue({
         id: 'provider-resource-id',
         route: '/example/v1',
@@ -30,6 +36,55 @@ describe('ResourcesService', () => {
       repository as never,
       provider as unknown as AuthorizationProviderService,
     );
+  });
+
+  it('updates the provider first and saves only its returned route locally', async () => {
+    const resource = { id: 7, route: '/old', providerId: 'provider-id' };
+    repository.findOneBy.mockResolvedValue(resource);
+    provider.updateResource.mockImplementation(async () => {
+      expect(repository.save).not.toHaveBeenCalled();
+      return { id: 'different-id', route: '/updated', updated_at: 'timestamp' };
+    });
+
+    await expect(
+      service.updateResource(7, { route: '/requested' }),
+    ).resolves.toEqual({
+      ...resource,
+      route: '/updated',
+    });
+    expect(repository.findOneBy).toHaveBeenCalledWith({ id: 7 });
+    expect(provider.updateResource).toHaveBeenCalledWith(
+      'provider-id',
+      '/requested',
+    );
+    expect(repository.save).toHaveBeenCalledExactlyOnceWith({
+      ...resource,
+      route: '/updated',
+    });
+    expect(resource.route).toBe('/old');
+  });
+
+  it('does not call the provider or save when the local resource is missing', async () => {
+    repository.findOneBy.mockResolvedValue(null);
+
+    await expect(
+      service.updateResource(404, { route: '/updated' }),
+    ).rejects.toMatchObject({ status: 404 });
+    expect(provider.updateResource).not.toHaveBeenCalled();
+    expect(repository.save).not.toHaveBeenCalled();
+  });
+
+  it('keeps the local resource unchanged when the provider update fails', async () => {
+    const resource = { id: 7, route: '/old', providerId: 'provider-id' };
+    repository.findOneBy.mockResolvedValue(resource);
+    const error = new Error('provider rejected update');
+    provider.updateResource.mockRejectedValue(error);
+
+    await expect(service.updateResource(7, { route: '/updated' })).rejects.toBe(
+      error,
+    );
+    expect(repository.save).not.toHaveBeenCalled();
+    expect(resource.route).toBe('/old');
   });
 
   it('returns resources from the local repository without calling the provider', async () => {

@@ -5,5 +5,5 @@ packages:
   # exclude packages that are inside test directories
   - "!**/test/**"
 allowBuilds:
-  '@scarf/scarf': set this to true or false
+  '@scarf/scarf': true
   unrs-resolver: true

@@ -1,11 +1,11 @@
-export interface SignupRequest {
+export interface RegisterWithUsernamePasswordRequest {
   username: string;
   email: string;
   password: string;
   mobile: string;
 }
 
-export interface LoginRequest {
+export interface LoginWithUsernamePasswordRequest {
   username: string;
   password: string;
 }

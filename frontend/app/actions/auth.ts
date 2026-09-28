@@ -2,10 +2,10 @@
 
 import { z } from "zod";
 
-import { AppApi } from "@/lib/api/server";
 import { toActionError } from "@/lib/api/error";
-import { registerAccount } from "@/services/auth/signup";
-import { verifyPhoneNumber } from "@/services/auth/confirm";
+import { loginWithUsernamePassword } from "@/services/auth/login-with-username-password";
+import { registerWithUsernamePassword } from "@/services/auth/register-with-username-password";
+import { confirmRegistrationBySms } from "@/services/auth/confirm-registration-by-sms";
 import {
   clearPendingUsername,
   clearSession,
@@ -24,16 +24,16 @@ import {
 import type {
   AuthActionResult,
   AuthTokenResponse,
-  LoginRequest,
+  LoginWithUsernamePasswordRequest,
 } from "@/types/auth";
 
 /*
 |--------------------------------------------------------------------------
-| Signup
+| Register with username and password
 |--------------------------------------------------------------------------
 */
 
-export async function signupAction(
+export async function registerWithUsernamePasswordAction(
   input: SignupFormData,
 ): Promise<AuthActionResult> {
   const parsed = signupSchema.safeParse(input);
@@ -61,7 +61,7 @@ export async function signupAction(
     };
   }
 
-  const result = await registerAccount(parsed.data);
+  const result = await registerWithUsernamePassword(parsed.data);
   if (!result.success) return result;
 
   await setPendingUsername(parsed.data.username);
@@ -71,11 +71,11 @@ export async function signupAction(
 
 /*
 |--------------------------------------------------------------------------
-| Login
+| Login with username and password
 |--------------------------------------------------------------------------
 */
 
-export async function loginAction(
+export async function loginWithUsernamePasswordAction(
   input: LoginFormData,
 ): Promise<AuthActionResult> {
   const parsed = loginSchema.safeParse(input);
@@ -97,7 +97,7 @@ export async function loginAction(
     };
   }
 
-  const body: LoginRequest = {
+  const body: LoginWithUsernamePasswordRequest = {
     username: parsed.data.username,
     password: parsed.data.password,
   };
@@ -105,11 +105,7 @@ export async function loginAction(
   let result: { data: AuthTokenResponse; message?: string };
 
   try {
-    result = await AppApi<AuthTokenResponse>("/auth/login", {
-      method: "POST",
-      data: body,
-      authenticated: false,
-    });
+    result = await loginWithUsernamePassword(body);
   } catch (error) {
     return toActionError(error);
   }
@@ -159,7 +155,7 @@ export async function verifySmsAction(
     };
   }
 
-  const result = await verifyPhoneNumber(parsed.data);
+  const result = await confirmRegistrationBySms(parsed.data);
   if (!result.success) return result;
 
   await clearPendingUsername();

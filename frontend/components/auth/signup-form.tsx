@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { showError, showSuccess } from "@/lib/api/show-error";
 import { TRANSPORT_ERROR_MESSAGE } from "@/lib/api/transport-error";
 
-import { signupAction } from "@/app/actions/auth";
+import { registerWithUsernamePasswordAction } from "@/app/actions/auth";
 import { AppButton } from "@/components/common/ui/app-button";
 import { AppFormField } from "@/components/common/ui/app-form-field";
 import { AppInput } from "@/components/common/ui/app-input";
@@ -34,7 +34,7 @@ export function SignupForm() {
   });
 
   async function onSubmit(data: SignupFormData) {
-    const result = await signupAction(data).catch(() => ({
+    const result = await registerWithUsernamePasswordAction(data).catch(() => ({
       success: false as const,
       message: TRANSPORT_ERROR_MESSAGE,
       fieldErrors: undefined,

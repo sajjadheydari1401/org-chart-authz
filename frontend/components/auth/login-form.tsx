@@ -7,7 +7,7 @@ import { showError, showSuccess } from "@/lib/api/show-error";
 import { useAuthUserStore } from "@/lib/auth/user-store";
 import { TRANSPORT_ERROR_MESSAGE } from "@/lib/api/transport-error";
 
-import { loginAction } from "@/app/actions/auth";
+import { loginWithUsernamePasswordAction } from "@/app/actions/auth";
 import { AppButton } from "@/components/common/ui/app-button";
 import { AppFormField } from "@/components/common/ui/app-form-field";
 import { AppInput } from "@/components/common/ui/app-input";
@@ -35,7 +35,7 @@ export function LoginForm() {
   });
 
   async function onSubmit(data: LoginFormData) {
-    const result = await loginAction(data).catch(() => ({
+    const result = await loginWithUsernamePasswordAction(data).catch(() => ({
       success: false as const,
       message: TRANSPORT_ERROR_MESSAGE,
       fieldErrors: undefined,

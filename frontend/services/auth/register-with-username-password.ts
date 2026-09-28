@@ -1,20 +1,24 @@
-﻿import "server-only";
+import "server-only";
 import { AppApi } from "@/lib/api/server";
 import { toActionError } from "@/lib/api/error";
 import type { SignupFormData } from "@/lib/schemas/auth";
-import type { AuthActionResult, SignupRequest } from "@/types/auth";
+import type {
+  AuthActionResult,
+  RegisterWithUsernamePasswordRequest,
+} from "@/types/auth";
 
-export async function registerAccount(
+export async function registerWithUsernamePassword(
   input: SignupFormData,
 ): Promise<AuthActionResult> {
-  const body: SignupRequest = {
+  const body: RegisterWithUsernamePasswordRequest = {
     email: input.email,
     username: input.username,
     password: input.password,
     mobile: input.mobile,
   };
+
   try {
-    const response = await AppApi("/auth/signup", {
+    const response = await AppApi("/auth/register/username-password", {
       method: "POST",
       data: body,
       authenticated: false,

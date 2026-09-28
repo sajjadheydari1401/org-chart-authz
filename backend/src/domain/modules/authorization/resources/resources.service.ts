@@ -13,6 +13,10 @@ export class ResourcesService {
     private readonly authorizationProvider: AuthorizationProviderService,
   ) {}
 
+  getAllResources(): Promise<Resource[]> {
+    return this.resources.find();
+  }
+
   async createResource(input: CreateResourceDto): Promise<Resource> {
     const providerResource = await this.authorizationProvider.createResource(
       input.route,

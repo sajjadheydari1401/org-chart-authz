@@ -5,6 +5,7 @@ import { ResourcesService } from './resources.service.js';
 describe('ResourcesService', () => {
   let service: ResourcesService;
   let repository: {
+    find: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
     save: ReturnType<typeof vi.fn>;
   };
@@ -12,6 +13,7 @@ describe('ResourcesService', () => {
 
   beforeEach(() => {
     repository = {
+      find: vi.fn(),
       create: vi.fn((input) => input),
       save: vi.fn(async (resource) => ({ id: 1, ...resource })),
     };
@@ -28,6 +30,33 @@ describe('ResourcesService', () => {
       repository as never,
       provider as unknown as AuthorizationProviderService,
     );
+  });
+
+  it('returns resources from the local repository without calling the provider', async () => {
+    const resources = [
+      { id: 1, route: '/example/v1', providerId: 'provider-resource-id' },
+      { id: 2, route: '/example/v2', providerId: 'another-provider-id' },
+    ];
+    repository.find.mockResolvedValue(resources);
+
+    await expect(service.getAllResources()).resolves.toBe(resources);
+    expect(repository.find).toHaveBeenCalledExactlyOnceWith();
+    expect(provider.createResource).not.toHaveBeenCalled();
+  });
+
+  it('returns an empty list when there are no local resources', async () => {
+    repository.find.mockResolvedValue([]);
+
+    await expect(service.getAllResources()).resolves.toEqual([]);
+    expect(provider.createResource).not.toHaveBeenCalled();
+  });
+
+  it('propagates local listing failures without calling the provider', async () => {
+    const error = new Error('database unavailable');
+    repository.find.mockRejectedValue(error);
+
+    await expect(service.getAllResources()).rejects.toBe(error);
+    expect(provider.createResource).not.toHaveBeenCalled();
   });
 
   it('creates the provider resource before saving route and provider ID locally', async () => {

@@ -5,7 +5,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Unit } from '../../units/entities/unit.entity.js';
+import { Unit } from '../../../units/entities/unit.entity.js';
 
 export enum RoleScopeMode {
   SELF = 'SELF',

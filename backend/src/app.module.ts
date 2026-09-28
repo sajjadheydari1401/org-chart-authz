@@ -7,6 +7,7 @@ import { createObserveModule } from '@nestjs/observe';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { AuthModule } from './domain/modules/auth/auth.module.js';
+import { AuthorizationModule } from './domain/modules/authorization/authorization.module.js';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { createTypeOrmConfig } from './config/typeOrmConfig.js';
 import { DatabaseConnectionLogger } from './common/logger/database-connection-logger.js';
@@ -24,6 +25,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
       useFactory: createTypeOrmConfig,
     }),
     AuthModule,
+    AuthorizationModule,
   ],
   controllers: [AppController],
   providers: [

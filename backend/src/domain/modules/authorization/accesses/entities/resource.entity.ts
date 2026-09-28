@@ -7,4 +7,7 @@ export class Resource {
 
   @Column({ type: 'varchar', length: 255 })
   route!: string;
+
+  @Column({ name: 'provider_id', type: 'varchar', length: 255 })
+  providerId!: string;
 }

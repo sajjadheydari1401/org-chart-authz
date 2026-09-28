@@ -10,6 +10,7 @@ import { CreateRoleAccesses20260928000004 } from '../database/migrations/2026092
 import { CreateRoleAssignments20260928000005 } from '../database/migrations/20260928000005-CreateRoleAssignments.js';
 import { RenameUserIdToSystemId20260928000006 } from '../database/migrations/20260928000006-RenameUserIdToSystemId.js';
 import { DropSystemIdFromUsers20260928000007 } from '../database/migrations/20260928000007-DropSystemIdFromUsers.js';
+import { AddProviderIdToResources20260928000008 } from '../database/migrations/20260928000008-AddProviderIdToResources.js';
 import { Access } from '../domain/modules/authorization/accesses/entities/access.entity.js';
 import { Resource } from '../domain/modules/authorization/accesses/entities/resource.entity.js';
 import { RoleAssignment } from '../domain/modules/authorization/roles/entities/role-assignment.entity.js';
@@ -39,6 +40,7 @@ export function createTypeOrmConfig(
       CreateRoleAssignments20260928000005,
       RenameUserIdToSystemId20260928000006,
       DropSystemIdFromUsers20260928000007,
+      AddProviderIdToResources20260928000008,
     ],
     migrationsRun: true,
     synchronize: false,

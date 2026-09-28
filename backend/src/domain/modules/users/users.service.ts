@@ -9,7 +9,7 @@ export class UsersService {
     @InjectRepository(User) private readonly users: Repository<User>,
   ) {}
 
-  async createUser(username: string): Promise<void> {
+  async createLocalUser(username: string): Promise<void> {
     const existingUser = await this.users.findOneBy({ username });
 
     if (existingUser) return;

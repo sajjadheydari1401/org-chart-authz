@@ -1,9 +1,9 @@
 import { Body, Controller, Post, UseInterceptors } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service.js';
-import { SignupDto } from './dto/signup.dto.js';
-import { ConfirmSMSDto } from './dto/confirm-sms.dto.js';
-import { LoginDto } from './dto/login.dto.js';
+import { ConfirmRegistrationBySmsDto } from './dto/confirm-registration-by-sms.dto.js';
+import { LoginWithUsernamePasswordDto } from './dto/login-with-username-password.dto.js';
+import { RegisterWithUsernamePasswordDto } from './dto/register-with-username-password.dto.js';
 import { FormatResponseInterceptor } from '../../../common/utils/interceptor/format-response.interceptor.js';
 
 @ApiTags('Auth')
@@ -12,18 +12,18 @@ import { FormatResponseInterceptor } from '../../../common/utils/interceptor/for
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('signup')
-  signup(@Body() input: SignupDto) {
-    return this.authService.signup(input);
+  @Post('register/username-password')
+  registerWithUsernamePassword(@Body() input: RegisterWithUsernamePasswordDto) {
+    return this.authService.registerWithUsernamePassword(input);
   }
 
-  @Post('confirm-sms')
-  confirmSms(@Body() input: ConfirmSMSDto) {
-    return this.authService.confirmSms(input);
+  @Post('register/confirm-sms')
+  confirmRegistrationBySms(@Body() input: ConfirmRegistrationBySmsDto) {
+    return this.authService.confirmRegistrationBySms(input);
   }
 
-  @Post('login')
-  login(@Body() input: LoginDto) {
-    return this.authService.login(input);
+  @Post('login/username-password')
+  loginWithUsernamePassword(@Body() input: LoginWithUsernamePasswordDto) {
+    return this.authService.loginWithUsernamePassword(input);
   }
 }

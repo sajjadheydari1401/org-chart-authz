@@ -1,6 +1,6 @@
 import { IsString, Length, MaxLength, MinLength } from 'class-validator';
 
-export class ConfirmSMSDto {
+export class ConfirmRegistrationBySmsDto {
   @IsString()
   @Length(2, 40)
   username: string;

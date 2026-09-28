@@ -1,7 +1,7 @@
 import { Transform } from 'class-transformer';
 import { IsEmail, IsString, Length, Matches, MinLength } from 'class-validator';
 
-export class SignupDto {
+export class RegisterWithUsernamePasswordDto {
   @IsEmail()
   email: string;
 

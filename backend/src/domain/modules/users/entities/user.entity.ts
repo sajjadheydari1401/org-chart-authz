@@ -8,7 +8,4 @@ export class User {
 
   @Column({ type: 'varchar', length: 40 })
   username!: string;
-
-  @Column({ name: 'user_id', type: 'varchar', length: 255 })
-  userId!: string;
 }

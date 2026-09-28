@@ -17,12 +17,10 @@ export interface VerifySmsRequest {
 export interface AuthTokenResponse {
   accessToken: string;
   username: string;
-  userId: string;
 }
 
 export interface AuthUser {
   username: string;
-  userId: string;
 }
 
 export interface AuthActionSuccess {

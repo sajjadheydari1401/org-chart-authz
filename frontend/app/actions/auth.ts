@@ -122,7 +122,6 @@ export async function loginAction(
     ...(result.message ? { message: result.message } : {}),
     user: {
       username: result.data.username,
-      userId: result.data.userId,
     },
   };
 }

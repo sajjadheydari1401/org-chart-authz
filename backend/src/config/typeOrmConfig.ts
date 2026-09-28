@@ -8,6 +8,8 @@ import { CreateUnits20260928000002 } from '../database/migrations/20260928000002
 import { CreateRoles20260928000003 } from '../database/migrations/20260928000003-CreateRoles.js';
 import { CreateRoleAccesses20260928000004 } from '../database/migrations/20260928000004-CreateRoleAccesses.js';
 import { CreateRoleAssignments20260928000005 } from '../database/migrations/20260928000005-CreateRoleAssignments.js';
+import { RenameUserIdToSystemId20260928000006 } from '../database/migrations/20260928000006-RenameUserIdToSystemId.js';
+import { DropSystemIdFromUsers20260928000007 } from '../database/migrations/20260928000007-DropSystemIdFromUsers.js';
 import { Access } from '../domain/modules/authorization/accesses/entities/access.entity.js';
 import { Resource } from '../domain/modules/authorization/accesses/entities/resource.entity.js';
 import { RoleAssignment } from '../domain/modules/authorization/roles/entities/role-assignment.entity.js';
@@ -35,6 +37,8 @@ export function createTypeOrmConfig(
       CreateRoles20260928000003,
       CreateRoleAccesses20260928000004,
       CreateRoleAssignments20260928000005,
+      RenameUserIdToSystemId20260928000006,
+      DropSystemIdFromUsers20260928000007,
     ],
     migrationsRun: true,
     synchronize: false,

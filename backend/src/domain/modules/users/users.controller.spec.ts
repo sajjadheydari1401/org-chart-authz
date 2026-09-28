@@ -6,6 +6,7 @@ describe('UsersController', () => {
   const usersService = {
     getAllUsers: vi.fn(),
     getSingleUser: vi.fn(),
+    updateUser: vi.fn(),
   };
   const controller = new UsersController(
     usersService as unknown as UsersService,
@@ -29,5 +30,14 @@ describe('UsersController', () => {
 
     await expect(controller.getSingleUser(7)).resolves.toBe(user);
     expect(usersService.getSingleUser).toHaveBeenCalledWith(7);
+  });
+
+  it('delegates username updates with the local ID and input', async () => {
+    const input = { username: 'renamed' };
+    const user = { id: 7, username: 'renamed' };
+    usersService.updateUser.mockResolvedValue(user);
+
+    await expect(controller.updateUser(7, input)).resolves.toBe(user);
+    expect(usersService.updateUser).toHaveBeenCalledWith(7, input);
   });
 });

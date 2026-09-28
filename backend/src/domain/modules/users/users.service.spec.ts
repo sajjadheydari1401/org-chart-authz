@@ -1,6 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AuthProviderService } from '../auth/auth-provider.service.js';
+import { UpdateUserDto } from './dto/update-user.dto.js';
 import { User } from './entities/user.entity.js';
 import { UsersService } from './users.service.js';
 
@@ -9,10 +10,11 @@ describe('UsersService', () => {
   let repository: {
     find: ReturnType<typeof vi.fn>;
     findOneBy: ReturnType<typeof vi.fn>;
+    save: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
-    repository = { find: vi.fn(), findOneBy: vi.fn() };
+    repository = { find: vi.fn(), findOneBy: vi.fn(), save: vi.fn() };
     service = new UsersService(repository as never, {} as AuthProviderService);
   });
 
@@ -38,5 +40,29 @@ describe('UsersService', () => {
     await expect(service.getSingleUser(404)).rejects.toBeInstanceOf(
       NotFoundException,
     );
+  });
+
+  it('updates a local username', async () => {
+    const user = { id: 7, username: 'person' } as User;
+    repository.findOneBy
+      .mockResolvedValueOnce(user)
+      .mockResolvedValueOnce(null);
+    repository.save.mockImplementation(async (savedUser) => savedUser);
+
+    await expect(
+      service.updateUser(7, { username: 'renamed' } as UpdateUserDto),
+    ).resolves.toMatchObject({ id: 7, username: 'renamed' });
+    expect(repository.save).toHaveBeenCalledWith(user);
+  });
+
+  it('rejects a username already owned by another local user', async () => {
+    repository.findOneBy
+      .mockResolvedValueOnce({ id: 7, username: 'person' })
+      .mockResolvedValueOnce({ id: 8, username: 'renamed' });
+
+    await expect(
+      service.updateUser(7, { username: 'renamed' } as UpdateUserDto),
+    ).rejects.toMatchObject({ status: 409 });
+    expect(repository.save).not.toHaveBeenCalled();
   });
 });

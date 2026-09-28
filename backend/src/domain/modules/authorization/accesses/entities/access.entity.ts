@@ -12,6 +12,9 @@ export class Access {
   @PrimaryGeneratedColumn({ type: 'integer' })
   id!: number;
 
+  @Column({ name: 'provider_id', type: 'varchar', length: 255 })
+  providerId!: string;
+
   @ManyToOne(() => Resource, { nullable: false })
   @JoinColumn({ name: 'resource_id' })
   resource!: Resource;

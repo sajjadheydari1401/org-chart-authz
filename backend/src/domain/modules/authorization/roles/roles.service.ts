@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Unit } from '../../units/entities/unit.entity.js';
 import { AuthorizationProviderService } from '../authorization-provider.service.js';
 import { CreateRoleDto } from './dto/create-role.dto.js';
+import { UpdateRoleDto } from './dto/update-role.dto.js';
 import { Role } from './entities/role.entity.js';
 
 @Injectable()
@@ -35,5 +36,28 @@ export class RolesService {
         scopeMode: input.scopeMode,
       }),
     );
+  }
+
+  async updateRole(id: number, input: UpdateRoleDto): Promise<Role> {
+    const role = await this.roles.findOneBy({ id });
+    if (!role) throw new NotFoundException();
+
+    const unit = await this.units.findOneBy({ id: input.unitId });
+    if (!unit) throw new NotFoundException();
+
+    const result = await this.authorizationProvider.updateRole(
+      role.providerId,
+      input.name,
+      input.description,
+    );
+
+    return this.roles.save({
+      ...role,
+      providerId: result.id,
+      name: result.name,
+      description: result.description,
+      unit,
+      scopeMode: input.scopeMode,
+    });
   }
 }

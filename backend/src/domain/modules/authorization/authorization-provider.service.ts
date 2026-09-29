@@ -4,6 +4,7 @@ import type { AddResourceResult } from '../../../common/types/add-resource-resul
 import type { AddRoleResult } from '../../../common/types/add-role-result.js';
 import type { AddAccessResult } from '../../../common/types/add-access-result.js';
 import type { UpdateResourceResult } from '../../../common/types/update-resource-result.js';
+import type { UpdateRoleResult } from '../../../common/types/update-role-result.js';
 import { postToProvider } from '../../../common/utils/api/post-to-provider.js';
 import {
   providerUrl,
@@ -21,6 +22,36 @@ export class AuthorizationProviderService {
       {
         username: systemUsername,
         password: systemPassword,
+        name,
+        description,
+      },
+    );
+    const result = data.result;
+    if (
+      !result ||
+      typeof result.id !== 'string' ||
+      !result.id.trim() ||
+      typeof result.name !== 'string' ||
+      !result.name.trim() ||
+      typeof result.description !== 'string'
+    ) {
+      throw new BadGatewayException();
+    }
+    return result;
+  }
+
+  async updateRole(
+    roleId: string,
+    name: string,
+    description: string,
+  ): Promise<UpdateRoleResult> {
+    const { systemUsername, systemPassword } = systemCredentials(this.config);
+    const data = await postToProvider<UpdateRoleResult>(
+      providerUrl(this.config, '/admin/updateRole'),
+      {
+        username: systemUsername,
+        password: systemPassword,
+        roleId,
         name,
         description,
       },

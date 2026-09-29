@@ -14,16 +14,21 @@ describe('RolesService', () => {
   const unit = { id: 7, name: 'Finance', type: 'department' };
   let roles: {
     find: ReturnType<typeof vi.fn>;
+    findOneBy: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
     save: ReturnType<typeof vi.fn>;
   };
   let units: { findOneBy: ReturnType<typeof vi.fn> };
-  let provider: { createRole: ReturnType<typeof vi.fn> };
+  let provider: {
+    createRole: ReturnType<typeof vi.fn>;
+    updateRole: ReturnType<typeof vi.fn>;
+  };
   let service: RolesService;
 
   beforeEach(() => {
     roles = {
       find: vi.fn(),
+      findOneBy: vi.fn(),
       create: vi.fn((value) => value),
       save: vi.fn(async (value) => ({ id: 1, ...value })),
     };
@@ -33,6 +38,11 @@ describe('RolesService', () => {
         id: 'role-id',
         name: 'Manager',
         description: 'provider description',
+      }),
+      updateRole: vi.fn().mockResolvedValue({
+        id: 'updated-provider-role-id',
+        name: 'Updated Manager',
+        description: 'updated provider description',
       }),
     };
     service = new RolesService(
@@ -102,6 +112,95 @@ describe('RolesService', () => {
       NotFoundException,
     );
     expect(provider.createRole).not.toHaveBeenCalled();
+    expect(roles.save).not.toHaveBeenCalled();
+  });
+
+  it('updates the provider first and saves its values with the requested unit and scope', async () => {
+    const role = {
+      id: 12,
+      providerId: 'provider-role-id',
+      name: 'Manager',
+      description: 'original description',
+      unit: { id: 6 },
+      scopeMode: RoleScopeMode.SELF,
+    };
+    const updatedInput = {
+      ...input,
+      unitId: 8,
+      scopeMode: RoleScopeMode.DESCENDANTS,
+    };
+    const updatedUnit = { id: 8, name: 'Operations', type: 'department' };
+    roles.findOneBy.mockResolvedValue(role);
+    units.findOneBy.mockResolvedValue(updatedUnit);
+    provider.updateRole.mockImplementation(async () => {
+      expect(roles.save).not.toHaveBeenCalled();
+      return {
+        id: 'updated-provider-role-id',
+        name: 'Updated Manager',
+        description: 'updated provider description',
+      };
+    });
+
+    await expect(service.updateRole(12, updatedInput)).resolves.toEqual({
+      id: 12,
+      ...role,
+      providerId: 'updated-provider-role-id',
+      name: 'Updated Manager',
+      description: 'updated provider description',
+      unit: updatedUnit,
+      scopeMode: RoleScopeMode.DESCENDANTS,
+    });
+    expect(roles.findOneBy).toHaveBeenCalledExactlyOnceWith({ id: 12 });
+    expect(units.findOneBy).toHaveBeenCalledExactlyOnceWith({ id: 8 });
+    expect(provider.updateRole).toHaveBeenCalledExactlyOnceWith(
+      'provider-role-id',
+      updatedInput.name,
+      updatedInput.description,
+    );
+    expect(roles.save).toHaveBeenCalledExactlyOnceWith({
+      ...role,
+      providerId: 'updated-provider-role-id',
+      name: 'Updated Manager',
+      description: 'updated provider description',
+      unit: updatedUnit,
+      scopeMode: RoleScopeMode.DESCENDANTS,
+    });
+  });
+
+  it('does not look up the unit or call the provider when the role is missing', async () => {
+    roles.findOneBy.mockResolvedValue(null);
+
+    await expect(service.updateRole(404, input)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
+    expect(units.findOneBy).not.toHaveBeenCalled();
+    expect(provider.updateRole).not.toHaveBeenCalled();
+    expect(roles.save).not.toHaveBeenCalled();
+  });
+
+  it('does not call the provider when the requested unit is missing', async () => {
+    roles.findOneBy.mockResolvedValue({
+      id: 12,
+      providerId: 'provider-role-id',
+    });
+    units.findOneBy.mockResolvedValue(null);
+
+    await expect(service.updateRole(12, input)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
+    expect(provider.updateRole).not.toHaveBeenCalled();
+    expect(roles.save).not.toHaveBeenCalled();
+  });
+
+  it('does not update the local role when the provider update fails', async () => {
+    roles.findOneBy.mockResolvedValue({
+      id: 12,
+      providerId: 'provider-role-id',
+    });
+    const error = new Error('provider update failed');
+    provider.updateRole.mockRejectedValue(error);
+
+    await expect(service.updateRole(12, input)).rejects.toBe(error);
     expect(roles.save).not.toHaveBeenCalled();
   });
 });

@@ -9,6 +9,7 @@ describe('RolesController', () => {
     const service = {
       getAllRoles: vi.fn().mockResolvedValue(roles),
       createRole: vi.fn(),
+      updateRole: vi.fn(),
     };
     const controller = new RolesController(service as unknown as RolesService);
 
@@ -33,5 +34,21 @@ describe('RolesController', () => {
     const controller = new RolesController(service as unknown as RolesService);
     await expect(controller.createRole(input)).resolves.toBe(role);
     expect(service.createRole).toHaveBeenCalledExactlyOnceWith(input);
+  });
+
+  it('delegates role updates with the local role ID and input', async () => {
+    const id = 12;
+    const input = {
+      name: 'manager',
+      description: 'updated description',
+      unitId: 7,
+      scopeMode: RoleScopeMode.SELF,
+    };
+    const role = { id, ...input, providerId: 'provider-role-id' };
+    const service = { updateRole: vi.fn().mockResolvedValue(role) };
+    const controller = new RolesController(service as unknown as RolesService);
+
+    await expect(controller.updateRole(id, input)).resolves.toBe(role);
+    expect(service.updateRole).toHaveBeenCalledExactlyOnceWith(id, input);
   });
 });

@@ -22,6 +22,57 @@ const configuration: Record<string, string> = {
 };
 
 describe('AuthorizationProviderService', () => {
+  it('posts updateAccess with stored credentials and accessId', async () => {
+    const result = { methodName: 'POST', description: 'updated' };
+    providerPost.mockResolvedValueOnce({
+      data: { success: true, result },
+    } as never);
+    await expect(
+      service.updateAccess('access-id', 'post', 'updated'),
+    ).resolves.toEqual(result);
+    expect(providerPost).toHaveBeenCalledExactlyOnceWith(
+      `${PROVIDER_BASE_URL}/admin/updateAccess`,
+      {
+        username: 'system-user',
+        password: 'system-password',
+        accessId: 'access-id',
+        methodName: 'post',
+        description: 'updated',
+      },
+    );
+  });
+
+  it('propagates provider rejection of access updates', async () => {
+    providerPost.mockResolvedValueOnce({
+      data: { success: false, message: 'rejected' },
+    } as never);
+    await expect(
+      service.updateAccess('access-id', 'post', 'updated'),
+    ).rejects.toBeInstanceOf(ProviderError);
+  });
+
+  it.each([
+    undefined,
+    {},
+    { methodName: ' ', description: '' },
+    { methodName: 'POST' },
+  ])('rejects malformed access update result %j', async (result) => {
+    providerPost.mockResolvedValueOnce({
+      data: { success: true, result },
+    } as never);
+    await expect(
+      service.updateAccess('access-id', 'post', 'updated'),
+    ).rejects.toBeInstanceOf(BadGatewayException);
+  });
+
+  it('propagates access update transport failures', async () => {
+    const error = new Error('network failed');
+    providerPost.mockRejectedValueOnce(error);
+    await expect(
+      service.updateAccess('access-id', 'post', 'updated'),
+    ).rejects.toBe(error);
+  });
+
   let service: AuthorizationProviderService;
 
   beforeEach(() => {

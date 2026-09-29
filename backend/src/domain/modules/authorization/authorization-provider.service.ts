@@ -13,6 +13,33 @@ import {
 export class AuthorizationProviderService {
   constructor(private readonly config: ConfigService) {}
 
+  async updateAccess(
+    accessId: string,
+    methodName: string,
+    description: string,
+  ): Promise<Pick<AddAccessResult, 'methodName' | 'description'>> {
+    const { systemUsername, systemPassword } = systemCredentials(this.config);
+    const data = await postToProvider<
+      Pick<AddAccessResult, 'methodName' | 'description'>
+    >(providerUrl(this.config, '/admin/updateAccess'), {
+      username: systemUsername,
+      password: systemPassword,
+      accessId,
+      methodName,
+      description,
+    });
+    const result = data.result;
+    if (
+      !result ||
+      typeof result.methodName !== 'string' ||
+      !result.methodName.trim() ||
+      typeof result.description !== 'string'
+    ) {
+      throw new BadGatewayException();
+    }
+    return result;
+  }
+
   async createAccess(
     resourceId: string,
     methodName: string,

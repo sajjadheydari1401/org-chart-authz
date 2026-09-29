@@ -16,22 +16,28 @@ describe('AccessesService', () => {
     providerId: 'provider-resource-id',
   };
   let repository: {
+    findOneBy: ReturnType<typeof vi.fn>;
     find: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
     save: ReturnType<typeof vi.fn>;
   };
   let resources: { getSingleResource: ReturnType<typeof vi.fn> };
-  let provider: { createAccess: ReturnType<typeof vi.fn> };
+  let provider: {
+    createAccess: ReturnType<typeof vi.fn>;
+    updateAccess: ReturnType<typeof vi.fn>;
+  };
   let service: AccessesService;
 
   beforeEach(() => {
     repository = {
+      findOneBy: vi.fn(),
       find: vi.fn(),
       create: vi.fn((value) => value),
       save: vi.fn(async (value) => ({ id: 1, ...value })),
     };
     resources = { getSingleResource: vi.fn().mockResolvedValue(resource) };
     provider = {
+      updateAccess: vi.fn(),
       createAccess: vi.fn().mockResolvedValue({
         id: 'provider-access-id',
         methodName: 'POST',
@@ -43,6 +49,67 @@ describe('AccessesService', () => {
       resources as unknown as ResourcesService,
       provider as unknown as AuthorizationProviderService,
     );
+  });
+
+  it('saves the method name and description returned by the provider', async () => {
+    const access = {
+      id: 9,
+      providerId: 'access-id',
+      methodName: 'GET',
+      description: 'old',
+    };
+    repository.findOneBy.mockResolvedValue(access);
+    provider.updateAccess.mockResolvedValue({
+      methodName: 'POST',
+      description: 'updated',
+    });
+
+    const result = await service.updateAccess(9, {
+      methodName: 'post',
+      description: 'requested',
+    });
+
+    expect(provider.updateAccess).toHaveBeenCalledExactlyOnceWith(
+      'access-id',
+      'post',
+      'requested',
+    );
+    const expected = { ...access, methodName: 'POST', description: 'updated' };
+    expect(repository.save).toHaveBeenCalledExactlyOnceWith(expected);
+    expect(result).toEqual(expected);
+  });
+
+  it('waits for the provider response before saving locally', async () => {
+    repository.findOneBy.mockResolvedValue({ id: 9, providerId: 'access-id' });
+    provider.updateAccess.mockImplementation(async () => {
+      await Promise.resolve();
+      expect(repository.save).not.toHaveBeenCalled();
+      return { methodName: 'POST', description: 'updated' };
+    });
+
+    await service.updateAccess(9, {
+      methodName: 'post',
+      description: 'updated',
+    });
+
+    expect(repository.save).toHaveBeenCalledOnce();
+  });
+
+  it('does not update the provider when the access is missing', async () => {
+    repository.findOneBy.mockResolvedValue(null);
+    await expect(service.updateAccess(404, input)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
+    expect(provider.updateAccess).not.toHaveBeenCalled();
+    expect(repository.save).not.toHaveBeenCalled();
+  });
+
+  it('does not save when the provider update fails', async () => {
+    repository.findOneBy.mockResolvedValue({ id: 9, providerId: 'access-id' });
+    const error = new Error('provider failed');
+    provider.updateAccess.mockRejectedValue(error);
+    await expect(service.updateAccess(9, input)).rejects.toBe(error);
+    expect(repository.save).not.toHaveBeenCalled();
   });
 
   it('returns accesses from the local repository without calling the provider', async () => {

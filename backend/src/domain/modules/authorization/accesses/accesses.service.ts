@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuthorizationProviderService } from '../authorization-provider.service.js';
 import { ResourcesService } from '../resources/resources.service.js';
 import { CreateAccessDto } from './dto/create-access.dto.js';
+import { UpdateAccessDto } from './dto/update-access.dto.js';
 import { Access } from './entities/access.entity.js';
 
 @Injectable()
@@ -16,6 +17,22 @@ export class AccessesService {
 
   getAllAccesses(): Promise<Access[]> {
     return this.accesses.find();
+  }
+
+  async updateAccess(id: number, input: UpdateAccessDto): Promise<Access> {
+    const access = await this.accesses.findOneBy({ id });
+    if (!access) throw new NotFoundException();
+
+    const result = await this.authorizationProvider.updateAccess(
+      access.providerId,
+      input.methodName,
+      input.description,
+    );
+    return this.accesses.save({
+      ...access,
+      methodName: result.methodName,
+      description: result.description,
+    });
   }
 
   async createAccess(input: CreateAccessDto): Promise<Access> {

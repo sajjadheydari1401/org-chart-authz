@@ -3,6 +3,16 @@ import { AccessesController } from './accesses.controller.js';
 import { AccessesService } from './accesses.service.js';
 
 describe('AccessesController', () => {
+  it('delegates access updates with the local ID and input', async () => {
+    const input = { methodName: 'post', description: 'updated' };
+    const access = { id: 9, ...input };
+    const service = { updateAccess: vi.fn().mockResolvedValue(access) };
+    const controller = new AccessesController(
+      service as unknown as AccessesService,
+    );
+    await expect(controller.updateAccess(9, input)).resolves.toBe(access);
+    expect(service.updateAccess).toHaveBeenCalledExactlyOnceWith(9, input);
+  });
   it('delegates getAllAccesses to the service', async () => {
     const accesses = [
       {

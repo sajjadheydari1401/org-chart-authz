@@ -16,6 +16,7 @@ describe('AccessesService', () => {
     providerId: 'provider-resource-id',
   };
   let repository: {
+    delete: ReturnType<typeof vi.fn>;
     findOneBy: ReturnType<typeof vi.fn>;
     find: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
@@ -23,6 +24,7 @@ describe('AccessesService', () => {
   };
   let resources: { getSingleResource: ReturnType<typeof vi.fn> };
   let provider: {
+    deleteAccess: ReturnType<typeof vi.fn>;
     createAccess: ReturnType<typeof vi.fn>;
     updateAccess: ReturnType<typeof vi.fn>;
   };
@@ -30,6 +32,7 @@ describe('AccessesService', () => {
 
   beforeEach(() => {
     repository = {
+      delete: vi.fn().mockResolvedValue({ affected: 1 }),
       findOneBy: vi.fn(),
       find: vi.fn(),
       create: vi.fn((value) => value),
@@ -37,6 +40,7 @@ describe('AccessesService', () => {
     };
     resources = { getSingleResource: vi.fn().mockResolvedValue(resource) };
     provider = {
+      deleteAccess: vi.fn().mockResolvedValue(undefined),
       updateAccess: vi.fn(),
       createAccess: vi.fn().mockResolvedValue({
         id: 'provider-access-id',
@@ -49,6 +53,55 @@ describe('AccessesService', () => {
       resources as unknown as ResourcesService,
       provider as unknown as AuthorizationProviderService,
     );
+  });
+
+  it('deletes locally after the provider succeeds', async () => {
+    repository.findOneBy.mockResolvedValue({ id: 9, providerId: 'access-id' });
+    provider.deleteAccess.mockImplementation(async () => {
+      await Promise.resolve();
+      expect(repository.delete).not.toHaveBeenCalled();
+    });
+
+    await expect(service.deleteAccess(9)).resolves.toBeUndefined();
+    expect(repository.findOneBy).toHaveBeenCalledWith({ id: 9 });
+    expect(provider.deleteAccess).toHaveBeenCalledExactlyOnceWith('access-id');
+    expect(repository.delete).toHaveBeenCalledExactlyOnceWith(9);
+  });
+
+  it('does not delete locally when the provider fails', async () => {
+    repository.findOneBy.mockResolvedValue({ id: 9, providerId: 'access-id' });
+    const error = new Error('provider failed');
+    provider.deleteAccess.mockRejectedValue(error);
+
+    await expect(service.deleteAccess(9)).rejects.toBe(error);
+    expect(repository.delete).not.toHaveBeenCalled();
+  });
+
+  it('does not call the provider when the access to delete is missing', async () => {
+    repository.findOneBy.mockResolvedValue(null);
+
+    await expect(service.deleteAccess(404)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
+    expect(provider.deleteAccess).not.toHaveBeenCalled();
+    expect(repository.delete).not.toHaveBeenCalled();
+  });
+
+  it('returns not found when local deletion affects no rows', async () => {
+    repository.findOneBy.mockResolvedValue({ id: 9, providerId: 'access-id' });
+    repository.delete.mockResolvedValue({ affected: 0 });
+
+    await expect(service.deleteAccess(9)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
+  });
+
+  it('propagates local deletion failures', async () => {
+    repository.findOneBy.mockResolvedValue({ id: 9, providerId: 'access-id' });
+    const error = new Error('database failed');
+    repository.delete.mockRejectedValue(error);
+
+    await expect(service.deleteAccess(9)).rejects.toBe(error);
   });
 
   it('saves the method name and description returned by the provider', async () => {

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -17,6 +18,11 @@ import { UpdateAccessDto } from './dto/update-access.dto.js';
 @Controller('accesses')
 export class AccessesController {
   constructor(private readonly accessesService: AccessesService) {}
+
+  @Delete(':id')
+  deleteAccess(@Param('id', ParseIntPipe) id: number) {
+    return this.accessesService.deleteAccess(id);
+  }
 
   @Patch(':id')
   updateAccess(

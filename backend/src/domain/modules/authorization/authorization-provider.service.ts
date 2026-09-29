@@ -13,6 +13,15 @@ import {
 export class AuthorizationProviderService {
   constructor(private readonly config: ConfigService) {}
 
+  async deleteAccess(accessId: string): Promise<void> {
+    const { systemUsername, systemPassword } = systemCredentials(this.config);
+    await postToProvider(providerUrl(this.config, '/admin/deleteAccess'), {
+      username: systemUsername,
+      password: systemPassword,
+      accessId,
+    });
+  }
+
   async updateAccess(
     accessId: string,
     methodName: string,

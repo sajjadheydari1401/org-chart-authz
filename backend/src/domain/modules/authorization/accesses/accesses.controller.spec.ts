@@ -3,6 +3,16 @@ import { AccessesController } from './accesses.controller.js';
 import { AccessesService } from './accesses.service.js';
 
 describe('AccessesController', () => {
+  it('delegates access deletion with the local ID', async () => {
+    const service = { deleteAccess: vi.fn().mockResolvedValue(undefined) };
+    const controller = new AccessesController(
+      service as unknown as AccessesService,
+    );
+
+    await expect(controller.deleteAccess(9)).resolves.toBeUndefined();
+    expect(service.deleteAccess).toHaveBeenCalledExactlyOnceWith(9);
+  });
+
   it('delegates access updates with the local ID and input', async () => {
     const input = { methodName: 'post', description: 'updated' };
     const access = { id: 9, ...input };

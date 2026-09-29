@@ -19,9 +19,22 @@ export class AccessesService {
     return this.accesses.find();
   }
 
-  async updateAccess(id: number, input: UpdateAccessDto): Promise<Access> {
+  private async getSingleAccess(id: number): Promise<Access> {
     const access = await this.accesses.findOneBy({ id });
     if (!access) throw new NotFoundException();
+    return access;
+  }
+
+  async deleteAccess(id: number): Promise<void> {
+    const access = await this.getSingleAccess(id);
+    await this.authorizationProvider.deleteAccess(access.providerId);
+
+    const result = await this.accesses.delete(id);
+    if (!result.affected) throw new NotFoundException();
+  }
+
+  async updateAccess(id: number, input: UpdateAccessDto): Promise<Access> {
+    const access = await this.getSingleAccess(id);
 
     const result = await this.authorizationProvider.updateAccess(
       access.providerId,

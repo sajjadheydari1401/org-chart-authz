@@ -22,6 +22,40 @@ const configuration: Record<string, string> = {
 };
 
 describe('AuthorizationProviderService', () => {
+  it('posts deleteAccess with system credentials and the provider access ID', async () => {
+    await expect(service.deleteAccess('access-id')).resolves.toBeUndefined();
+    expect(providerPost).toHaveBeenCalledExactlyOnceWith(
+      `${PROVIDER_BASE_URL}/admin/deleteAccess`,
+      {
+        username: 'system-user',
+        password: 'system-password',
+        accessId: 'access-id',
+      },
+    );
+  });
+
+  it('propagates provider rejection of access deletion', async () => {
+    providerPost.mockResolvedValueOnce({
+      data: { success: false, message: 'rejected' },
+    } as never);
+    await expect(service.deleteAccess('access-id')).rejects.toBeInstanceOf(
+      ProviderError,
+    );
+  });
+
+  it('rejects access deletion responses without confirmed success', async () => {
+    providerPost.mockResolvedValueOnce({ data: {} } as never);
+    await expect(service.deleteAccess('access-id')).rejects.toBeInstanceOf(
+      BadGatewayException,
+    );
+  });
+
+  it('propagates access deletion transport failures', async () => {
+    const error = new Error('network failed');
+    providerPost.mockRejectedValueOnce(error);
+    await expect(service.deleteAccess('access-id')).rejects.toBe(error);
+  });
+
   it('posts updateAccess with stored credentials and accessId', async () => {
     const result = { methodName: 'POST', description: 'updated' };
     providerPost.mockResolvedValueOnce({

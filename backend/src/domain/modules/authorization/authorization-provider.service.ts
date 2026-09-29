@@ -70,6 +70,15 @@ export class AuthorizationProviderService {
     return result;
   }
 
+  async deleteRole(roleId: string): Promise<void> {
+    const { systemUsername, systemPassword } = systemCredentials(this.config);
+    await postToProvider(providerUrl(this.config, '/admin/deleteRole'), {
+      username: systemUsername,
+      password: systemPassword,
+      roleId,
+    });
+  }
+
   async deleteAccess(accessId: string): Promise<void> {
     const { systemUsername, systemPassword } = systemCredentials(this.config);
     await postToProvider(providerUrl(this.config, '/admin/deleteAccess'), {

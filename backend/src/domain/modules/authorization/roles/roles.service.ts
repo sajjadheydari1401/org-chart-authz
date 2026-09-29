@@ -60,4 +60,14 @@ export class RolesService {
       scopeMode: input.scopeMode,
     });
   }
+
+  async deleteRole(id: number): Promise<void> {
+    const role = await this.roles.findOneBy({ id });
+    if (!role) throw new NotFoundException();
+
+    await this.authorizationProvider.deleteRole(role.providerId);
+
+    const result = await this.roles.delete(id);
+    if (!result.affected) throw new NotFoundException();
+  }
 }

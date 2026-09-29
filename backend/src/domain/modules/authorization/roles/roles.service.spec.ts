@@ -15,6 +15,7 @@ describe('RolesService', () => {
   let roles: {
     find: ReturnType<typeof vi.fn>;
     findOneBy: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
     save: ReturnType<typeof vi.fn>;
   };
@@ -22,6 +23,7 @@ describe('RolesService', () => {
   let provider: {
     createRole: ReturnType<typeof vi.fn>;
     updateRole: ReturnType<typeof vi.fn>;
+    deleteRole: ReturnType<typeof vi.fn>;
   };
   let service: RolesService;
 
@@ -29,6 +31,7 @@ describe('RolesService', () => {
     roles = {
       find: vi.fn(),
       findOneBy: vi.fn(),
+      delete: vi.fn().mockResolvedValue({ affected: 1 }),
       create: vi.fn((value) => value),
       save: vi.fn(async (value) => ({ id: 1, ...value })),
     };
@@ -44,6 +47,7 @@ describe('RolesService', () => {
         name: 'Updated Manager',
         description: 'updated provider description',
       }),
+      deleteRole: vi.fn().mockResolvedValue(undefined),
     };
     service = new RolesService(
       roles as never,
@@ -202,5 +206,63 @@ describe('RolesService', () => {
 
     await expect(service.updateRole(12, input)).rejects.toBe(error);
     expect(roles.save).not.toHaveBeenCalled();
+  });
+
+  it('deletes the local role only after provider deletion succeeds', async () => {
+    roles.findOneBy.mockResolvedValue({
+      id: 12,
+      providerId: 'provider-role-id',
+    });
+    const calls: string[] = [];
+    provider.deleteRole.mockImplementation(async () => {
+      expect(roles.delete).not.toHaveBeenCalled();
+      calls.push('provider');
+    });
+    roles.delete.mockImplementation(async () => {
+      calls.push('local');
+      return { affected: 1 };
+    });
+
+    await expect(service.deleteRole(12)).resolves.toBeUndefined();
+    expect(roles.findOneBy).toHaveBeenCalledExactlyOnceWith({ id: 12 });
+    expect(provider.deleteRole).toHaveBeenCalledExactlyOnceWith(
+      'provider-role-id',
+    );
+    expect(roles.delete).toHaveBeenCalledExactlyOnceWith(12);
+    expect(calls).toEqual(['provider', 'local']);
+  });
+
+  it('does not call the provider or delete locally when the role is missing', async () => {
+    roles.findOneBy.mockResolvedValue(null);
+
+    await expect(service.deleteRole(404)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
+    expect(provider.deleteRole).not.toHaveBeenCalled();
+    expect(roles.delete).not.toHaveBeenCalled();
+  });
+
+  it('does not delete locally when provider role deletion fails', async () => {
+    roles.findOneBy.mockResolvedValue({
+      id: 12,
+      providerId: 'provider-role-id',
+    });
+    const error = new Error('provider deletion failed');
+    provider.deleteRole.mockRejectedValue(error);
+
+    await expect(service.deleteRole(12)).rejects.toBe(error);
+    expect(roles.delete).not.toHaveBeenCalled();
+  });
+
+  it('returns not found if local role deletion affects no rows', async () => {
+    roles.findOneBy.mockResolvedValue({
+      id: 12,
+      providerId: 'provider-role-id',
+    });
+    roles.delete.mockResolvedValue({ affected: 0 });
+
+    await expect(service.deleteRole(12)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
   });
 });

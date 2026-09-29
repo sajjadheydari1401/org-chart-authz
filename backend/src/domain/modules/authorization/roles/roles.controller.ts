@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -34,5 +35,10 @@ export class RolesController {
     @Body() input: UpdateRoleDto,
   ) {
     return this.rolesService.updateRole(id, input);
+  }
+
+  @Delete(':id')
+  deleteRole(@Param('id', ParseIntPipe) id: number) {
+    return this.rolesService.deleteRole(id);
   }
 }

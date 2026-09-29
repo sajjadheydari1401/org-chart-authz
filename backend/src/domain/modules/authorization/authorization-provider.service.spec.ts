@@ -80,6 +80,39 @@ describe('AuthorizationProviderService', () => {
     );
   });
 
+  it('posts deleteRole with system credentials and the provider role ID', async () => {
+    await expect(service.deleteRole('role-id')).resolves.toBeUndefined();
+    expect(providerPost).toHaveBeenCalledExactlyOnceWith(
+      `${PROVIDER_BASE_URL}/admin/deleteRole`,
+      {
+        username: 'system-user',
+        password: 'system-password',
+        roleId: 'role-id',
+      },
+    );
+  });
+
+  it('propagates provider rejection of role deletion', async () => {
+    providerPost.mockResolvedValueOnce({
+      data: { success: false, message: 'rejected' },
+    } as never);
+    await expect(service.deleteRole('role-id')).rejects.toBeInstanceOf(
+      ProviderError,
+    );
+  });
+
+  it('rejects role deletion responses without confirmed success', async () => {
+    providerPost.mockResolvedValueOnce({ data: {} } as never);
+    await expect(service.deleteRole('role-id')).rejects.toBeInstanceOf(
+      BadGatewayException,
+    );
+  });
+
+  it('propagates role deletion transport failures', async () => {
+    const error = new Error('network failed');
+    providerPost.mockRejectedValueOnce(error);
+    await expect(service.deleteRole('role-id')).rejects.toBe(error);
+  });
   it('posts updateRole with system credentials and returns the provider role', async () => {
     const result = {
       id: 'role-id',

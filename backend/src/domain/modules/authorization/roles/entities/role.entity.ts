@@ -35,6 +35,7 @@ export class Role {
     type: 'enum',
     enum: RoleScopeMode,
     enumName: 'roles_scope_mode_enum',
+    default: RoleScopeMode.DESCENDANTS,
   })
   scopeMode!: RoleScopeMode;
 }

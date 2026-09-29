@@ -1,16 +1,9 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccessesModule } from './accesses/accesses.module.js';
 import { ResourcesModule } from './resources/resources.module.js';
-import { RoleAssignment } from './roles/entities/role-assignment.entity.js';
-import { RoleAccess } from './roles/entities/role-access.entity.js';
-import { Role } from './roles/entities/role.entity.js';
+import { RolesModule } from './roles/roles.module.js';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Role, RoleAccess, RoleAssignment]),
-    ResourcesModule,
-    AccessesModule,
-  ],
+  imports: [RolesModule, ResourcesModule, AccessesModule],
 })
 export class AuthorizationModule {}

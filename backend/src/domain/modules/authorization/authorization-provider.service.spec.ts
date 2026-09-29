@@ -22,6 +22,64 @@ const configuration: Record<string, string> = {
 };
 
 describe('AuthorizationProviderService', () => {
+  it('posts addRole with environment credentials and returns the provider role', async () => {
+    const result = {
+      id: 'role-id',
+      name: 'manager',
+      description: 'manager description',
+      created_at: '2026-09-29T06:12:45.261Z',
+      updated_at: '2026-09-29T06:12:45.261Z',
+      deleted_at: null,
+    };
+    providerPost.mockResolvedValueOnce({
+      data: { success: true, result },
+    } as never);
+    await expect(
+      service.createRole('manager', 'manager description'),
+    ).resolves.toEqual(result);
+    expect(providerPost).toHaveBeenCalledExactlyOnceWith(
+      `${PROVIDER_BASE_URL}/admin/addRole`,
+      {
+        username: 'system-user',
+        password: 'system-password',
+        name: 'manager',
+        description: 'manager description',
+      },
+    );
+  });
+
+  it('propagates provider rejection of role creation', async () => {
+    providerPost.mockResolvedValueOnce({
+      data: { success: false, message: 'rejected' },
+    } as never);
+    await expect(
+      service.createRole('manager', 'description'),
+    ).rejects.toBeInstanceOf(ProviderError);
+  });
+
+  it.each([
+    undefined,
+    {},
+    { id: '', name: 'manager', description: '' },
+    { id: 'id', name: ' ', description: '' },
+    { id: 'id', name: 'manager' },
+  ])('rejects malformed role creation result %j', async (result) => {
+    providerPost.mockResolvedValueOnce({
+      data: { success: true, result },
+    } as never);
+    await expect(
+      service.createRole('manager', 'description'),
+    ).rejects.toBeInstanceOf(BadGatewayException);
+  });
+
+  it('propagates role creation transport failures', async () => {
+    const error = new Error('network failed');
+    providerPost.mockRejectedValueOnce(error);
+    await expect(service.createRole('manager', 'description')).rejects.toBe(
+      error,
+    );
+  });
+
   it('posts deleteAccess with system credentials and the provider access ID', async () => {
     await expect(service.deleteAccess('access-id')).resolves.toBeUndefined();
     expect(providerPost).toHaveBeenCalledExactlyOnceWith(

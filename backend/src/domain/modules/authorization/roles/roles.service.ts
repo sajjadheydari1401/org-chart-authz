@@ -14,6 +14,10 @@ export class RolesService {
     private readonly authorizationProvider: AuthorizationProviderService,
   ) {}
 
+  getAllRoles(): Promise<Role[]> {
+    return this.roles.find();
+  }
+
   async createRole(input: CreateRoleDto): Promise<Role> {
     const unit = await this.units.findOneBy({ id: input.unitId });
     if (!unit) throw new NotFoundException();

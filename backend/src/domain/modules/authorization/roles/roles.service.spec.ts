@@ -13,6 +13,7 @@ describe('RolesService', () => {
   };
   const unit = { id: 7, name: 'Finance', type: 'department' };
   let roles: {
+    find: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
     save: ReturnType<typeof vi.fn>;
   };
@@ -22,6 +23,7 @@ describe('RolesService', () => {
 
   beforeEach(() => {
     roles = {
+      find: vi.fn(),
       create: vi.fn((value) => value),
       save: vi.fn(async (value) => ({ id: 1, ...value })),
     };
@@ -38,6 +40,15 @@ describe('RolesService', () => {
       units as never,
       provider as unknown as AuthorizationProviderService,
     );
+  });
+
+  it('lists roles from the local repository without calling the provider', async () => {
+    const localRoles = [{ id: 1, name: 'manager' }];
+    roles.find.mockResolvedValue(localRoles);
+
+    await expect(service.getAllRoles()).resolves.toBe(localRoles);
+    expect(roles.find).toHaveBeenCalledExactlyOnceWith();
+    expect(provider.createRole).not.toHaveBeenCalled();
   });
 
   it.each([RoleScopeMode.SELF, RoleScopeMode.DESCENDANTS])(

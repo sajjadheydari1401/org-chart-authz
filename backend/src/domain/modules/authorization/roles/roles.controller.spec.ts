@@ -4,6 +4,18 @@ import { RolesService } from './roles.service.js';
 import { RoleScopeMode } from './entities/role.entity.js';
 
 describe('RolesController', () => {
+  it('delegates getAllRoles to the local service', async () => {
+    const roles = [{ id: 1, name: 'manager' }];
+    const service = {
+      getAllRoles: vi.fn().mockResolvedValue(roles),
+      createRole: vi.fn(),
+    };
+    const controller = new RolesController(service as unknown as RolesService);
+
+    await expect(controller.getAllRoles()).resolves.toBe(roles);
+    expect(service.getAllRoles).toHaveBeenCalledExactlyOnceWith();
+  });
+
   it('delegates role creation to the service', async () => {
     const input = {
       name: 'manager',

@@ -17,6 +17,9 @@ export class Role {
   @PrimaryGeneratedColumn({ type: 'integer' })
   id!: number;
 
+  @Column({ name: 'provider_id', type: 'varchar', length: 255 })
+  providerId!: string;
+
   @ManyToOne(() => Unit, { nullable: false })
   @JoinColumn({ name: 'unit_id' })
   unit!: Unit;

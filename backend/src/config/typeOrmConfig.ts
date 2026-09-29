@@ -14,6 +14,7 @@ import { AddProviderIdToResources20260928000008 } from '../database/migrations/2
 import { AddProviderIdToAccesses20260928000009 } from '../database/migrations/20260928000009-AddProviderIdToAccesses.js';
 import { AddProviderIdToRoles20260929000000 } from '../database/migrations/20260929000000-AddProviderIdToRoles.js';
 import { SetRoleScopeModeDefault20260929000001 } from '../database/migrations/20260929000001-SetRoleScopeModeDefault.js';
+import { AddProviderIdToRoleAccesses20260929000002 } from '../database/migrations/20260929000002-AddProviderIdToRoleAccesses.js';
 import { Access } from '../domain/modules/authorization/accesses/entities/access.entity.js';
 import { Resource } from '../domain/modules/authorization/resources/entities/resource.entity.js';
 import { RoleAssignment } from '../domain/modules/authorization/roles/entities/role-assignment.entity.js';
@@ -47,6 +48,7 @@ export function createTypeOrmConfig(
       AddProviderIdToAccesses20260928000009,
       AddProviderIdToRoles20260929000000,
       SetRoleScopeModeDefault20260929000001,
+      AddProviderIdToRoleAccesses20260929000002,
     ],
     migrationsRun: true,
     synchronize: false,

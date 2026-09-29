@@ -1,4 +1,4 @@
-import { Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { Access } from '../../accesses/entities/access.entity.js';
 import { Role } from './role.entity.js';
 
@@ -17,4 +17,7 @@ export class RoleAccess {
   @ManyToOne(() => Access, { nullable: false })
   @JoinColumn({ name: 'access_id' })
   access!: Access;
+
+  @Column({ name: 'provider_id', type: 'varchar', length: 255 })
+  providerId!: string;
 }

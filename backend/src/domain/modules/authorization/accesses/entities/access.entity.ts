@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -8,6 +9,9 @@ import {
 import { Resource } from '../../resources/entities/resource.entity.js';
 
 @Entity({ name: 'accesses' })
+@Index('UQ_accesses_resource_id_method_name', ['resource', 'methodName'], {
+  unique: true,
+})
 export class Access {
   @PrimaryGeneratedColumn({ type: 'integer' })
   id!: number;

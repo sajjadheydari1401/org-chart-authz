@@ -37,15 +37,25 @@ export class RolesService {
       input.name,
       input.description,
     );
-    return this.roles.save(
-      this.roles.create({
-        name: result.name,
-        description: result.description,
-        providerId: result.id,
-        unit,
-        scopeMode: input.scopeMode,
-      }),
-    );
+    try {
+      return await this.roles.save(
+        this.roles.create({
+          name: result.name,
+          description: result.description,
+          providerId: result.id,
+          unit,
+          scopeMode: input.scopeMode,
+        }),
+      );
+    } catch (error) {
+      try {
+        await this.authorizationProvider.deleteRole(result.id);
+      } catch {
+        // TODO: Handle provider cleanup failures.
+      }
+
+      throw error;
+    }
   }
 
   async updateRole(id: number, input: UpdateRoleDto): Promise<Role> {

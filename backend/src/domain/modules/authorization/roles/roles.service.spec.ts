@@ -137,6 +137,14 @@ describe('RolesService', () => {
     expect(roles.save).not.toHaveBeenCalled();
   });
 
+  it('deletes the provider role if saving the local role fails', async () => {
+    const localSaveError = new Error('local role save failed');
+    roles.save.mockRejectedValue(localSaveError);
+
+    await expect(service.createRole(input)).rejects.toBe(localSaveError);
+    expect(provider.deleteRole).toHaveBeenCalledExactlyOnceWith('role-id');
+  });
+
   it('does not call the provider when the unit is missing', async () => {
     units.findOneBy.mockResolvedValue(null);
     await expect(service.createRole(input)).rejects.toBeInstanceOf(

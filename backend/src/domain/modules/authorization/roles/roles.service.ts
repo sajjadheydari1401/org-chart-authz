@@ -1,21 +1,10 @@
-import {
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from '../../users/entities/user.entity.js';
 import { Unit } from '../../units/entities/unit.entity.js';
-import { Access } from '../accesses/entities/access.entity.js';
 import { AuthorizationProviderService } from '../authorization-provider.service.js';
-import { CreateRoleAssignmentDto } from './dto/create-role-assignment.dto.js';
 import { CreateRoleDto } from './dto/create-role.dto.js';
-import { CreateRoleAccessDto } from './dto/create-role-access.dto.js';
-import { UpdateRoleAssignmentDto } from './dto/update-role-assignment.dto.js';
 import { UpdateRoleDto } from './dto/update-role.dto.js';
-import { RoleAssignment } from './entities/role-assignment.entity.js';
-import { RoleAccess } from './entities/role-access.entity.js';
 import { Role } from './entities/role.entity.js';
 
 @Injectable()
@@ -23,12 +12,6 @@ export class RolesService {
   constructor(
     @InjectRepository(Role) private readonly roles: Repository<Role>,
     @InjectRepository(Unit) private readonly units: Repository<Unit>,
-    @InjectRepository(User) private readonly users: Repository<User>,
-    @InjectRepository(Access) private readonly accesses: Repository<Access>,
-    @InjectRepository(RoleAccess)
-    private readonly roleAccesses: Repository<RoleAccess>,
-    @InjectRepository(RoleAssignment)
-    private readonly roleAssignments: Repository<RoleAssignment>,
     private readonly authorizationProvider: AuthorizationProviderService,
   ) {}
 
@@ -95,130 +78,6 @@ export class RolesService {
     await this.authorizationProvider.deleteRole(role.providerId);
 
     const result = await this.roles.delete(id);
-    if (!result.affected) throw new NotFoundException();
-  }
-
-  async createRoleAccess(input: CreateRoleAccessDto): Promise<RoleAccess> {
-    const role = await this.roles.findOneBy({ id: input.roleId });
-    if (!role) throw new NotFoundException();
-
-    const access = await this.accesses.findOneBy({ id: input.accessId });
-    if (!access) throw new NotFoundException();
-
-    const existingRoleAccess = await this.roleAccesses.findOneBy({
-      roleId: input.roleId,
-      accessId: input.accessId,
-    });
-    if (existingRoleAccess) throw new ConflictException();
-
-    const result = await this.authorizationProvider.createRoleAccess(
-      access.providerId,
-      role.providerId,
-    );
-
-    try {
-      return await this.roleAccesses.save(
-        this.roleAccesses.create({
-          role,
-          access,
-          providerId: result.id,
-        }),
-      );
-    } catch (error) {
-      try {
-        await this.authorizationProvider.deleteRoleAccess(result.id);
-      } catch {
-        // TODO: Handle provider cleanup failures.
-      }
-
-      throw error;
-    }
-  }
-
-  async createRoleAssignment(
-    input: CreateRoleAssignmentDto,
-  ): Promise<RoleAssignment> {
-    const user = await this.users.findOneBy({ id: input.userId });
-    if (!user) throw new NotFoundException();
-
-    const role = await this.roles.findOneBy({ id: input.roleId });
-    if (!role) throw new NotFoundException();
-
-    const existingAssignment = await this.roleAssignments.findOne({
-      where: { user: { id: input.userId }, role: { id: input.roleId } },
-      relations: { user: true, role: true },
-    });
-    if (existingAssignment) throw new ConflictException();
-
-    return this.roleAssignments.save(
-      this.roleAssignments.create({
-        user,
-        role,
-      }),
-    );
-  }
-
-  getAllRoleAssignments(): Promise<RoleAssignment[]> {
-    return this.roleAssignments.find({
-      relations: { user: true, role: true },
-    });
-  }
-
-  async getRoleAssignment(id: number): Promise<RoleAssignment> {
-    const assignment = await this.roleAssignments.findOne({
-      where: { id },
-      relations: { user: true, role: true },
-    });
-    if (!assignment) throw new NotFoundException();
-
-    return assignment;
-  }
-
-  async updateRoleAssignment(
-    id: number,
-    input: UpdateRoleAssignmentDto,
-  ): Promise<RoleAssignment> {
-    const assignment = await this.roleAssignments.findOneBy({ id });
-    if (!assignment) throw new NotFoundException();
-
-    const user = await this.users.findOneBy({ id: input.userId });
-    if (!user) throw new NotFoundException();
-
-    const role = await this.roles.findOneBy({ id: input.roleId });
-    if (!role) throw new NotFoundException();
-
-    const existingAssignment = await this.roleAssignments.findOne({
-      where: { user: { id: input.userId }, role: { id: input.roleId } },
-    });
-    if (existingAssignment && existingAssignment.id !== id) {
-      throw new ConflictException();
-    }
-
-    return this.roleAssignments.save({
-      ...assignment,
-      user,
-      role,
-    });
-  }
-
-  async deleteRoleAssignment(id: number): Promise<void> {
-    const result = await this.roleAssignments.delete(id);
-    if (!result.affected) throw new NotFoundException();
-  }
-
-  getAllRoleAccesses(): Promise<RoleAccess[]> {
-    return this.roleAccesses.find({
-      relations: { role: true, access: true },
-    });
-  }
-
-  async deleteRoleAccess(roleId: number, accessId: number): Promise<void> {
-    const roleAccess = await this.roleAccesses.findOneBy({ roleId, accessId });
-    if (!roleAccess) throw new NotFoundException();
-
-    await this.authorizationProvider.deleteRoleAccess(roleAccess.providerId);
-
-    const result = await this.roleAccesses.delete({ roleId, accessId });
     if (!result.affected) throw new NotFoundException();
   }
 }

@@ -172,11 +172,16 @@ describe('UnitsService', () => {
   });
 
   it('deletes the whole unit subtree with a recursive CTE when the unit exists', async () => {
+    units.findOne.mockResolvedValue({ id: 8, parent: { id: 1 } });
     dataSource.query
       .mockResolvedValueOnce([{ count: 1 }])
       .mockResolvedValueOnce(undefined);
 
     await expect(service.deleteUnit(8)).resolves.toBeUndefined();
+    expect(units.findOne).toHaveBeenCalledExactlyOnceWith({
+      where: { id: 8 },
+      relations: { parent: true },
+    });
     expect(dataSource.query).toHaveBeenCalledTimes(2);
     expect(dataSource.query).toHaveBeenNthCalledWith(
       1,

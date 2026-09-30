@@ -17,8 +17,8 @@ import { SetRoleScopeModeDefault20260929000001 } from '../database/migrations/20
 import { AddProviderIdToRoleAccesses20260929000002 } from '../database/migrations/20260929000002-AddProviderIdToRoleAccesses.js';
 import { Access } from '../domain/modules/authorization/accesses/entities/access.entity.js';
 import { Resource } from '../domain/modules/authorization/resources/entities/resource.entity.js';
-import { RoleAssignment } from '../domain/modules/authorization/roles/entities/role-assignment.entity.js';
-import { RoleAccess } from '../domain/modules/authorization/roles/entities/role-access.entity.js';
+import { RoleAssignment } from '../domain/modules/authorization/role-assignments/entities/role-assignment.entity.js';
+import { RoleAccess } from '../domain/modules/authorization/role-accesses/entities/role-access.entity.js';
 import { Role } from '../domain/modules/authorization/roles/entities/role.entity.js';
 import { Unit } from '../domain/modules/units/entities/unit.entity.js';
 import { User } from '../domain/modules/users/entities/user.entity.js';

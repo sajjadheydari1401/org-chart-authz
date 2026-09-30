@@ -1,9 +1,17 @@
 import { Module } from '@nestjs/common';
 import { AccessesModule } from './accesses/accesses.module.js';
+import { RoleAccessesModule } from './role-accesses/role-accesses.module.js';
+import { RoleAssignmentsModule } from './role-assignments/role-assignments.module.js';
 import { ResourcesModule } from './resources/resources.module.js';
 import { RolesModule } from './roles/roles.module.js';
 
 @Module({
-  imports: [RolesModule, ResourcesModule, AccessesModule],
+  imports: [
+    RolesModule,
+    RoleAccessesModule,
+    RoleAssignmentsModule,
+    ResourcesModule,
+    AccessesModule,
+  ],
 })
 export class AuthorizationModule {}

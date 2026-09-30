@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import type { AddResourceResult } from '../../../common/types/add-resource-result.js';
 import type { AddRoleResult } from '../../../common/types/add-role-result.js';
 import type { AddAccessResult } from '../../../common/types/add-access-result.js';
+import type { AddRoleAccessResult } from '../../../common/types/add-role-access-result.js';
 import type { UpdateResourceResult } from '../../../common/types/update-resource-result.js';
 import type { UpdateRoleResult } from '../../../common/types/update-role-result.js';
 import { postToProvider } from '../../../common/utils/api/post-to-provider.js';
@@ -77,6 +78,35 @@ export class AuthorizationProviderService {
       password: systemPassword,
       roleId,
     });
+  }
+
+  async createRoleAccess(
+    accessId: string,
+    roleId: string,
+  ): Promise<AddRoleAccessResult> {
+    const { systemUsername, systemPassword } = systemCredentials(this.config);
+    const data = await postToProvider<AddRoleAccessResult>(
+      providerUrl(this.config, '/admin/addRoleAccess'),
+      {
+        username: systemUsername,
+        password: systemPassword,
+        accessId,
+        roleId,
+      },
+    );
+    const result = data.result;
+    if (
+      !result ||
+      typeof result.id !== 'string' ||
+      !result.id.trim() ||
+      result.accessId !== accessId ||
+      result.roleId !== roleId ||
+      typeof result.createdAt !== 'string' ||
+      !result.createdAt.trim()
+    ) {
+      throw new BadGatewayException();
+    }
+    return result;
   }
 
   async deleteAccess(accessId: string): Promise<void> {

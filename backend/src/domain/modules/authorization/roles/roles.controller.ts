@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { FormatResponseInterceptor } from '../../../../common/utils/interceptor/format-response.interceptor.js';
 import { CreateRoleDto } from './dto/create-role.dto.js';
+import { CreateRoleAccessDto } from './dto/create-role-access.dto.js';
 import { UpdateRoleDto } from './dto/update-role.dto.js';
 import { RolesService } from './roles.service.js';
 
@@ -40,5 +41,10 @@ export class RolesController {
   @Delete(':id')
   deleteRole(@Param('id', ParseIntPipe) id: number) {
     return this.rolesService.deleteRole(id);
+  }
+
+  @Post('role-accesses')
+  createRoleAccess(@Body() input: CreateRoleAccessDto) {
+    return this.rolesService.createRoleAccess(input);
   }
 }

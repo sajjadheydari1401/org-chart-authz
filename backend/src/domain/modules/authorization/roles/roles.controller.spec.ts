@@ -11,6 +11,7 @@ describe('RolesController', () => {
       createRole: vi.fn(),
       updateRole: vi.fn(),
       deleteRole: vi.fn(),
+      createRoleAccess: vi.fn(),
     };
     const controller = new RolesController(service as unknown as RolesService);
 
@@ -60,5 +61,17 @@ describe('RolesController', () => {
 
     await expect(controller.deleteRole(id)).resolves.toBeUndefined();
     expect(service.deleteRole).toHaveBeenCalledExactlyOnceWith(id);
+  });
+
+  it('delegates role-access creation with both local IDs', async () => {
+    const input = { roleId: 12, accessId: 34 };
+    const mapping = { id: 'mapping-id', ...input };
+    const service = {
+      createRoleAccess: vi.fn().mockResolvedValue(mapping),
+    };
+    const controller = new RolesController(service as unknown as RolesService);
+
+    await expect(controller.createRoleAccess(input)).resolves.toBe(mapping);
+    expect(service.createRoleAccess).toHaveBeenCalledExactlyOnceWith(input);
   });
 });

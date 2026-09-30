@@ -80,6 +80,78 @@ describe('AuthorizationProviderService', () => {
     );
   });
 
+  it('posts addRoleAccess with provider IDs and configured credentials', async () => {
+    const result = {
+      id: 'provider-role-access-id',
+      accessId: 'provider-access-id',
+      roleId: 'provider-role-id',
+      createdAt: '2026-09-30T05:10:09.523Z',
+    };
+    providerPost.mockResolvedValueOnce({
+      data: { success: true, result },
+    } as never);
+
+    await expect(
+      service.createRoleAccess('provider-access-id', 'provider-role-id'),
+    ).resolves.toEqual(result);
+    expect(providerPost).toHaveBeenCalledExactlyOnceWith(
+      `${PROVIDER_BASE_URL}/admin/addRoleAccess`,
+      {
+        username: 'system-user',
+        password: 'system-password',
+        accessId: 'provider-access-id',
+        roleId: 'provider-role-id',
+      },
+    );
+  });
+
+  it('propagates provider rejection of role-access creation', async () => {
+    providerPost.mockResolvedValueOnce({
+      data: { success: false, message: 'rejected' },
+    } as never);
+
+    await expect(
+      service.createRoleAccess('provider-access-id', 'provider-role-id'),
+    ).rejects.toBeInstanceOf(ProviderError);
+  });
+
+  it.each([
+    undefined,
+    {},
+    {
+      id: '',
+      accessId: 'provider-access-id',
+      roleId: 'provider-role-id',
+      createdAt: 'now',
+    },
+    {
+      id: 'mapping-id',
+      accessId: 'wrong-access-id',
+      roleId: 'provider-role-id',
+      createdAt: 'now',
+    },
+    {
+      id: 'mapping-id',
+      accessId: 'provider-access-id',
+      roleId: 'wrong-role-id',
+      createdAt: 'now',
+    },
+    {
+      id: 'mapping-id',
+      accessId: 'provider-access-id',
+      roleId: 'provider-role-id',
+      createdAt: '',
+    },
+  ])('rejects malformed role-access result %j', async (result) => {
+    providerPost.mockResolvedValueOnce({
+      data: { success: true, result },
+    } as never);
+
+    await expect(
+      service.createRoleAccess('provider-access-id', 'provider-role-id'),
+    ).rejects.toBeInstanceOf(BadGatewayException);
+  });
+
   it('posts deleteRole with system credentials and the provider role ID', async () => {
     await expect(service.deleteRole('role-id')).resolves.toBeUndefined();
     expect(providerPost).toHaveBeenCalledExactlyOnceWith(

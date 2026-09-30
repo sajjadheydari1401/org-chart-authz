@@ -1,6 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AuthorizationProviderService } from '../authorization-provider.service.js';
+import { Access } from '../../accesses/entities/access.entity.js';
 import { RoleScopeMode } from './entities/role.entity.js';
 import { RolesService } from './roles.service.js';
 
@@ -20,10 +21,17 @@ describe('RolesService', () => {
     save: ReturnType<typeof vi.fn>;
   };
   let units: { findOneBy: ReturnType<typeof vi.fn> };
+  let accesses: { findOneBy: ReturnType<typeof vi.fn> };
+  let roleAccesses: {
+    findOneBy: ReturnType<typeof vi.fn>;
+    create: ReturnType<typeof vi.fn>;
+    save: ReturnType<typeof vi.fn>;
+  };
   let provider: {
     createRole: ReturnType<typeof vi.fn>;
     updateRole: ReturnType<typeof vi.fn>;
     deleteRole: ReturnType<typeof vi.fn>;
+    createRoleAccess: ReturnType<typeof vi.fn>;
   };
   let service: RolesService;
 
@@ -36,6 +44,12 @@ describe('RolesService', () => {
       save: vi.fn(async (value) => ({ id: 1, ...value })),
     };
     units = { findOneBy: vi.fn().mockResolvedValue(unit) };
+    accesses = { findOneBy: vi.fn() };
+    roleAccesses = {
+      findOneBy: vi.fn().mockResolvedValue(null),
+      create: vi.fn((value) => value),
+      save: vi.fn(async (value) => ({ id: 'local-role-access', ...value })),
+    };
     provider = {
       createRole: vi.fn().mockResolvedValue({
         id: 'role-id',
@@ -48,10 +62,18 @@ describe('RolesService', () => {
         description: 'updated provider description',
       }),
       deleteRole: vi.fn().mockResolvedValue(undefined),
+      createRoleAccess: vi.fn().mockResolvedValue({
+        id: 'provider-role-access-id',
+        accessId: 'provider-access-id',
+        roleId: 'provider-role-id',
+        createdAt: '2026-09-30T05:10:09.523Z',
+      }),
     };
     service = new RolesService(
       roles as never,
       units as never,
+      accesses as never,
+      roleAccesses as never,
       provider as unknown as AuthorizationProviderService,
     );
   });
@@ -264,5 +286,85 @@ describe('RolesService', () => {
     await expect(service.deleteRole(12)).rejects.toBeInstanceOf(
       NotFoundException,
     );
+  });
+
+  describe('createRoleAccess', () => {
+    const role = { id: 12, providerId: 'provider-role-id' };
+    const access = { id: 34, providerId: 'provider-access-id' };
+    const input = { roleId: 12, accessId: 34 };
+
+    it('resolves local IDs, creates the provider mapping, and saves its provider ID locally', async () => {
+      roles.findOneBy.mockResolvedValue(role);
+      accesses.findOneBy.mockResolvedValue(access);
+
+      await expect(service.createRoleAccess(input)).resolves.toEqual({
+        id: 'local-role-access',
+        role,
+        access,
+        providerId: 'provider-role-access-id',
+      });
+      expect(roles.findOneBy).toHaveBeenCalledExactlyOnceWith({ id: 12 });
+      expect(accesses.findOneBy).toHaveBeenCalledExactlyOnceWith({ id: 34 });
+      expect(roleAccesses.findOneBy).toHaveBeenCalledExactlyOnceWith({
+        roleId: 12,
+        accessId: 34,
+      });
+      expect(provider.createRoleAccess).toHaveBeenCalledExactlyOnceWith(
+        'provider-access-id',
+        'provider-role-id',
+      );
+      const mapping = {
+        role,
+        access,
+        providerId: 'provider-role-access-id',
+      };
+      expect(roleAccesses.create).toHaveBeenCalledExactlyOnceWith(mapping);
+      expect(roleAccesses.save).toHaveBeenCalledExactlyOnceWith(mapping);
+    });
+
+    it('does not look up the access or call the provider when the role is missing', async () => {
+      roles.findOneBy.mockResolvedValue(null);
+
+      await expect(service.createRoleAccess(input)).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
+      expect(accesses.findOneBy).not.toHaveBeenCalled();
+      expect(provider.createRoleAccess).not.toHaveBeenCalled();
+      expect(roleAccesses.save).not.toHaveBeenCalled();
+    });
+
+    it('does not call the provider when the access is missing', async () => {
+      roles.findOneBy.mockResolvedValue(role);
+      accesses.findOneBy.mockResolvedValue(null);
+
+      await expect(service.createRoleAccess(input)).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
+      expect(provider.createRoleAccess).not.toHaveBeenCalled();
+      expect(roleAccesses.save).not.toHaveBeenCalled();
+    });
+
+    it('rejects an existing role-access mapping without calling the provider', async () => {
+      roles.findOneBy.mockResolvedValue(role);
+      accesses.findOneBy.mockResolvedValue(access);
+      roleAccesses.findOneBy.mockResolvedValue({ role, access });
+
+      await expect(service.createRoleAccess(input)).rejects.toMatchObject({
+        status: 409,
+      });
+      expect(provider.createRoleAccess).not.toHaveBeenCalled();
+      expect(roleAccesses.save).not.toHaveBeenCalled();
+    });
+
+    it('does not save locally when provider mapping creation fails', async () => {
+      roles.findOneBy.mockResolvedValue(role);
+      accesses.findOneBy.mockResolvedValue(access);
+      const error = new Error('provider mapping failed');
+      provider.createRoleAccess.mockRejectedValue(error);
+
+      await expect(service.createRoleAccess(input)).rejects.toBe(error);
+      expect(roleAccesses.create).not.toHaveBeenCalled();
+      expect(roleAccesses.save).not.toHaveBeenCalled();
+    });
   });
 });

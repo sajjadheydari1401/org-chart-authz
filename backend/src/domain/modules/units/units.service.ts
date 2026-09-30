@@ -1,15 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { CreateUnitDto } from './dto/create-unit.dto.js';
 import { UpdateUnitDto } from './dto/update-unit.dto.js';
 import { Unit } from './entities/unit.entity.js';
+import { deleteUnitSubtree } from './utils/delete-unit-subtree.js';
 import { getParentWithoutCycle } from './utils/unit-hierarchy.js';
 
 @Injectable()
 export class UnitsService {
   constructor(
     @InjectRepository(Unit) private readonly units: Repository<Unit>,
+    @InjectDataSource() private readonly dataSource: DataSource,
   ) {}
 
   getAllUnits(): Promise<Unit[]> {
@@ -63,6 +65,20 @@ export class UnitsService {
     return this.units.save(unit);
   }
 
+  async deleteUnit(id: number): Promise<void> {
+    const unit = await this.units.findOne({
+      where: { id },
+      relations: { parent: true },
+    });
+
+    if (!unit) throw new NotFoundException();
+    if (isRootUnit(unit)) {
+      throw new NotFoundException('Root unit cannot be deleted.');
+    }
+
+    await deleteUnitSubtree(this.dataSource, id);
+  }
+
   private async applyParentChange(
     unit: Unit,
     parentId: number | null,
@@ -73,4 +89,8 @@ export class UnitsService {
         ? null
         : await getParentWithoutCycle(this.units, unit.id, parentId);
   }
+}
+
+function isRootUnit(unit: Pick<Unit, 'parent'>): boolean {
+  return unit.parent === null || unit.parent === undefined;
 }

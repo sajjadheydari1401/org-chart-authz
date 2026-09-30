@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -39,5 +40,10 @@ export class UnitsController {
     @Body() input: UpdateUnitDto,
   ) {
     return this.unitsService.updateUnit(id, input);
+  }
+
+  @Delete(':id')
+  deleteUnit(@Param('id', ParseIntPipe) id: number) {
+    return this.unitsService.deleteUnit(id);
   }
 }

@@ -48,4 +48,14 @@ describe('UnitsController', () => {
     await expect(controller.updateUnit(8, input)).resolves.toBe(unit);
     expect(unitsService.updateUnit).toHaveBeenCalledExactlyOnceWith(8, input);
   });
+
+  it('delegates unit deletion with the local ID', async () => {
+    const unitsService = { deleteUnit: vi.fn().mockResolvedValue(undefined) };
+    const controller = new UnitsController(
+      unitsService as unknown as UnitsService,
+    );
+
+    await expect(controller.deleteUnit(8)).resolves.toBeUndefined();
+    expect(unitsService.deleteUnit).toHaveBeenCalledExactlyOnceWith(8);
+  });
 });

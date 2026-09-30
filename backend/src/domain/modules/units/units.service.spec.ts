@@ -9,7 +9,9 @@ describe('UnitsService', () => {
     findOne: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
     save: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
   };
+  let dataSource: { query: ReturnType<typeof vi.fn> };
   let service: UnitsService;
 
   beforeEach(() => {
@@ -19,8 +21,12 @@ describe('UnitsService', () => {
       findOne: vi.fn(),
       create: vi.fn((value) => value),
       save: vi.fn(async (unit) => ({ id: 1, ...unit })),
+      delete: vi.fn(),
     };
-    service = new UnitsService(units as never);
+    dataSource = {
+      query: vi.fn(),
+    };
+    service = new UnitsService(units as never, dataSource as never);
   });
 
   it('lists all units from the local repository', async () => {
@@ -163,6 +169,42 @@ describe('UnitsService', () => {
       parent: null,
     });
     expect(units.findOne).not.toHaveBeenCalled();
+  });
+
+  it('deletes the whole unit subtree with a recursive CTE when the unit exists', async () => {
+    dataSource.query
+      .mockResolvedValueOnce([{ count: 1 }])
+      .mockResolvedValueOnce(undefined);
+
+    await expect(service.deleteUnit(8)).resolves.toBeUndefined();
+    expect(dataSource.query).toHaveBeenCalledTimes(2);
+    expect(dataSource.query).toHaveBeenNthCalledWith(
+      1,
+      'SELECT COUNT(*)::int AS count FROM units WHERE id = $1',
+      [8],
+    );
+    expect(dataSource.query.mock.calls[1][0]).toContain(
+      'WITH RECURSIVE unit_tree',
+    );
+    expect(dataSource.query.mock.calls[1][1]).toEqual([8]);
+  });
+
+  it('throws not found when the unit to delete does not exist', async () => {
+    units.findOne.mockResolvedValue(null);
+
+    await expect(service.deleteUnit(404)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
+    expect(dataSource.query).not.toHaveBeenCalled();
+  });
+
+  it('throws not found when the unit to delete is the root', async () => {
+    units.findOne.mockResolvedValue({ id: 1, parent: null });
+
+    await expect(service.deleteUnit(1)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
+    expect(dataSource.query).not.toHaveBeenCalled();
   });
 
   it('throws not found when the unit to move does not exist', async () => {

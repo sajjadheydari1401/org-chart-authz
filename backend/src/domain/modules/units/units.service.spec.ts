@@ -113,6 +113,44 @@ describe('UnitsService', () => {
     expect(units.findOne).not.toHaveBeenCalled();
   });
 
+  it('moves a unit to a new parent and saves it', async () => {
+    const unit = { id: 8, name: 'Floor 1', type: 'floor', parent: null };
+    const parent = {
+      id: 5,
+      name: 'Head Office',
+      type: 'building',
+      parent: null,
+    };
+    units.findOneBy.mockResolvedValue(unit);
+    units.findOne.mockResolvedValue(parent);
+    units.save.mockImplementation(async (movedUnit) => movedUnit);
+
+    await expect(service.moveUnit(8, 5)).resolves.toEqual({ ...unit, parent });
+    expect(units.findOneBy).toHaveBeenCalledExactlyOnceWith({ id: 8 });
+    expect(units.save).toHaveBeenCalledExactlyOnceWith({ ...unit, parent });
+  });
+
+  it('moves a unit to the root when parentId is null', async () => {
+    const unit = { id: 8, name: 'Floor 1', type: 'floor', parent: { id: 5 } };
+    units.findOneBy.mockResolvedValue(unit);
+    units.save.mockImplementation(async (movedUnit) => movedUnit);
+
+    await expect(service.moveUnit(8, null)).resolves.toEqual({
+      ...unit,
+      parent: null,
+    });
+    expect(units.findOne).not.toHaveBeenCalled();
+  });
+
+  it('throws not found when the unit to move does not exist', async () => {
+    units.findOneBy.mockResolvedValue(null);
+
+    await expect(service.moveUnit(404, 5)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
+    expect(units.save).not.toHaveBeenCalled();
+  });
+
   it('throws not found when the unit to update does not exist', async () => {
     units.findOneBy.mockResolvedValue(null);
 

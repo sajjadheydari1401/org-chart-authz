@@ -39,13 +39,28 @@ export class UnitsService {
     };
 
     if (input.parentId !== undefined) {
-      // Null clears the parent; an ID must resolve to a valid parent.
-      updatedUnit.parent =
-        input.parentId === null
-          ? null
-          : await getParentWithoutCycle(this.units, id, input.parentId);
+      await this.applyParentChange(updatedUnit, input.parentId);
     }
 
     return this.units.save(updatedUnit);
+  }
+
+  async moveUnit(id: number, parentId: number | null): Promise<Unit> {
+    const unit = await this.units.findOneBy({ id });
+    if (!unit) throw new NotFoundException();
+
+    await this.applyParentChange(unit, parentId);
+    return this.units.save(unit);
+  }
+
+  private async applyParentChange(
+    unit: Unit,
+    parentId: number | null,
+  ): Promise<void> {
+    // Null moves the unit to the root; an ID must resolve to a valid parent.
+    unit.parent =
+      parentId === null
+        ? null
+        : await getParentWithoutCycle(this.units, unit.id, parentId);
   }
 }

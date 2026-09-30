@@ -1,4 +1,4 @@
-﻿import { Injectable, ServiceUnavailableException } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { ConfirmRegistrationBySmsDto } from './dto/confirm-registration-by-sms.dto.js';
 import { LoginWithUsernamePasswordDto } from './dto/login-with-username-password.dto.js';
 import { RegisterWithUsernamePasswordDto } from './dto/register-with-username-password.dto.js';
@@ -24,7 +24,7 @@ export class AuthService {
       try {
         await this.authProvider.deleteUser(input.username);
       } catch {
-        throw new ServiceUnavailableException();
+        // TODO: Handle provider cleanup failures.
       }
 
       throw error;

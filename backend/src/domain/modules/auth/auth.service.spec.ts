@@ -1,4 +1,3 @@
-import { ServiceUnavailableException } from '@nestjs/common';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AuthProviderService } from './auth-provider.service.js';
 import { AuthService } from './auth.service.js';
@@ -78,10 +77,9 @@ describe('AuthService', () => {
     expect(authProvider.deleteUser).toHaveBeenCalledWith('person');
   });
 
-  it('returns unavailable if provider cleanup fails after local creation fails', async () => {
-    usersService.createLocalUser.mockRejectedValue(
-      new Error('local database failed'),
-    );
+  it('preserves the local creation error if provider cleanup fails', async () => {
+    const persistenceError = new Error('local database failed');
+    usersService.createLocalUser.mockRejectedValue(persistenceError);
     authProvider.deleteUser.mockRejectedValue(
       new Error('provider cleanup failed'),
     );
@@ -90,7 +88,7 @@ describe('AuthService', () => {
       service.registerWithUsernamePassword({
         username: 'person',
       } as RegisterWithUsernamePasswordDto),
-    ).rejects.toBeInstanceOf(ServiceUnavailableException);
+    ).rejects.toBe(persistenceError);
   });
 
   it('delegates registration SMS confirmation', async () => {

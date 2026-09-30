@@ -19,6 +19,7 @@ import { AddUnitsParentIdIndex20260930000000 } from '../database/migrations/2026
 import { AddRoleAssignmentIndexes20260930000001 } from '../database/migrations/20260930000001-AddRoleAssignmentIndexes.js';
 import { AddRolesUnitIdIndex20260930000002 } from '../database/migrations/20260930000002-AddRolesUnitIdIndex.js';
 import { AddAccessResourceMethodUniqueIndex20260930000003 } from '../database/migrations/20260930000003-AddAccessResourceMethodUniqueIndex.js';
+import { AddRoleAccessAccessIdIndex20260930000004 } from '../database/migrations/20260930000004-AddRoleAccessAccessIdIndex.js';
 import { Access } from '../domain/modules/authorization/accesses/entities/access.entity.js';
 import { Resource } from '../domain/modules/authorization/resources/entities/resource.entity.js';
 import { RoleAssignment } from '../domain/modules/authorization/role-assignments/entities/role-assignment.entity.js';
@@ -57,6 +58,7 @@ export function createTypeOrmConfig(
       AddRoleAssignmentIndexes20260930000001,
       AddRolesUnitIdIndex20260930000002,
       AddAccessResourceMethodUniqueIndex20260930000003,
+      AddRoleAccessAccessIdIndex20260930000004,
     ],
     migrationsRun: true,
     synchronize: false,

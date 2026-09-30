@@ -1,8 +1,16 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryColumn,
+} from 'typeorm';
 import { Access } from '../../accesses/entities/access.entity.js';
 import { Role } from '../../roles/entities/role.entity.js';
 
 @Entity({ name: 'role_accesses' })
+@Index('IDX_role_accesses_access_id', ['accessId'])
 export class RoleAccess {
   @PrimaryColumn({ name: 'role_id', type: 'integer' })
   roleId!: number;

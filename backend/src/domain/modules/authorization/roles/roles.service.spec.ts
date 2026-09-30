@@ -370,6 +370,20 @@ describe('RolesService', () => {
       expect(roleAccesses.create).not.toHaveBeenCalled();
       expect(roleAccesses.save).not.toHaveBeenCalled();
     });
+
+    it('deletes the provider mapping when saving the local mapping fails', async () => {
+      roles.findOneBy.mockResolvedValue(role);
+      accesses.findOneBy.mockResolvedValue(access);
+      const localSaveError = new Error('local mapping save failed');
+      roleAccesses.save.mockRejectedValue(localSaveError);
+
+      await expect(service.createRoleAccess(input)).rejects.toBe(
+        localSaveError,
+      );
+      expect(provider.deleteRoleAccess).toHaveBeenCalledExactlyOnceWith(
+        'provider-role-access-id',
+      );
+    });
   });
 
   it('gets role accesses and relations from the local database', async () => {

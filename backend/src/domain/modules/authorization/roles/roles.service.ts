@@ -99,18 +99,38 @@ export class RolesService {
       role.providerId,
     );
 
-    return this.roleAccesses.save(
-      this.roleAccesses.create({
-        role,
-        access,
-        providerId: result.id,
-      }),
-    );
+    try {
+      return await this.roleAccesses.save(
+        this.roleAccesses.create({
+          role,
+          access,
+          providerId: result.id,
+        }),
+      );
+    } catch (error) {
+      try {
+        await this.authorizationProvider.deleteRoleAccess(result.id);
+      } catch {
+        // TODO: Handle provider cleanup failures.
+      }
+
+      throw error;
+    }
   }
 
   getAllRoleAccesses(): Promise<RoleAccess[]> {
     return this.roleAccesses.find({
       relations: { role: true, access: true },
     });
+  }
+
+  async deleteRoleAccess(roleId: number, accessId: number): Promise<void> {
+    const roleAccess = await this.roleAccesses.findOneBy({ roleId, accessId });
+    if (!roleAccess) throw new NotFoundException();
+
+    await this.authorizationProvider.deleteRoleAccess(roleAccess.providerId);
+
+    const result = await this.roleAccesses.delete({ roleId, accessId });
+    if (!result.affected) throw new NotFoundException();
   }
 }

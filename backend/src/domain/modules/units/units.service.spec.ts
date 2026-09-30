@@ -1,10 +1,11 @@
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { UnitsService } from './units.service.js';
 
 describe('UnitsService', () => {
   let units: {
     findOneBy: ReturnType<typeof vi.fn>;
+    findOne: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
     save: ReturnType<typeof vi.fn>;
   };
@@ -13,6 +14,7 @@ describe('UnitsService', () => {
   beforeEach(() => {
     units = {
       findOneBy: vi.fn(),
+      findOne: vi.fn(),
       create: vi.fn((value) => value),
       save: vi.fn(async (unit) => ({ id: 1, ...unit })),
     };
@@ -33,7 +35,12 @@ describe('UnitsService', () => {
   });
 
   it('creates a child unit using its local parent relation', async () => {
-    const parent = { id: 5, name: 'Head Office', type: 'building' };
+    const parent = {
+      id: 5,
+      name: 'Head Office',
+      type: 'building',
+      parent: null,
+    };
     units.findOneBy.mockResolvedValue(parent);
     const input = { name: 'Floor 1', type: 'floor', parentId: 5 };
     const expected = { name: input.name, type: input.type, parent };
@@ -54,6 +61,131 @@ describe('UnitsService', () => {
       service.createUnit({ name: 'Floor 1', type: 'floor', parentId: 404 }),
     ).rejects.toBeInstanceOf(NotFoundException);
     expect(units.create).not.toHaveBeenCalled();
+    expect(units.save).not.toHaveBeenCalled();
+  });
+
+  it('updates only the supplied scalar fields', async () => {
+    const unit = { id: 8, name: 'Floor 1', type: 'floor' };
+    units.findOneBy.mockResolvedValue(unit);
+    units.save.mockImplementation(async (updatedUnit) => updatedUnit);
+
+    await expect(
+      service.updateUnit(8, { name: 'Upper Floor' }),
+    ).resolves.toEqual({ ...unit, name: 'Upper Floor' });
+    expect(units.save).toHaveBeenCalledExactlyOnceWith({
+      ...unit,
+      name: 'Upper Floor',
+    });
+    expect(units.findOne).not.toHaveBeenCalled();
+  });
+
+  it('changes the parent after verifying the new parent exists', async () => {
+    const unit = { id: 8, name: 'Floor 1', type: 'floor' };
+    const parent = {
+      id: 5,
+      name: 'Head Office',
+      type: 'building',
+      parent: null,
+    };
+    units.findOneBy.mockResolvedValue(unit);
+    units.findOne.mockResolvedValue(parent);
+    units.save.mockImplementation(async (updatedUnit) => updatedUnit);
+
+    await expect(service.updateUnit(8, { parentId: 5 })).resolves.toEqual({
+      ...unit,
+      parent,
+    });
+    expect(units.findOne).toHaveBeenCalledExactlyOnceWith({
+      where: { id: 5 },
+      relations: { parent: true },
+    });
+  });
+
+  it('clears the parent when parentId is null', async () => {
+    const unit = { id: 8, name: 'Floor 1', type: 'floor', parent: { id: 5 } };
+    units.findOneBy.mockResolvedValue(unit);
+    units.save.mockImplementation(async (updatedUnit) => updatedUnit);
+
+    await expect(service.updateUnit(8, { parentId: null })).resolves.toEqual({
+      ...unit,
+      parent: null,
+    });
+    expect(units.findOne).not.toHaveBeenCalled();
+  });
+
+  it('throws not found when the unit to update does not exist', async () => {
+    units.findOneBy.mockResolvedValue(null);
+
+    await expect(
+      service.updateUnit(404, { name: 'Unknown' }),
+    ).rejects.toBeInstanceOf(NotFoundException);
+    expect(units.save).not.toHaveBeenCalled();
+  });
+
+  it('throws not found when the new parent does not exist', async () => {
+    units.findOneBy.mockResolvedValue({
+      id: 8,
+      name: 'Floor 1',
+      type: 'floor',
+    });
+    units.findOne.mockResolvedValue(null);
+
+    await expect(
+      service.updateUnit(8, { parentId: 404 }),
+    ).rejects.toBeInstanceOf(NotFoundException);
+    expect(units.save).not.toHaveBeenCalled();
+  });
+
+  it('rejects a parent change that would create a hierarchy cycle', async () => {
+    units.findOneBy.mockResolvedValue({
+      id: 8,
+      name: 'Floor 1',
+      type: 'floor',
+    });
+    units.findOne
+      .mockResolvedValueOnce({
+        id: 9,
+        name: 'Child',
+        type: 'floor',
+        parent: { id: 8 },
+      })
+      .mockResolvedValueOnce({ id: 8, name: 'Floor 1', type: 'floor' });
+
+    await expect(service.updateUnit(8, { parentId: 9 })).rejects.toBeInstanceOf(
+      BadRequestException,
+    );
+    expect(units.save).not.toHaveBeenCalled();
+  });
+
+  it('rejects a proposed parent with an already-cyclic ancestor chain', async () => {
+    units.findOneBy.mockResolvedValue({
+      id: 8,
+      name: 'Floor 1',
+      type: 'floor',
+    });
+    units.findOne
+      .mockResolvedValueOnce({
+        id: 9,
+        name: 'Child',
+        type: 'floor',
+        parent: { id: 10 },
+      })
+      .mockResolvedValueOnce({
+        id: 10,
+        name: 'Other',
+        type: 'floor',
+        parent: { id: 9 },
+      })
+      .mockResolvedValueOnce({
+        id: 9,
+        name: 'Child',
+        type: 'floor',
+        parent: { id: 10 },
+      });
+
+    await expect(service.updateUnit(8, { parentId: 9 })).rejects.toBeInstanceOf(
+      BadRequestException,
+    );
     expect(units.save).not.toHaveBeenCalled();
   });
 });

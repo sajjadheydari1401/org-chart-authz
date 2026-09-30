@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -13,6 +14,7 @@ export enum RoleScopeMode {
 }
 
 @Entity({ name: 'roles' })
+@Index('IDX_roles_unit_id', ['unit'])
 export class Role {
   @PrimaryGeneratedColumn({ type: 'integer' })
   id!: number;

@@ -17,6 +17,7 @@ import { SetRoleScopeModeDefault20260929000001 } from '../database/migrations/20
 import { AddProviderIdToRoleAccesses20260929000002 } from '../database/migrations/20260929000002-AddProviderIdToRoleAccesses.js';
 import { AddUnitsParentIdIndex20260930000000 } from '../database/migrations/20260930000000-AddUnitsParentIdIndex.js';
 import { AddRoleAssignmentIndexes20260930000001 } from '../database/migrations/20260930000001-AddRoleAssignmentIndexes.js';
+import { AddRolesUnitIdIndex20260930000002 } from '../database/migrations/20260930000002-AddRolesUnitIdIndex.js';
 import { Access } from '../domain/modules/authorization/accesses/entities/access.entity.js';
 import { Resource } from '../domain/modules/authorization/resources/entities/resource.entity.js';
 import { RoleAssignment } from '../domain/modules/authorization/role-assignments/entities/role-assignment.entity.js';
@@ -53,6 +54,7 @@ export function createTypeOrmConfig(
       AddProviderIdToRoleAccesses20260929000002,
       AddUnitsParentIdIndex20260930000000,
       AddRoleAssignmentIndexes20260930000001,
+      AddRolesUnitIdIndex20260930000002,
     ],
     migrationsRun: true,
     synchronize: false,

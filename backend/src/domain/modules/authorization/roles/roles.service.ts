@@ -158,6 +158,22 @@ export class RolesService {
     );
   }
 
+  getAllRoleAssignments(): Promise<RoleAssignment[]> {
+    return this.roleAssignments.find({
+      relations: { user: true, role: true },
+    });
+  }
+
+  async getRoleAssignment(id: number): Promise<RoleAssignment> {
+    const assignment = await this.roleAssignments.findOne({
+      where: { id },
+      relations: { user: true, role: true },
+    });
+    if (!assignment) throw new NotFoundException();
+
+    return assignment;
+  }
+
   async updateRoleAssignment(
     id: number,
     input: UpdateRoleAssignmentDto,

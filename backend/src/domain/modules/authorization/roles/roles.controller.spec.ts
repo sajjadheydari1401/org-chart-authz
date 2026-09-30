@@ -78,6 +78,29 @@ describe('RolesController', () => {
     expect(service.createRoleAssignment).toHaveBeenCalledExactlyOnceWith(input);
   });
 
+  it('delegates role-assignment listing to the service', async () => {
+    const assignments = [{ id: 1, user: { id: 88 }, role: { id: 12 } }];
+    const service = {
+      getAllRoleAssignments: vi.fn().mockResolvedValue(assignments),
+    };
+    const controller = new RolesController(service as unknown as RolesService);
+
+    await expect(controller.getAllRoleAssignments()).resolves.toBe(assignments);
+    expect(service.getAllRoleAssignments).toHaveBeenCalledExactlyOnceWith();
+  });
+
+  it('delegates role-assignment lookup with the local assignment ID', async () => {
+    const id = 6;
+    const assignment = { id, user: { id: 88 }, role: { id: 12 } };
+    const service = {
+      getRoleAssignment: vi.fn().mockResolvedValue(assignment),
+    };
+    const controller = new RolesController(service as unknown as RolesService);
+
+    await expect(controller.getRoleAssignment(id)).resolves.toBe(assignment);
+    expect(service.getRoleAssignment).toHaveBeenCalledExactlyOnceWith(id);
+  });
+
   it('delegates role-assignment updates with the assignment ID and new relation IDs', async () => {
     const id = 6;
     const input = { userId: 88, roleId: 12 };

@@ -32,6 +32,7 @@ describe('RolesService', () => {
   let roleAssignments: {
     findOneBy: ReturnType<typeof vi.fn>;
     findOne: ReturnType<typeof vi.fn>;
+    find: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
     save: ReturnType<typeof vi.fn>;
   };
@@ -67,6 +68,7 @@ describe('RolesService', () => {
     roleAssignments = {
       findOneBy: vi.fn(),
       findOne: vi.fn().mockResolvedValue(null),
+      find: vi.fn(),
       create: vi.fn((value) => value),
       save: vi.fn(async (value) => ({ id: 1, ...value })),
     };
@@ -377,6 +379,35 @@ describe('RolesService', () => {
         status: 409,
       });
       expect(roleAssignments.save).not.toHaveBeenCalled();
+    });
+
+    it('lists role assignments with their user and role relations', async () => {
+      const assignments = [{ id: 1, user: { id: 88 }, role: { id: 12 } }];
+      roleAssignments.find.mockResolvedValue(assignments);
+
+      await expect(service.getAllRoleAssignments()).resolves.toBe(assignments);
+      expect(roleAssignments.find).toHaveBeenCalledExactlyOnceWith({
+        relations: { user: true, role: true },
+      });
+    });
+
+    it('gets one role assignment with its user and role relations', async () => {
+      const assignment = { id: 6, user: { id: 88 }, role: { id: 12 } };
+      roleAssignments.findOne.mockResolvedValue(assignment);
+
+      await expect(service.getRoleAssignment(6)).resolves.toBe(assignment);
+      expect(roleAssignments.findOne).toHaveBeenCalledExactlyOnceWith({
+        where: { id: 6 },
+        relations: { user: true, role: true },
+      });
+    });
+
+    it('returns not found when the requested assignment does not exist', async () => {
+      roleAssignments.findOne.mockResolvedValue(null);
+
+      await expect(service.getRoleAssignment(404)).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
     });
 
     describe('updateRoleAssignment', () => {

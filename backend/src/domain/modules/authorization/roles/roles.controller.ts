@@ -60,6 +60,16 @@ export class RolesController {
     return this.rolesService.createRoleAssignment(input);
   }
 
+  @Get('role-assignments')
+  getAllRoleAssignments() {
+    return this.rolesService.getAllRoleAssignments();
+  }
+
+  @Get('role-assignments/:id')
+  getRoleAssignment(@Param('id', ParseIntPipe) id: number) {
+    return this.rolesService.getRoleAssignment(id);
+  }
+
   @Patch('role-assignments/:id')
   updateRoleAssignment(
     @Param('id', ParseIntPipe) id: number,

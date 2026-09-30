@@ -12,6 +12,7 @@ describe('RolesController', () => {
       updateRole: vi.fn(),
       deleteRole: vi.fn(),
       createRoleAccess: vi.fn(),
+      getAllRoleAccesses: vi.fn(),
     };
     const controller = new RolesController(service as unknown as RolesService);
 
@@ -73,5 +74,16 @@ describe('RolesController', () => {
 
     await expect(controller.createRoleAccess(input)).resolves.toBe(mapping);
     expect(service.createRoleAccess).toHaveBeenCalledExactlyOnceWith(input);
+  });
+
+  it('delegates role-access listing to the service', async () => {
+    const result = [[{ role_Access_id: 'provider-role-access-id' }]];
+    const service = {
+      getAllRoleAccesses: vi.fn().mockResolvedValue(result),
+    };
+    const controller = new RolesController(service as unknown as RolesService);
+
+    await expect(controller.getAllRoleAccesses()).resolves.toBe(result);
+    expect(service.getAllRoleAccesses).toHaveBeenCalledExactlyOnceWith();
   });
 });

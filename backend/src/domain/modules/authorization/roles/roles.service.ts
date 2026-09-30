@@ -107,4 +107,10 @@ export class RolesService {
       }),
     );
   }
+
+  getAllRoleAccesses(): Promise<RoleAccess[]> {
+    return this.roleAccesses.find({
+      relations: { role: true, access: true },
+    });
+  }
 }

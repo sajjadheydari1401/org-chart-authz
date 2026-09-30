@@ -1,7 +1,6 @@
 import { NotFoundException } from '@nestjs/common';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AuthorizationProviderService } from '../authorization-provider.service.js';
-import { Access } from '../../accesses/entities/access.entity.js';
 import { RoleScopeMode } from './entities/role.entity.js';
 import { RolesService } from './roles.service.js';
 
@@ -23,6 +22,7 @@ describe('RolesService', () => {
   let units: { findOneBy: ReturnType<typeof vi.fn> };
   let accesses: { findOneBy: ReturnType<typeof vi.fn> };
   let roleAccesses: {
+    find: ReturnType<typeof vi.fn>;
     findOneBy: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
     save: ReturnType<typeof vi.fn>;
@@ -46,6 +46,7 @@ describe('RolesService', () => {
     units = { findOneBy: vi.fn().mockResolvedValue(unit) };
     accesses = { findOneBy: vi.fn() };
     roleAccesses = {
+      find: vi.fn(),
       findOneBy: vi.fn().mockResolvedValue(null),
       create: vi.fn((value) => value),
       save: vi.fn(async (value) => ({ id: 'local-role-access', ...value })),
@@ -366,5 +367,22 @@ describe('RolesService', () => {
       expect(roleAccesses.create).not.toHaveBeenCalled();
       expect(roleAccesses.save).not.toHaveBeenCalled();
     });
+  });
+
+  it('gets role accesses and relations from the local database', async () => {
+    const result = [
+      {
+        role: { id: 12, name: 'Manager' },
+        access: { id: 34, methodName: 'POST' },
+        providerId: 'provider-role-access-id',
+      },
+    ];
+    roleAccesses.find.mockResolvedValue(result);
+
+    await expect(service.getAllRoleAccesses()).resolves.toBe(result);
+    expect(roleAccesses.find).toHaveBeenCalledExactlyOnceWith({
+      relations: { role: true, access: true },
+    });
+    expect(provider.createRoleAccess).not.toHaveBeenCalled();
   });
 });

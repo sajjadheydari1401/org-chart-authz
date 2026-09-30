@@ -43,6 +43,11 @@ export class RolesController {
     return this.rolesService.deleteRole(id);
   }
 
+  @Get('role-accesses')
+  getAllRoleAccesses() {
+    return this.rolesService.getAllRoleAccesses();
+  }
+
   @Post('role-accesses')
   createRoleAccess(@Body() input: CreateRoleAccessDto) {
     return this.rolesService.createRoleAccess(input);

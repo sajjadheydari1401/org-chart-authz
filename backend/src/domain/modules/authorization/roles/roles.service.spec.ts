@@ -169,7 +169,6 @@ describe('RolesService', () => {
     });
 
     await expect(service.updateRole(12, updatedInput)).resolves.toEqual({
-      id: 12,
       ...role,
       providerId: 'updated-provider-role-id',
       name: 'Updated Manager',

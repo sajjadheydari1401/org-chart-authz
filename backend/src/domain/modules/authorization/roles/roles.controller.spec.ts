@@ -86,4 +86,14 @@ describe('RolesController', () => {
     await expect(controller.getAllRoleAccesses()).resolves.toBe(result);
     expect(service.getAllRoleAccesses).toHaveBeenCalledExactlyOnceWith();
   });
+
+  it('delegates role-access deletion with the local composite key', async () => {
+    const service = {
+      deleteRoleAccess: vi.fn().mockResolvedValue(undefined),
+    };
+    const controller = new RolesController(service as unknown as RolesService);
+
+    await expect(controller.deleteRoleAccess(12, 34)).resolves.toBeUndefined();
+    expect(service.deleteRoleAccess).toHaveBeenCalledExactlyOnceWith(12, 34);
+  });
 });

@@ -152,6 +152,30 @@ describe('AuthorizationProviderService', () => {
     ).rejects.toBeInstanceOf(BadGatewayException);
   });
 
+  it('posts deleteRoleAccess using the provider-required roleAccesseId field', async () => {
+    await expect(
+      service.deleteRoleAccess('provider-role-access-id'),
+    ).resolves.toBeUndefined();
+    expect(providerPost).toHaveBeenCalledExactlyOnceWith(
+      `${PROVIDER_BASE_URL}/admin/deleteRoleAccess`,
+      {
+        username: 'system-user',
+        password: 'system-password',
+        roleAccesseId: 'provider-role-access-id',
+      },
+    );
+  });
+
+  it('propagates provider rejection of role-access deletion', async () => {
+    providerPost.mockResolvedValueOnce({
+      data: { success: false, message: 'rejected' },
+    } as never);
+
+    await expect(
+      service.deleteRoleAccess('provider-role-access-id'),
+    ).rejects.toBeInstanceOf(ProviderError);
+  });
+
   it('posts deleteRole with system credentials and the provider role ID', async () => {
     await expect(service.deleteRole('role-id')).resolves.toBeUndefined();
     expect(providerPost).toHaveBeenCalledExactlyOnceWith(

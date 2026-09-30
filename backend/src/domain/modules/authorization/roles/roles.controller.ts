@@ -52,4 +52,12 @@ export class RolesController {
   createRoleAccess(@Body() input: CreateRoleAccessDto) {
     return this.rolesService.createRoleAccess(input);
   }
+
+  @Delete(':roleId/accesses/:accessId')
+  deleteRoleAccess(
+    @Param('roleId', ParseIntPipe) roleId: number,
+    @Param('accessId', ParseIntPipe) accessId: number,
+  ) {
+    return this.rolesService.deleteRoleAccess(roleId, accessId);
+  }
 }

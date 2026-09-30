@@ -24,6 +24,7 @@ describe('RolesService', () => {
   let roleAccesses: {
     find: ReturnType<typeof vi.fn>;
     findOneBy: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
     save: ReturnType<typeof vi.fn>;
   };
@@ -32,6 +33,7 @@ describe('RolesService', () => {
     updateRole: ReturnType<typeof vi.fn>;
     deleteRole: ReturnType<typeof vi.fn>;
     createRoleAccess: ReturnType<typeof vi.fn>;
+    deleteRoleAccess: ReturnType<typeof vi.fn>;
   };
   let service: RolesService;
 
@@ -48,6 +50,7 @@ describe('RolesService', () => {
     roleAccesses = {
       find: vi.fn(),
       findOneBy: vi.fn().mockResolvedValue(null),
+      delete: vi.fn().mockResolvedValue({ affected: 1 }),
       create: vi.fn((value) => value),
       save: vi.fn(async (value) => ({ id: 'local-role-access', ...value })),
     };
@@ -69,6 +72,7 @@ describe('RolesService', () => {
         roleId: 'provider-role-id',
         createdAt: '2026-09-30T05:10:09.523Z',
       }),
+      deleteRoleAccess: vi.fn().mockResolvedValue(undefined),
     };
     service = new RolesService(
       roles as never,
@@ -383,5 +387,68 @@ describe('RolesService', () => {
       relations: { role: true, access: true },
     });
     expect(provider.createRoleAccess).not.toHaveBeenCalled();
+  });
+
+  describe('deleteRoleAccess', () => {
+    const roleAccess = {
+      roleId: 12,
+      accessId: 34,
+      providerId: 'provider-role-access-id',
+    };
+
+    it('deletes from the provider before deleting the local mapping', async () => {
+      roleAccesses.findOneBy.mockResolvedValue(roleAccess);
+      const calls: string[] = [];
+      provider.deleteRoleAccess.mockImplementation(async () => {
+        expect(roleAccesses.delete).not.toHaveBeenCalled();
+        calls.push('provider');
+      });
+      roleAccesses.delete.mockImplementation(async () => {
+        calls.push('local');
+        return { affected: 1 };
+      });
+
+      await expect(service.deleteRoleAccess(12, 34)).resolves.toBeUndefined();
+      expect(roleAccesses.findOneBy).toHaveBeenCalledExactlyOnceWith({
+        roleId: 12,
+        accessId: 34,
+      });
+      expect(provider.deleteRoleAccess).toHaveBeenCalledExactlyOnceWith(
+        'provider-role-access-id',
+      );
+      expect(roleAccesses.delete).toHaveBeenCalledExactlyOnceWith({
+        roleId: 12,
+        accessId: 34,
+      });
+      expect(calls).toEqual(['provider', 'local']);
+    });
+
+    it('does not call the provider when the local mapping is missing', async () => {
+      roleAccesses.findOneBy.mockResolvedValue(null);
+
+      await expect(service.deleteRoleAccess(12, 34)).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
+      expect(provider.deleteRoleAccess).not.toHaveBeenCalled();
+      expect(roleAccesses.delete).not.toHaveBeenCalled();
+    });
+
+    it('keeps the local mapping when provider deletion fails', async () => {
+      roleAccesses.findOneBy.mockResolvedValue(roleAccess);
+      const error = new Error('provider deletion failed');
+      provider.deleteRoleAccess.mockRejectedValue(error);
+
+      await expect(service.deleteRoleAccess(12, 34)).rejects.toBe(error);
+      expect(roleAccesses.delete).not.toHaveBeenCalled();
+    });
+
+    it('returns not found when local deletion affects no rows', async () => {
+      roleAccesses.findOneBy.mockResolvedValue(roleAccess);
+      roleAccesses.delete.mockResolvedValue({ affected: 0 });
+
+      await expect(service.deleteRoleAccess(12, 34)).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
+    });
   });
 });

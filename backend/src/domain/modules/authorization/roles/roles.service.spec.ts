@@ -30,6 +30,7 @@ describe('RolesService', () => {
     save: ReturnType<typeof vi.fn>;
   };
   let roleAssignments: {
+    findOneBy: ReturnType<typeof vi.fn>;
     findOne: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
     save: ReturnType<typeof vi.fn>;
@@ -64,6 +65,7 @@ describe('RolesService', () => {
       save: vi.fn(async (value) => ({ id: 'local-role-access', ...value })),
     };
     roleAssignments = {
+      findOneBy: vi.fn(),
       findOne: vi.fn().mockResolvedValue(null),
       create: vi.fn((value) => value),
       save: vi.fn(async (value) => ({ id: 1, ...value })),
@@ -375,6 +377,76 @@ describe('RolesService', () => {
         status: 409,
       });
       expect(roleAssignments.save).not.toHaveBeenCalled();
+    });
+
+    describe('updateRoleAssignment', () => {
+      const assignmentId = 6;
+      const currentAssignment = {
+        id: assignmentId,
+        user: { id: 77, username: 'bob' },
+        role: { id: 11, name: 'Analyst' },
+      };
+
+      it('updates the existing assignment with validated user and role relations', async () => {
+        roleAssignments.findOneBy.mockResolvedValue(currentAssignment);
+        users.findOneBy.mockResolvedValue(user);
+        roles.findOneBy.mockResolvedValue(role);
+
+        await expect(
+          service.updateRoleAssignment(assignmentId, input),
+        ).resolves.toEqual({ id: assignmentId, user, role });
+        expect(roleAssignments.findOneBy).toHaveBeenCalledExactlyOnceWith({
+          id: assignmentId,
+        });
+        expect(users.findOneBy).toHaveBeenCalledExactlyOnceWith({ id: 88 });
+        expect(roles.findOneBy).toHaveBeenCalledExactlyOnceWith({ id: 12 });
+        expect(roleAssignments.findOne).toHaveBeenCalledExactlyOnceWith({
+          where: { user: { id: 88 }, role: { id: 12 } },
+        });
+        expect(roleAssignments.save).toHaveBeenCalledExactlyOnceWith({
+          id: assignmentId,
+          user,
+          role,
+        });
+      });
+
+      it('does not look up relations when the assignment does not exist', async () => {
+        roleAssignments.findOneBy.mockResolvedValue(null);
+
+        await expect(
+          service.updateRoleAssignment(404, input),
+        ).rejects.toBeInstanceOf(NotFoundException);
+        expect(users.findOneBy).not.toHaveBeenCalled();
+        expect(roleAssignments.save).not.toHaveBeenCalled();
+      });
+
+      it('rejects the update when the user-role pair is already assigned elsewhere', async () => {
+        roleAssignments.findOneBy.mockResolvedValue(currentAssignment);
+        users.findOneBy.mockResolvedValue(user);
+        roles.findOneBy.mockResolvedValue(role);
+        roleAssignments.findOne.mockResolvedValue({ id: 99, user, role });
+
+        await expect(
+          service.updateRoleAssignment(assignmentId, input),
+        ).rejects.toMatchObject({ status: 409 });
+        expect(roleAssignments.save).not.toHaveBeenCalled();
+      });
+
+      it('allows the pair already held by the assignment being updated', async () => {
+        roleAssignments.findOneBy.mockResolvedValue({ id: assignmentId });
+        users.findOneBy.mockResolvedValue(user);
+        roles.findOneBy.mockResolvedValue(role);
+        roleAssignments.findOne.mockResolvedValue({
+          id: assignmentId,
+          user,
+          role,
+        });
+
+        await expect(
+          service.updateRoleAssignment(assignmentId, input),
+        ).resolves.toEqual({ id: assignmentId, user, role });
+        expect(roleAssignments.save).toHaveBeenCalledOnce();
+      });
     });
   });
 

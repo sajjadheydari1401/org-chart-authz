@@ -13,6 +13,7 @@ import { FormatResponseInterceptor } from '../../../../common/utils/interceptor/
 import { CreateRoleAssignmentDto } from './dto/create-role-assignment.dto.js';
 import { CreateRoleDto } from './dto/create-role.dto.js';
 import { CreateRoleAccessDto } from './dto/create-role-access.dto.js';
+import { UpdateRoleAssignmentDto } from './dto/update-role-assignment.dto.js';
 import { UpdateRoleDto } from './dto/update-role.dto.js';
 import { RolesService } from './roles.service.js';
 
@@ -57,6 +58,14 @@ export class RolesController {
   @Post('role-assignments')
   createRoleAssignment(@Body() input: CreateRoleAssignmentDto) {
     return this.rolesService.createRoleAssignment(input);
+  }
+
+  @Patch('role-assignments/:id')
+  updateRoleAssignment(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() input: UpdateRoleAssignmentDto,
+  ) {
+    return this.rolesService.updateRoleAssignment(id, input);
   }
 
   @Delete(':roleId/accesses/:accessId')

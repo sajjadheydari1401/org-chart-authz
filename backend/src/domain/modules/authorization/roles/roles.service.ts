@@ -12,6 +12,7 @@ import { AuthorizationProviderService } from '../authorization-provider.service.
 import { CreateRoleAssignmentDto } from './dto/create-role-assignment.dto.js';
 import { CreateRoleDto } from './dto/create-role.dto.js';
 import { CreateRoleAccessDto } from './dto/create-role-access.dto.js';
+import { UpdateRoleAssignmentDto } from './dto/update-role-assignment.dto.js';
 import { UpdateRoleDto } from './dto/update-role.dto.js';
 import { RoleAssignment } from './entities/role-assignment.entity.js';
 import { RoleAccess } from './entities/role-access.entity.js';
@@ -155,6 +156,33 @@ export class RolesService {
         role,
       }),
     );
+  }
+
+  async updateRoleAssignment(
+    id: number,
+    input: UpdateRoleAssignmentDto,
+  ): Promise<RoleAssignment> {
+    const assignment = await this.roleAssignments.findOneBy({ id });
+    if (!assignment) throw new NotFoundException();
+
+    const user = await this.users.findOneBy({ id: input.userId });
+    if (!user) throw new NotFoundException();
+
+    const role = await this.roles.findOneBy({ id: input.roleId });
+    if (!role) throw new NotFoundException();
+
+    const existingAssignment = await this.roleAssignments.findOne({
+      where: { user: { id: input.userId }, role: { id: input.roleId } },
+    });
+    if (existingAssignment && existingAssignment.id !== id) {
+      throw new ConflictException();
+    }
+
+    return this.roleAssignments.save({
+      ...assignment,
+      user,
+      role,
+    });
   }
 
   getAllRoleAccesses(): Promise<RoleAccess[]> {

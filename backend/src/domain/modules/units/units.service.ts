@@ -12,6 +12,16 @@ export class UnitsService {
     @InjectRepository(Unit) private readonly units: Repository<Unit>,
   ) {}
 
+  getAllUnits(): Promise<Unit[]> {
+    return this.units.find();
+  }
+
+  async getSingleUnit(id: number): Promise<Unit> {
+    const unit = await this.units.findOneBy({ id });
+    if (!unit) throw new NotFoundException();
+    return unit;
+  }
+
   async createUnit(input: CreateUnitDto): Promise<Unit> {
     const parent = input.parentId
       ? await this.units.findOneBy({ id: input.parentId })

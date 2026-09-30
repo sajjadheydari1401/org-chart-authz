@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Param,
   ParseIntPipe,
   Patch,
@@ -16,6 +17,16 @@ import { UnitsService } from './units.service.js';
 @Controller('units')
 export class UnitsController {
   constructor(private readonly unitsService: UnitsService) {}
+
+  @Get()
+  getAllUnits() {
+    return this.unitsService.getAllUnits();
+  }
+
+  @Get(':id')
+  getSingleUnit(@Param('id', ParseIntPipe) id: number) {
+    return this.unitsService.getSingleUnit(id);
+  }
 
   @Post()
   createUnit(@Body() input: CreateUnitDto) {

@@ -3,6 +3,28 @@ import { UnitsController } from './units.controller.js';
 import { UnitsService } from './units.service.js';
 
 describe('UnitsController', () => {
+  it('delegates listing units to the service', async () => {
+    const units = [{ id: 1, name: 'Head Office', type: 'building' }];
+    const unitsService = { getAllUnits: vi.fn().mockResolvedValue(units) };
+    const controller = new UnitsController(
+      unitsService as unknown as UnitsService,
+    );
+
+    await expect(controller.getAllUnits()).resolves.toBe(units);
+    expect(unitsService.getAllUnits).toHaveBeenCalledExactlyOnceWith();
+  });
+
+  it('delegates getting a single unit by id to the service', async () => {
+    const unit = { id: 8, name: 'Floor 1', type: 'floor' };
+    const unitsService = { getSingleUnit: vi.fn().mockResolvedValue(unit) };
+    const controller = new UnitsController(
+      unitsService as unknown as UnitsService,
+    );
+
+    await expect(controller.getSingleUnit(8)).resolves.toBe(unit);
+    expect(unitsService.getSingleUnit).toHaveBeenCalledExactlyOnceWith(8);
+  });
+
   it('delegates unit creation to the local service', async () => {
     const input = { name: 'Head Office', type: 'building' };
     const unit = { id: 1, ...input, parent: null };

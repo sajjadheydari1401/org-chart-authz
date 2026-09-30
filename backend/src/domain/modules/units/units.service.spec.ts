@@ -4,6 +4,7 @@ import { UnitsService } from './units.service.js';
 
 describe('UnitsService', () => {
   let units: {
+    find: ReturnType<typeof vi.fn>;
     findOneBy: ReturnType<typeof vi.fn>;
     findOne: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
@@ -13,12 +14,34 @@ describe('UnitsService', () => {
 
   beforeEach(() => {
     units = {
+      find: vi.fn(),
       findOneBy: vi.fn(),
       findOne: vi.fn(),
       create: vi.fn((value) => value),
       save: vi.fn(async (unit) => ({ id: 1, ...unit })),
     };
     service = new UnitsService(units as never);
+  });
+
+  it('lists all units from the local repository', async () => {
+    const localUnits = [{ id: 1, name: 'Head Office', type: 'building' }];
+    units.find.mockResolvedValue(localUnits);
+
+    await expect(service.getAllUnits()).resolves.toBe(localUnits);
+    expect(units.find).toHaveBeenCalledExactlyOnceWith();
+  });
+
+  it('gets a single unit by local ID and throws when it does not exist', async () => {
+    const localUnit = { id: 8, name: 'Floor 1', type: 'floor' };
+    units.findOneBy.mockResolvedValue(localUnit);
+
+    await expect(service.getSingleUnit(8)).resolves.toBe(localUnit);
+    expect(units.findOneBy).toHaveBeenCalledExactlyOnceWith({ id: 8 });
+
+    units.findOneBy.mockResolvedValue(null);
+    await expect(service.getSingleUnit(404)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
   });
 
   it('creates a root unit locally when no parent is provided', async () => {

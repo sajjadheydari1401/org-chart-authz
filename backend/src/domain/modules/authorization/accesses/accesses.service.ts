@@ -58,13 +58,23 @@ export class AccessesService {
       input.description,
     );
 
-    return this.accesses.save(
-      this.accesses.create({
-        methodName: result.methodName,
-        description: result.description,
-        resource,
-        providerId: result.id,
-      }),
-    );
+    try {
+      return await this.accesses.save(
+        this.accesses.create({
+          methodName: result.methodName,
+          description: result.description,
+          resource,
+          providerId: result.id,
+        }),
+      );
+    } catch (error) {
+      try {
+        await this.authorizationProvider.deleteAccess(result.id);
+      } catch {
+        // TODO: Handle provider cleanup failures.
+      }
+
+      throw error;
+    }
   }
 }

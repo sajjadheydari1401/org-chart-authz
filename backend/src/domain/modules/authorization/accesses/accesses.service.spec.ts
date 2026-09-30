@@ -237,6 +237,16 @@ describe('AccessesService', () => {
     expect(repository.save).not.toHaveBeenCalled();
   });
 
+  it('deletes the provider access if saving the local access fails', async () => {
+    const localSaveError = new Error('local access save failed');
+    repository.save.mockRejectedValue(localSaveError);
+
+    await expect(service.createAccess(input)).rejects.toBe(localSaveError);
+    expect(provider.deleteAccess).toHaveBeenCalledExactlyOnceWith(
+      'provider-access-id',
+    );
+  });
+
   it('does not call the provider when the local resource is missing', async () => {
     resources.getSingleResource.mockRejectedValue(new NotFoundException());
     await expect(service.createAccess(input)).rejects.toMatchObject({

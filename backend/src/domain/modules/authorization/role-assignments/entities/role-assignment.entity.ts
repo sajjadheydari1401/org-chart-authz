@@ -1,8 +1,18 @@
-import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { User } from '../../../users/entities/user.entity.js';
 import { Role } from '../../roles/entities/role.entity.js';
 
 @Entity({ name: 'role_assignments' })
+@Index('UQ_role_assignments_user_id_role_id', ['user', 'role'], {
+  unique: true,
+})
+@Index('IDX_role_assignments_role_id', ['role'])
 export class RoleAssignment {
   @PrimaryGeneratedColumn({ type: 'integer' })
   id!: number;

@@ -5,13 +5,16 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { User } from '../../users/entities/user.entity.js';
 import { Unit } from '../../units/entities/unit.entity.js';
 import { Access } from '../accesses/entities/access.entity.js';
 import { AuthorizationProviderService } from '../authorization-provider.service.js';
+import { CreateRoleAssignmentDto } from './dto/create-role-assignment.dto.js';
 import { CreateRoleDto } from './dto/create-role.dto.js';
 import { CreateRoleAccessDto } from './dto/create-role-access.dto.js';
-import { RoleAccess } from './entities/role-access.entity.js';
 import { UpdateRoleDto } from './dto/update-role.dto.js';
+import { RoleAssignment } from './entities/role-assignment.entity.js';
+import { RoleAccess } from './entities/role-access.entity.js';
 import { Role } from './entities/role.entity.js';
 
 @Injectable()
@@ -19,9 +22,12 @@ export class RolesService {
   constructor(
     @InjectRepository(Role) private readonly roles: Repository<Role>,
     @InjectRepository(Unit) private readonly units: Repository<Unit>,
+    @InjectRepository(User) private readonly users: Repository<User>,
     @InjectRepository(Access) private readonly accesses: Repository<Access>,
     @InjectRepository(RoleAccess)
     private readonly roleAccesses: Repository<RoleAccess>,
+    @InjectRepository(RoleAssignment)
+    private readonly roleAssignments: Repository<RoleAssignment>,
     private readonly authorizationProvider: AuthorizationProviderService,
   ) {}
 
@@ -126,6 +132,29 @@ export class RolesService {
 
       throw error;
     }
+  }
+
+  async createRoleAssignment(
+    input: CreateRoleAssignmentDto,
+  ): Promise<RoleAssignment> {
+    const user = await this.users.findOneBy({ id: input.userId });
+    if (!user) throw new NotFoundException();
+
+    const role = await this.roles.findOneBy({ id: input.roleId });
+    if (!role) throw new NotFoundException();
+
+    const existingAssignment = await this.roleAssignments.findOne({
+      where: { user: { id: input.userId }, role: { id: input.roleId } },
+      relations: { user: true, role: true },
+    });
+    if (existingAssignment) throw new ConflictException();
+
+    return this.roleAssignments.save(
+      this.roleAssignments.create({
+        user,
+        role,
+      }),
+    );
   }
 
   getAllRoleAccesses(): Promise<RoleAccess[]> {

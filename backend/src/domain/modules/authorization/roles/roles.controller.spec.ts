@@ -64,6 +64,20 @@ describe('RolesController', () => {
     expect(service.deleteRole).toHaveBeenCalledExactlyOnceWith(id);
   });
 
+  it('delegates role-assignment creation with both local IDs', async () => {
+    const input = { userId: 88, roleId: 12 };
+    const assignment = { id: 1, ...input };
+    const service = {
+      createRoleAssignment: vi.fn().mockResolvedValue(assignment),
+    };
+    const controller = new RolesController(service as unknown as RolesService);
+
+    await expect(controller.createRoleAssignment(input)).resolves.toBe(
+      assignment,
+    );
+    expect(service.createRoleAssignment).toHaveBeenCalledExactlyOnceWith(input);
+  });
+
   it('delegates role-access creation with both local IDs', async () => {
     const input = { roleId: 12, accessId: 34 };
     const mapping = { id: 'mapping-id', ...input };

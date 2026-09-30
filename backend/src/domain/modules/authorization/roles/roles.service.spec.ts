@@ -20,11 +20,17 @@ describe('RolesService', () => {
     save: ReturnType<typeof vi.fn>;
   };
   let units: { findOneBy: ReturnType<typeof vi.fn> };
+  let users: { findOneBy: ReturnType<typeof vi.fn> };
   let accesses: { findOneBy: ReturnType<typeof vi.fn> };
   let roleAccesses: {
     find: ReturnType<typeof vi.fn>;
     findOneBy: ReturnType<typeof vi.fn>;
     delete: ReturnType<typeof vi.fn>;
+    create: ReturnType<typeof vi.fn>;
+    save: ReturnType<typeof vi.fn>;
+  };
+  let roleAssignments: {
+    findOne: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
     save: ReturnType<typeof vi.fn>;
   };
@@ -46,6 +52,9 @@ describe('RolesService', () => {
       save: vi.fn(async (value) => ({ id: 1, ...value })),
     };
     units = { findOneBy: vi.fn().mockResolvedValue(unit) };
+    users = {
+      findOneBy: vi.fn().mockResolvedValue({ id: 88, username: 'alice' }),
+    };
     accesses = { findOneBy: vi.fn() };
     roleAccesses = {
       find: vi.fn(),
@@ -53,6 +62,11 @@ describe('RolesService', () => {
       delete: vi.fn().mockResolvedValue({ affected: 1 }),
       create: vi.fn((value) => value),
       save: vi.fn(async (value) => ({ id: 'local-role-access', ...value })),
+    };
+    roleAssignments = {
+      findOne: vi.fn().mockResolvedValue(null),
+      create: vi.fn((value) => value),
+      save: vi.fn(async (value) => ({ id: 1, ...value })),
     };
     provider = {
       createRole: vi.fn().mockResolvedValue({
@@ -77,8 +91,10 @@ describe('RolesService', () => {
     service = new RolesService(
       roles as never,
       units as never,
+      users as never,
       accesses as never,
       roleAccesses as never,
+      roleAssignments as never,
       provider as unknown as AuthorizationProviderService,
     );
   });
@@ -298,6 +314,68 @@ describe('RolesService', () => {
     await expect(service.deleteRole(12)).rejects.toBeInstanceOf(
       NotFoundException,
     );
+  });
+
+  describe('createRoleAssignment', () => {
+    const user = { id: 88, username: 'alice' };
+    const role = { id: 12, name: 'Manager', providerId: 'provider-role-id' };
+    const input = { userId: 88, roleId: 12 };
+
+    it('creates a user-role assignment after validating both local records exist', async () => {
+      users.findOneBy.mockResolvedValue(user);
+      roles.findOneBy.mockResolvedValue(role);
+
+      await expect(service.createRoleAssignment(input)).resolves.toEqual({
+        id: 1,
+        user,
+        role,
+      });
+      expect(users.findOneBy).toHaveBeenCalledExactlyOnceWith({ id: 88 });
+      expect(roles.findOneBy).toHaveBeenCalledExactlyOnceWith({ id: 12 });
+      expect(roleAssignments.findOne).toHaveBeenCalledExactlyOnceWith({
+        where: { user: { id: 88 }, role: { id: 12 } },
+        relations: { user: true, role: true },
+      });
+      expect(roleAssignments.create).toHaveBeenCalledExactlyOnceWith({
+        user,
+        role,
+      });
+      expect(roleAssignments.save).toHaveBeenCalledExactlyOnceWith({
+        user,
+        role,
+      });
+    });
+
+    it('does not create an assignment when the user is missing', async () => {
+      users.findOneBy.mockResolvedValue(null);
+
+      await expect(service.createRoleAssignment(input)).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
+      expect(roles.findOneBy).not.toHaveBeenCalled();
+      expect(roleAssignments.save).not.toHaveBeenCalled();
+    });
+
+    it('does not create an assignment when the role is missing', async () => {
+      users.findOneBy.mockResolvedValue(user);
+      roles.findOneBy.mockResolvedValue(null);
+
+      await expect(service.createRoleAssignment(input)).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
+      expect(roleAssignments.save).not.toHaveBeenCalled();
+    });
+
+    it('rejects duplicate role assignments without saving', async () => {
+      users.findOneBy.mockResolvedValue(user);
+      roles.findOneBy.mockResolvedValue(role);
+      roleAssignments.findOne.mockResolvedValue({ id: 99, user, role });
+
+      await expect(service.createRoleAssignment(input)).rejects.toMatchObject({
+        status: 409,
+      });
+      expect(roleAssignments.save).not.toHaveBeenCalled();
+    });
   });
 
   describe('createRoleAccess', () => {

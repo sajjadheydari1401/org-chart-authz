@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   OneToMany,
@@ -8,6 +9,7 @@ import {
 } from 'typeorm';
 
 @Entity({ name: 'units' })
+@Index('IDX_units_parent_id', ['parent'])
 export class Unit {
   @PrimaryGeneratedColumn({ type: 'integer' })
   id!: number;

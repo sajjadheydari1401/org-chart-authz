@@ -51,11 +51,21 @@ export class ResourcesService {
       input.route,
     );
 
-    return this.resources.save(
-      this.resources.create({
-        route: input.route,
-        providerId: providerResource.id,
-      }),
-    );
+    try {
+      return await this.resources.save(
+        this.resources.create({
+          route: input.route,
+          providerId: providerResource.id,
+        }),
+      );
+    } catch (error) {
+      try {
+        await this.authorizationProvider.deleteResource(providerResource.id);
+      } catch {
+        // TODO: Handle provider cleanup failures.
+      }
+
+      throw error;
+    }
   }
 }

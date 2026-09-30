@@ -209,4 +209,16 @@ describe('ResourcesService', () => {
     );
     expect(repository.save).not.toHaveBeenCalled();
   });
+
+  it('deletes the provider resource if saving the local resource fails', async () => {
+    const localSaveError = new Error('local resource save failed');
+    repository.save.mockRejectedValue(localSaveError);
+
+    await expect(service.createResource({ route: '/example/v1' })).rejects.toBe(
+      localSaveError,
+    );
+    expect(provider.deleteResource).toHaveBeenCalledExactlyOnceWith(
+      'provider-resource-id',
+    );
+  });
 });

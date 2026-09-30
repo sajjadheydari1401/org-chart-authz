@@ -78,6 +78,11 @@ export class RolesController {
     return this.rolesService.updateRoleAssignment(id, input);
   }
 
+  @Delete('role-assignments/:id')
+  deleteRoleAssignment(@Param('id', ParseIntPipe) id: number) {
+    return this.rolesService.deleteRoleAssignment(id);
+  }
+
   @Delete(':roleId/accesses/:accessId')
   deleteRoleAccess(
     @Param('roleId', ParseIntPipe) roleId: number,

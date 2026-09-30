@@ -33,6 +33,7 @@ describe('RolesService', () => {
     findOneBy: ReturnType<typeof vi.fn>;
     findOne: ReturnType<typeof vi.fn>;
     find: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
     save: ReturnType<typeof vi.fn>;
   };
@@ -69,6 +70,7 @@ describe('RolesService', () => {
       findOneBy: vi.fn(),
       findOne: vi.fn().mockResolvedValue(null),
       find: vi.fn(),
+      delete: vi.fn().mockResolvedValue({ affected: 1 }),
       create: vi.fn((value) => value),
       save: vi.fn(async (value) => ({ id: 1, ...value })),
     };
@@ -408,6 +410,20 @@ describe('RolesService', () => {
       await expect(service.getRoleAssignment(404)).rejects.toBeInstanceOf(
         NotFoundException,
       );
+    });
+
+    it('deletes the assignment by its local ID', async () => {
+      await expect(service.deleteRoleAssignment(6)).resolves.toBeUndefined();
+      expect(roleAssignments.delete).toHaveBeenCalledExactlyOnceWith(6);
+    });
+
+    it('returns not found when no assignment was deleted', async () => {
+      roleAssignments.delete.mockResolvedValue({ affected: 0 });
+
+      await expect(service.deleteRoleAssignment(404)).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
+      expect(roleAssignments.delete).toHaveBeenCalledExactlyOnceWith(404);
     });
 
     describe('updateRoleAssignment', () => {

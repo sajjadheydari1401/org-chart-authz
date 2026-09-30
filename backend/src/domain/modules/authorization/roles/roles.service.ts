@@ -201,6 +201,11 @@ export class RolesService {
     });
   }
 
+  async deleteRoleAssignment(id: number): Promise<void> {
+    const result = await this.roleAssignments.delete(id);
+    if (!result.affected) throw new NotFoundException();
+  }
+
   getAllRoleAccesses(): Promise<RoleAccess[]> {
     return this.roleAccesses.find({
       relations: { role: true, access: true },

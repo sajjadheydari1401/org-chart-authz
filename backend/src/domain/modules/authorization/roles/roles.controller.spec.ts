@@ -119,6 +119,17 @@ describe('RolesController', () => {
     );
   });
 
+  it('delegates role-assignment deletion with the local assignment ID', async () => {
+    const id = 6;
+    const service = {
+      deleteRoleAssignment: vi.fn().mockResolvedValue(undefined),
+    };
+    const controller = new RolesController(service as unknown as RolesService);
+
+    await expect(controller.deleteRoleAssignment(id)).resolves.toBeUndefined();
+    expect(service.deleteRoleAssignment).toHaveBeenCalledExactlyOnceWith(id);
+  });
+
   it('delegates role-access creation with both local IDs', async () => {
     const input = { roleId: 12, accessId: 34 };
     const mapping = { id: 'mapping-id', ...input };

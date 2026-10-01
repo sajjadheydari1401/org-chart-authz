@@ -21,6 +21,7 @@ import { AddRolesUnitIdIndex20260930000002 } from '../database/migrations/202609
 import { AddAccessResourceMethodUniqueIndex20260930000003 } from '../database/migrations/20260930000003-AddAccessResourceMethodUniqueIndex.js';
 import { AddRoleAccessAccessIdIndex20260930000004 } from '../database/migrations/20260930000004-AddRoleAccessAccessIdIndex.js';
 import { ConvertEntityIdsToUuid20261001000000 } from '../database/migrations/20261001000000-ConvertEntityIdsToUuid.js';
+import { AddFarsiNameToRoles20261001000001 } from '../database/migrations/20261001000001-AddFarsiNameToRoles.js';
 import { Access } from '../domain/modules/authorization/accesses/entities/access.entity.js';
 import { Resource } from '../domain/modules/authorization/resources/entities/resource.entity.js';
 import { RoleAssignment } from '../domain/modules/authorization/role-assignments/entities/role-assignment.entity.js';
@@ -61,6 +62,7 @@ export function createTypeOrmConfig(
       AddAccessResourceMethodUniqueIndex20260930000003,
       AddRoleAccessAccessIdIndex20260930000004,
       ConvertEntityIdsToUuid20261001000000,
+      AddFarsiNameToRoles20261001000001,
     ],
     migrationsRun: true,
     synchronize: false,

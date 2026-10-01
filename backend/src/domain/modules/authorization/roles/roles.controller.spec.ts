@@ -23,6 +23,7 @@ describe('RolesController', () => {
   it('delegates role creation to the service', async () => {
     const input = {
       name: 'manager',
+      farsiName: 'مدیر سازمان',
       description: 'description',
       unitId: 7,
       scopeMode: RoleScopeMode.DESCENDANTS,
@@ -43,6 +44,7 @@ describe('RolesController', () => {
     const id = 12;
     const input = {
       name: 'manager',
+      farsiName: 'مدیر سازمان',
       description: 'updated description',
       unitId: 7,
       scopeMode: RoleScopeMode.SELF,

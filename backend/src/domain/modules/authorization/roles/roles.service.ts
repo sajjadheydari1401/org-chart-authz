@@ -31,6 +31,7 @@ export class RolesService {
       return await this.roles.save(
         this.roles.create({
           name: result.name,
+          farsiName: input.farsiName,
           description: result.description,
           providerId: result.id,
           unit,
@@ -65,6 +66,7 @@ export class RolesService {
       ...role,
       providerId: result.id,
       name: result.name,
+      farsiName: input.farsiName,
       description: result.description,
       unit,
       scopeMode: input.scopeMode,

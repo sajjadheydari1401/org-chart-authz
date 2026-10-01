@@ -13,6 +13,16 @@ export class UpdateRoleDto {
   name!: string;
 
   @ApiProperty({
+    description:
+      'Local Farsi display name for the role; not sent to the provider.',
+    example: 'مدیر واحد سازمانی',
+    maxLength: 255,
+  })
+  @IsString()
+  @Length(1, 255)
+  farsiName!: string;
+
+  @ApiProperty({
     description: 'Updated description of the role.',
     example: 'Manages an organizational unit.',
   })

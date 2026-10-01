@@ -29,6 +29,9 @@ export class Role {
   @Column({ type: 'varchar', length: 100 })
   name!: string;
 
+  @Column({ name: 'farsi_name', type: 'varchar', length: 255 })
+  farsiName!: string;
+
   @Column({ type: 'text' })
   description!: string;
 

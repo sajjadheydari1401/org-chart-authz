@@ -7,6 +7,7 @@ import { RolesService } from './roles.service.js';
 describe('RolesService', () => {
   const input = {
     name: 'manager',
+    farsiName: 'مدیر سازمان',
     description: 'requested description',
     unitId: 7,
     scopeMode: RoleScopeMode.SELF,
@@ -70,6 +71,7 @@ describe('RolesService', () => {
     async (scopeMode) => {
       const expected = {
         name: 'Manager',
+        farsiName: input.farsiName,
         description: 'provider description',
         providerId: 'role-id',
         unit,
@@ -133,6 +135,7 @@ describe('RolesService', () => {
       providerId: 'provider-role-id',
       name: 'Manager',
       description: 'original description',
+      farsiName: 'مدیر قبلی',
       unit: { id: 6 },
       scopeMode: RoleScopeMode.SELF,
     };
@@ -157,6 +160,7 @@ describe('RolesService', () => {
       ...role,
       providerId: 'updated-provider-role-id',
       name: 'Updated Manager',
+      farsiName: updatedInput.farsiName,
       description: 'updated provider description',
       unit: updatedUnit,
       scopeMode: RoleScopeMode.DESCENDANTS,
@@ -172,6 +176,7 @@ describe('RolesService', () => {
       ...role,
       providerId: 'updated-provider-role-id',
       name: 'Updated Manager',
+      farsiName: updatedInput.farsiName,
       description: 'updated provider description',
       unit: updatedUnit,
       scopeMode: RoleScopeMode.DESCENDANTS,

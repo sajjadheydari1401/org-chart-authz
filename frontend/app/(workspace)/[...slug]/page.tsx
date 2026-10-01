@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 
 import { getWorkspacePageTitle } from '@/lib/workspace-navigation';
 
+// Show a title for menu links that do not have their own page yet.
 export default async function WorkspacePlaceholderPage({
   params,
 }: {

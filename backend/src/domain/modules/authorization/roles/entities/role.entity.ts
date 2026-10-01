@@ -16,8 +16,8 @@ export enum RoleScopeMode {
 @Entity({ name: 'roles' })
 @Index('IDX_roles_unit_id', ['unit'])
 export class Role {
-  @PrimaryGeneratedColumn({ type: 'integer' })
-  id!: number;
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
 
   @Column({ name: 'provider_id', type: 'varchar', length: 255 })
   providerId!: string;

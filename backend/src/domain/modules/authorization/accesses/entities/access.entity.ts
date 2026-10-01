@@ -13,8 +13,8 @@ import { Resource } from '../../resources/entities/resource.entity.js';
   unique: true,
 })
 export class Access {
-  @PrimaryGeneratedColumn({ type: 'integer' })
-  id!: number;
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
 
   @Column({ name: 'provider_id', type: 'varchar', length: 255 })
   providerId!: string;

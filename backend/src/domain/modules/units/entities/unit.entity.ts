@@ -11,8 +11,8 @@ import {
 @Entity({ name: 'units' })
 @Index('IDX_units_parent_id', ['parent'])
 export class Unit {
-  @PrimaryGeneratedColumn({ type: 'integer' })
-  id!: number;
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
 
   @ManyToOne(() => Unit, (unit) => unit.children, { nullable: true })
   @JoinColumn({ name: 'parent_id' })

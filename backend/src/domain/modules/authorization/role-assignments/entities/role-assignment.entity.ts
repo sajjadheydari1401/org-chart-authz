@@ -14,8 +14,8 @@ import { Role } from '../../roles/entities/role.entity.js';
 })
 @Index('IDX_role_assignments_role_id', ['role'])
 export class RoleAssignment {
-  @PrimaryGeneratedColumn({ type: 'integer' })
-  id!: number;
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
 
   @ManyToOne(() => User, { nullable: false })
   @JoinColumn({ name: 'user_id' })

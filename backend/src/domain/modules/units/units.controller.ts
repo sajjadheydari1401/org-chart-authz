@@ -10,31 +10,49 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FormatResponseInterceptor } from '../../../common/utils/interceptor/format-response.interceptor.js';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateUnitDto } from './dto/create-unit.dto.js';
 import { UpdateUnitDto } from './dto/update-unit.dto.js';
 import { UnitsService } from './units.service.js';
 
 @UseInterceptors(FormatResponseInterceptor)
+@ApiTags('Organizational Units')
 @Controller('units')
 export class UnitsController {
   constructor(private readonly unitsService: UnitsService) {}
 
   @Get()
+  @ApiOperation({
+    summary: 'List organizational units',
+    description: 'Returns all units from the local hierarchy.',
+  })
   getAllUnits() {
     return this.unitsService.getAllUnits();
   }
 
   @Get(':id')
+  @ApiOperation({
+    summary: 'Get an organizational unit',
+    description: 'Returns one unit by numeric ID.',
+  })
   getSingleUnit(@Param('id', ParseIntPipe) id: number) {
     return this.unitsService.getSingleUnit(id);
   }
 
   @Post()
+  @ApiOperation({
+    summary: 'Create an organizational unit',
+    description: 'Creates a unit, optionally under an existing parent unit.',
+  })
   createUnit(@Body() input: CreateUnitDto) {
     return this.unitsService.createUnit(input);
   }
 
   @Patch(':id')
+  @ApiOperation({
+    summary: 'Update an organizational unit',
+    description: 'Updates a unit name, type, or parent.',
+  })
   updateUnit(
     @Param('id', ParseIntPipe) id: number,
     @Body() input: UpdateUnitDto,
@@ -43,6 +61,11 @@ export class UnitsController {
   }
 
   @Delete(':id')
+  @ApiOperation({
+    summary: 'Delete an organizational unit subtree',
+    description:
+      'Deletes the selected unit and all descendants. The root unit cannot be deleted.',
+  })
   deleteUnit(@Param('id', ParseIntPipe) id: number) {
     return this.unitsService.deleteUnit(id);
   }

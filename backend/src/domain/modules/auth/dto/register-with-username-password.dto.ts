@@ -1,18 +1,35 @@
 import { Transform } from 'class-transformer';
 import { IsEmail, IsString, Length, Matches, MinLength } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class RegisterWithUsernamePasswordDto {
+  @ApiProperty({
+    description: 'Email address for the new account.',
+    example: 'person@example.com',
+  })
   @IsEmail()
   email: string;
 
+  @ApiProperty({
+    description: 'Account username. Must be 2 to 40 characters.',
+    example: 'sajjad',
+  })
   @IsString()
   @Length(2, 40)
   username: string;
 
+  @ApiProperty({
+    description: 'Account password. Must contain at least 8 characters.',
+    example: 'strong-password',
+  })
   @IsString()
   @MinLength(8)
   password: string;
 
+  @ApiProperty({
+    description: 'Iranian mobile number used for SMS verification.',
+    example: '09123456789',
+  })
   @Transform(({ value }) =>
     typeof value === 'string'
       ? value

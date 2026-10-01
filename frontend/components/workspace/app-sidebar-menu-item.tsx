@@ -19,10 +19,7 @@ import {
 } from 'lucide-react';
 
 import { AppLink } from '@/components/common/ui/app-link';
-import type {
-  WorkspaceIconKey,
-  WorkspaceNavigationItem,
-} from '@/lib/workspace-navigation';
+import type { WorkspaceIconKey, WorkspaceNavigationItem } from '@/types/menu';
 import { cn } from '@/lib/cn';
 
 const icons: Record<WorkspaceIconKey, LucideIcon> = {

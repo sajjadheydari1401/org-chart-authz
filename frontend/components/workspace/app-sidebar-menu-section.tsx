@@ -5,7 +5,7 @@ import { ChevronDown } from 'lucide-react';
 
 import { cn } from '@/lib/cn';
 import { AppSidebarMenuItem } from './app-sidebar-menu-item';
-import type { WorkspaceNavigationSection } from '@/lib/workspace-navigation';
+import type { WorkspaceNavigationSection } from '@/types/menu';
 
 interface AppSidebarMenuSectionProps {
   section: WorkspaceNavigationSection;

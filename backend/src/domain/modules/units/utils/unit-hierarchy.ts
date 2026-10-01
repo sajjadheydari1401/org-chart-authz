@@ -5,8 +5,8 @@ import { Unit } from '../entities/unit.entity.js';
 // Finds the proposed parent and checks its ancestors to prevent a hierarchy loop.
 export async function getParentWithoutCycle(
   units: Pick<Repository<Unit>, 'findOne'>,
-  unitId: number,
-  parentId: number,
+  unitId: string,
+  parentId: string,
 ): Promise<Unit> {
   // Load the proposed parent's parent so the loop can continue up the hierarchy.
   const parent = await units.findOne({
@@ -15,7 +15,7 @@ export async function getParentWithoutCycle(
   });
   if (!parent) throw new NotFoundException();
 
-  const visited = new Set<number>();
+  const visited = new Set<string>();
   let current: Unit | null = parent;
 
   while (current) {

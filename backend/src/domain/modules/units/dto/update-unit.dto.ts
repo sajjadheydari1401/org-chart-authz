@@ -1,4 +1,4 @@
-import { IsInt, IsString, Length, Min, ValidateIf } from 'class-validator';
+import { IsString, IsUUID, Length, ValidateIf } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateUnitDto {
@@ -28,14 +28,14 @@ export class UpdateUnitDto {
 
   // Omitted leaves the parent unchanged; null explicitly clears it.
   @ApiPropertyOptional({
-    description: 'New parent unit ID. Send null to move the unit to the root.',
-    example: 3,
-    minimum: 1,
+    description:
+      'New parent unit UUID. Send null to move the unit to the root.',
+    example: '8d73c1e7-7f2a-4a6f-bf1f-9bb77cf21734',
+    format: 'uuid',
     nullable: true,
-    type: Number,
+    type: String,
   })
   @ValidateIf((_object, value) => value !== undefined && value !== null)
-  @IsInt()
-  @Min(1)
-  parentId?: number | null;
+  @IsUUID()
+  parentId?: string | null;
 }

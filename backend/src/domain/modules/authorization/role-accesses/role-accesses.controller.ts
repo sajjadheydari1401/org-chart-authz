@@ -4,12 +4,12 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
+  ParseUUIDPipe,
   Post,
   UseInterceptors,
 } from '@nestjs/common';
 import { FormatResponseInterceptor } from '../../../../common/utils/interceptor/format-response.interceptor.js';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CreateRoleAccessDto } from './dto/create-role-access.dto.js';
 import { RoleAccessesService } from './role-accesses.service.js';
 
@@ -39,14 +39,26 @@ export class RoleAccessesController {
   }
 
   @Delete(':roleId/accesses/:accessId')
+  @ApiParam({
+    name: 'roleId',
+    type: String,
+    format: 'uuid',
+    description: 'Role UUID.',
+  })
+  @ApiParam({
+    name: 'accessId',
+    type: String,
+    format: 'uuid',
+    description: 'Access UUID.',
+  })
   @ApiOperation({
     summary: 'Unlink an access from a role',
     description:
       'Deletes a role-access link from the provider and local database.',
   })
   deleteRoleAccess(
-    @Param('roleId', ParseIntPipe) roleId: number,
-    @Param('accessId', ParseIntPipe) accessId: number,
+    @Param('roleId', ParseUUIDPipe) roleId: string,
+    @Param('accessId', ParseUUIDPipe) accessId: string,
   ) {
     return this.roleAccessesService.deleteRoleAccess(roleId, accessId);
   }

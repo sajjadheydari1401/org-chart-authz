@@ -61,7 +61,7 @@ export class RoleAccessesService {
     }
   }
 
-  async deleteRoleAccess(roleId: number, accessId: number): Promise<void> {
+  async deleteRoleAccess(roleId: string, accessId: string): Promise<void> {
     const roleAccess = await this.roleAccesses.findOneBy({ roleId, accessId });
     if (!roleAccess) throw new NotFoundException();
 

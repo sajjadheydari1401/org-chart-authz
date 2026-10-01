@@ -39,7 +39,7 @@ import type { DataSource } from 'typeorm';
  */
 export async function deleteUnitSubtree(
   dataSource: Pick<DataSource, 'query'>,
-  unitId: number,
+  unitId: string,
 ): Promise<void> {
   const [{ count }] = await dataSource.query(
     'SELECT COUNT(*)::int AS count FROM units WHERE id = $1',

@@ -1,4 +1,4 @@
-import { IsEnum, IsInt, IsString, Length, Min } from 'class-validator';
+import { IsEnum, IsString, IsUUID, Length } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { RoleScopeMode } from '../entities/role.entity.js';
 
@@ -20,13 +20,12 @@ export class UpdateRoleDto {
   description!: string;
 
   @ApiProperty({
-    description: 'Local ID of the unit this role belongs to.',
-    example: 3,
-    minimum: 1,
+    description: 'Local UUID of the unit this role belongs to.',
+    example: '8d73c1e7-7f2a-4a6f-bf1f-9bb77cf21734',
+    format: 'uuid',
   })
-  @IsInt()
-  @Min(1)
-  unitId!: number;
+  @IsUUID()
+  unitId!: string;
 
   @ApiProperty({
     description:

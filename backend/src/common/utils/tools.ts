@@ -33,12 +33,15 @@ export function paginatedResponse<T>(
   return { items: [...items], pagination: metadata };
 }
 
-export const validateIdParam = (id: number) => {
-  const Id = +id;
-  if (Number.isNaN(Id)) {
-    throw new BadRequestException('Id is not valid !');
+export const validateIdParam = (id: string) => {
+  if (
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      id,
+    )
+  ) {
+    throw new BadRequestException('Id is not a valid UUID.');
   }
-  return Id;
+  return id;
 };
 export const stripHtml = (html: string) => {
   return html.replace(/(<([^>]+)>)/gi, '');

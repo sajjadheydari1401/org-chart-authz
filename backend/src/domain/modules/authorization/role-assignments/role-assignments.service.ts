@@ -48,7 +48,7 @@ export class RoleAssignmentsService {
     });
   }
 
-  async getRoleAssignment(id: number): Promise<RoleAssignment> {
+  async getRoleAssignment(id: string): Promise<RoleAssignment> {
     const assignment = await this.roleAssignments.findOne({
       where: { id },
       relations: { user: true, role: true },
@@ -58,7 +58,7 @@ export class RoleAssignmentsService {
   }
 
   async updateRoleAssignment(
-    id: number,
+    id: string,
     input: UpdateRoleAssignmentDto,
   ): Promise<RoleAssignment> {
     const assignment = await this.roleAssignments.findOneBy({ id });
@@ -80,7 +80,7 @@ export class RoleAssignmentsService {
     return this.roleAssignments.save({ ...assignment, user, role });
   }
 
-  async deleteRoleAssignment(id: number): Promise<void> {
+  async deleteRoleAssignment(id: string): Promise<void> {
     const result = await this.roleAssignments.delete(id);
     if (!result.affected) throw new NotFoundException();
   }

@@ -4,13 +4,13 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
+  ParseUUIDPipe,
   Patch,
   Post,
   UseInterceptors,
 } from '@nestjs/common';
 import { FormatResponseInterceptor } from '../../../../common/utils/interceptor/format-response.interceptor.js';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CreateResourceDto } from './dto/create-resource.dto.js';
 import { UpdateResourceDto } from './dto/update-resource.dto.js';
 import { ResourcesService } from './resources.service.js';
@@ -22,11 +22,17 @@ export class ResourcesController {
   constructor(private readonly resourcesService: ResourcesService) {}
 
   @Delete(':id')
+  @ApiParam({
+    name: 'id',
+    type: String,
+    format: 'uuid',
+    description: 'Resource UUID.',
+  })
   @ApiOperation({
     summary: 'Delete a resource',
     description: 'Deletes the resource from the provider and local database.',
   })
-  deleteResource(@Param('id', ParseIntPipe) id: number) {
+  deleteResource(@Param('id', ParseUUIDPipe) id: string) {
     return this.resourcesService.deleteResource(id);
   }
 
@@ -49,12 +55,18 @@ export class ResourcesController {
   }
 
   @Patch(':id')
+  @ApiParam({
+    name: 'id',
+    type: String,
+    format: 'uuid',
+    description: 'Resource UUID.',
+  })
   @ApiOperation({
     summary: 'Update a resource route',
     description: 'Updates the route in the provider and local database.',
   })
   updateResource(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() input: UpdateResourceDto,
   ) {
     return this.resourcesService.updateResource(id, input);

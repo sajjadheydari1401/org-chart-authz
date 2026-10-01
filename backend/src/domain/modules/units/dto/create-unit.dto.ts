@@ -1,4 +1,4 @@
-import { IsInt, IsOptional, IsString, Length, Min } from 'class-validator';
+import { IsOptional, IsString, IsUUID, Length } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateUnitDto {
@@ -13,12 +13,11 @@ export class CreateUnitDto {
   type!: string;
 
   @ApiPropertyOptional({
-    description: 'Parent unit ID. Omit to create a root unit.',
-    example: 3,
-    minimum: 1,
+    description: 'Parent unit UUID. Omit to create a root unit.',
+    example: '8d73c1e7-7f2a-4a6f-bf1f-9bb77cf21734',
+    format: 'uuid',
   })
   @IsOptional()
-  @IsInt()
-  @Min(1)
-  parentId?: number;
+  @IsUUID()
+  parentId?: string;
 }

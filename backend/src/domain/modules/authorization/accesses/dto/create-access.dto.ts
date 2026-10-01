@@ -1,4 +1,4 @@
-import { IsInt, IsString, Length, Min } from 'class-validator';
+import { IsString, IsUUID, Length } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateAccessDto {
@@ -20,10 +20,9 @@ export class CreateAccessDto {
 
   @ApiProperty({
     description: 'Local ID of the resource this access belongs to.',
-    example: 1,
-    minimum: 1,
+    example: '550e8400-e29b-41d4-a716-446655440000',
+    format: 'uuid',
   })
-  @IsInt()
-  @Min(1)
-  resourceId!: number;
+  @IsUUID()
+  resourceId!: string;
 }

@@ -18,7 +18,7 @@ export class UnitsService {
     return this.units.find();
   }
 
-  async getSingleUnit(id: number): Promise<Unit> {
+  async getSingleUnit(id: string): Promise<Unit> {
     const unit = await this.units.findOneBy({ id });
     if (!unit) throw new NotFoundException();
     return unit;
@@ -40,7 +40,7 @@ export class UnitsService {
     );
   }
 
-  async updateUnit(id: number, input: UpdateUnitDto): Promise<Unit> {
+  async updateUnit(id: string, input: UpdateUnitDto): Promise<Unit> {
     const unit = await this.units.findOneBy({ id });
     if (!unit) throw new NotFoundException();
 
@@ -57,7 +57,7 @@ export class UnitsService {
     return this.units.save(updatedUnit);
   }
 
-  async moveUnit(id: number, parentId: number | null): Promise<Unit> {
+  async moveUnit(id: string, parentId: string | null): Promise<Unit> {
     const unit = await this.units.findOneBy({ id });
     if (!unit) throw new NotFoundException();
 
@@ -65,7 +65,7 @@ export class UnitsService {
     return this.units.save(unit);
   }
 
-  async deleteUnit(id: number): Promise<void> {
+  async deleteUnit(id: string): Promise<void> {
     const unit = await this.units.findOne({
       where: { id },
       relations: { parent: true },
@@ -81,7 +81,7 @@ export class UnitsService {
 
   private async applyParentChange(
     unit: Unit,
-    parentId: number | null,
+    parentId: string | null,
   ): Promise<void> {
     // Null moves the unit to the root; an ID must resolve to a valid parent.
     unit.parent =

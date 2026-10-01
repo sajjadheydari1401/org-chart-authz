@@ -20,13 +20,13 @@ export class UsersService {
     return this.users.find();
   }
 
-  async getSingleUser(id: number): Promise<User> {
+  async getSingleUser(id: string): Promise<User> {
     const user = await this.users.findOneBy({ id });
     if (!user) throw new NotFoundException();
     return user;
   }
 
-  async updateUser(id: number, input: UpdateUserDto): Promise<User> {
+  async updateUser(id: string, input: UpdateUserDto): Promise<User> {
     const user = await this.getSingleUser(id);
     const existingUser = await this.users.findOneBy({
       username: input.username,
@@ -40,7 +40,7 @@ export class UsersService {
     return this.users.save(updatedUser);
   }
 
-  async deleteUser(id: number): Promise<void> {
+  async deleteUser(id: string): Promise<void> {
     const user = await this.getSingleUser(id);
     await this.authProvider.deleteUser(user.username);
 

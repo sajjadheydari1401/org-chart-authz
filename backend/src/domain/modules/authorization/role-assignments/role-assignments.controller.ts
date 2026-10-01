@@ -4,13 +4,13 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
+  ParseUUIDPipe,
   Patch,
   Post,
   UseInterceptors,
 } from '@nestjs/common';
 import { FormatResponseInterceptor } from '../../../../common/utils/interceptor/format-response.interceptor.js';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CreateRoleAssignmentDto } from './dto/create-role-assignment.dto.js';
 import { UpdateRoleAssignmentDto } from './dto/update-role-assignment.dto.js';
 import { RoleAssignmentsService } from './role-assignments.service.js';
@@ -43,32 +43,50 @@ export class RoleAssignmentsController {
   }
 
   @Get(':id')
+  @ApiParam({
+    name: 'id',
+    type: String,
+    format: 'uuid',
+    description: 'Role assignment UUID.',
+  })
   @ApiOperation({
     summary: 'Get a role assignment',
-    description: 'Returns one local role assignment by numeric ID.',
+    description: 'Returns one local role assignment by UUID.',
   })
-  getRoleAssignment(@Param('id', ParseIntPipe) id: number) {
+  getRoleAssignment(@Param('id', ParseUUIDPipe) id: string) {
     return this.roleAssignmentsService.getRoleAssignment(id);
   }
 
   @Patch(':id')
+  @ApiParam({
+    name: 'id',
+    type: String,
+    format: 'uuid',
+    description: 'Role assignment UUID.',
+  })
   @ApiOperation({
     summary: 'Update a role assignment',
     description: 'Changes the user or role linked by an assignment.',
   })
   updateRoleAssignment(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() input: UpdateRoleAssignmentDto,
   ) {
     return this.roleAssignmentsService.updateRoleAssignment(id, input);
   }
 
   @Delete(':id')
+  @ApiParam({
+    name: 'id',
+    type: String,
+    format: 'uuid',
+    description: 'Role assignment UUID.',
+  })
   @ApiOperation({
     summary: 'Delete a role assignment',
-    description: 'Removes a local user-role assignment by its numeric ID.',
+    description: 'Removes a local user-role assignment by its UUID.',
   })
-  deleteRoleAssignment(@Param('id', ParseIntPipe) id: number) {
+  deleteRoleAssignment(@Param('id', ParseUUIDPipe) id: string) {
     return this.roleAssignmentsService.deleteRoleAssignment(id);
   }
 }

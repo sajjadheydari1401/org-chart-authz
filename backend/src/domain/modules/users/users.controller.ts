@@ -5,11 +5,11 @@ import {
   Get,
   Patch,
   Param,
-  ParseIntPipe,
+  ParseUUIDPipe,
   UseInterceptors,
 } from '@nestjs/common';
 import { FormatResponseInterceptor } from '../../../common/utils/interceptor/format-response.interceptor.js';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 import { UsersService } from './users.service.js';
 
@@ -29,33 +29,51 @@ export class UsersController {
   }
 
   @Get(':id')
+  @ApiParam({
+    name: 'id',
+    type: String,
+    format: 'uuid',
+    description: 'User UUID.',
+  })
   @ApiOperation({
     summary: 'Get a user',
-    description: 'Returns one local user by numeric ID.',
+    description: 'Returns one local user by UUID.',
   })
-  getSingleUser(@Param('id', ParseIntPipe) id: number) {
+  getSingleUser(@Param('id', ParseUUIDPipe) id: string) {
     return this.usersService.getSingleUser(id);
   }
 
   @Patch(':id')
+  @ApiParam({
+    name: 'id',
+    type: String,
+    format: 'uuid',
+    description: 'User UUID.',
+  })
   @ApiOperation({
     summary: 'Update a username',
     description: 'Changes the username of a local user.',
   })
   updateUser(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() input: UpdateUserDto,
   ) {
     return this.usersService.updateUser(id, input);
   }
 
   @Delete(':id')
+  @ApiParam({
+    name: 'id',
+    type: String,
+    format: 'uuid',
+    description: 'User UUID.',
+  })
   @ApiOperation({
     summary: 'Delete a user',
     description:
       'Deletes the user from the authentication provider and then from the local database.',
   })
-  deleteUser(@Param('id', ParseIntPipe) id: number) {
+  deleteUser(@Param('id', ParseUUIDPipe) id: string) {
     return this.usersService.deleteUser(id);
   }
 }

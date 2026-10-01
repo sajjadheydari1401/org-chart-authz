@@ -4,13 +4,13 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
+  ParseUUIDPipe,
   Patch,
   Post,
   UseInterceptors,
 } from '@nestjs/common';
 import { FormatResponseInterceptor } from '../../../common/utils/interceptor/format-response.interceptor.js';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CreateUnitDto } from './dto/create-unit.dto.js';
 import { UpdateUnitDto } from './dto/update-unit.dto.js';
 import { UnitsService } from './units.service.js';
@@ -31,11 +31,17 @@ export class UnitsController {
   }
 
   @Get(':id')
+  @ApiParam({
+    name: 'id',
+    type: String,
+    format: 'uuid',
+    description: 'Unit UUID.',
+  })
   @ApiOperation({
     summary: 'Get an organizational unit',
-    description: 'Returns one unit by numeric ID.',
+    description: 'Returns one unit by UUID.',
   })
-  getSingleUnit(@Param('id', ParseIntPipe) id: number) {
+  getSingleUnit(@Param('id', ParseUUIDPipe) id: string) {
     return this.unitsService.getSingleUnit(id);
   }
 
@@ -49,24 +55,36 @@ export class UnitsController {
   }
 
   @Patch(':id')
+  @ApiParam({
+    name: 'id',
+    type: String,
+    format: 'uuid',
+    description: 'Unit UUID.',
+  })
   @ApiOperation({
     summary: 'Update an organizational unit',
     description: 'Updates a unit name, type, or parent.',
   })
   updateUnit(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() input: UpdateUnitDto,
   ) {
     return this.unitsService.updateUnit(id, input);
   }
 
   @Delete(':id')
+  @ApiParam({
+    name: 'id',
+    type: String,
+    format: 'uuid',
+    description: 'Unit UUID.',
+  })
   @ApiOperation({
     summary: 'Delete an organizational unit subtree',
     description:
       'Deletes the selected unit and all descendants. The root unit cannot be deleted.',
   })
-  deleteUnit(@Param('id', ParseIntPipe) id: number) {
+  deleteUnit(@Param('id', ParseUUIDPipe) id: string) {
     return this.unitsService.deleteUnit(id);
   }
 }

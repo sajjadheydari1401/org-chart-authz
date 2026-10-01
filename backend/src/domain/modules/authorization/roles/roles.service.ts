@@ -48,7 +48,7 @@ export class RolesService {
     }
   }
 
-  async updateRole(id: number, input: UpdateRoleDto): Promise<Role> {
+  async updateRole(id: string, input: UpdateRoleDto): Promise<Role> {
     const role = await this.roles.findOneBy({ id });
     if (!role) throw new NotFoundException();
 
@@ -71,7 +71,7 @@ export class RolesService {
     });
   }
 
-  async deleteRole(id: number): Promise<void> {
+  async deleteRole(id: string): Promise<void> {
     const role = await this.roles.findOneBy({ id });
     if (!role) throw new NotFoundException();
 

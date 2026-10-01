@@ -1,22 +1,20 @@
-import { IsInt, Min } from 'class-validator';
+import { IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateRoleAssignmentDto {
   @ApiProperty({
-    description: 'Local user ID receiving the role.',
-    example: 7,
-    minimum: 1,
+    description: 'Local user UUID receiving the role.',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+    format: 'uuid',
   })
-  @IsInt()
-  @Min(1)
-  userId!: number;
+  @IsUUID()
+  userId!: string;
 
   @ApiProperty({
-    description: 'Local role ID to assign.',
-    example: 2,
-    minimum: 1,
+    description: 'Local role UUID to assign.',
+    example: '8d73c1e7-7f2a-4a6f-bf1f-9bb77cf21734',
+    format: 'uuid',
   })
-  @IsInt()
-  @Min(1)
-  roleId!: number;
+  @IsUUID()
+  roleId!: string;
 }

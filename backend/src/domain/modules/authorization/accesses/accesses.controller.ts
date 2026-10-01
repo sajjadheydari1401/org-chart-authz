@@ -4,13 +4,13 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
+  ParseUUIDPipe,
   Patch,
   Post,
   UseInterceptors,
 } from '@nestjs/common';
 import { FormatResponseInterceptor } from '../../../../common/utils/interceptor/format-response.interceptor.js';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AccessesService } from './accesses.service.js';
 import { CreateAccessDto } from './dto/create-access.dto.js';
 import { UpdateAccessDto } from './dto/update-access.dto.js';
@@ -22,22 +22,34 @@ export class AccessesController {
   constructor(private readonly accessesService: AccessesService) {}
 
   @Delete(':id')
+  @ApiParam({
+    name: 'id',
+    type: String,
+    format: 'uuid',
+    description: 'Access UUID.',
+  })
   @ApiOperation({
     summary: 'Delete an access',
     description: 'Deletes an access from the provider and local database.',
   })
-  deleteAccess(@Param('id', ParseIntPipe) id: number) {
+  deleteAccess(@Param('id', ParseUUIDPipe) id: string) {
     return this.accessesService.deleteAccess(id);
   }
 
   @Patch(':id')
+  @ApiParam({
+    name: 'id',
+    type: String,
+    format: 'uuid',
+    description: 'Access UUID.',
+  })
   @ApiOperation({
     summary: 'Update an access',
     description:
       'Updates an access method and description in the provider and local database.',
   })
   updateAccess(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() input: UpdateAccessDto,
   ) {
     return this.accessesService.updateAccess(id, input);

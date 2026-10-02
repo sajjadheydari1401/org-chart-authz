@@ -5,14 +5,18 @@ import { RoleScopeMode } from './entities/role.entity.js';
 import { RolesService } from './roles.service.js';
 
 describe('RolesService', () => {
+  const unitId = '550e8400-e29b-41d4-a716-446655440001';
+  const updatedUnitId = '550e8400-e29b-41d4-a716-446655440002';
+  const roleId = '550e8400-e29b-41d4-a716-446655440010';
+  const missingRoleId = '550e8400-e29b-41d4-a716-446655440404';
   const input = {
     name: 'manager',
     farsiName: 'مدیر سازمان',
     description: 'requested description',
-    unitId: 7,
+    unitId,
     scopeMode: RoleScopeMode.SELF,
   };
-  const unit = { id: 7, name: 'Finance', type: 'department' };
+  const unit = { id: unitId, name: 'Finance', type: 'department' };
   let roles: {
     find: ReturnType<typeof vi.fn>;
     findOneBy: ReturnType<typeof vi.fn>;
@@ -34,7 +38,7 @@ describe('RolesService', () => {
       findOneBy: vi.fn(),
       delete: vi.fn().mockResolvedValue({ affected: 1 }),
       create: vi.fn((value) => value),
-      save: vi.fn(async (value) => ({ id: 1, ...value })),
+      save: vi.fn(async (value) => ({ id: roleId, ...value })),
     };
     units = { findOneBy: vi.fn().mockResolvedValue(unit) };
     provider = {
@@ -58,12 +62,30 @@ describe('RolesService', () => {
   });
 
   it('lists roles from the local repository without calling the provider', async () => {
-    const localRoles = [{ id: 1, name: 'manager' }];
+    const localRoles = [{ id: roleId, name: 'manager' }];
     roles.find.mockResolvedValue(localRoles);
 
     await expect(service.getAllRoles()).resolves.toBe(localRoles);
     expect(roles.find).toHaveBeenCalledExactlyOnceWith();
     expect(provider.createRole).not.toHaveBeenCalled();
+  });
+
+  it('finds a local role by its English name', async () => {
+    const role = { id: 'role-id', name: 'manager' };
+    roles.findOneBy.mockResolvedValue(role);
+
+    await expect(service.getRoleByName('manager')).resolves.toBe(role);
+    expect(roles.findOneBy).toHaveBeenCalledExactlyOnceWith({
+      name: 'manager',
+    });
+  });
+
+  it('rejects an unknown local role name', async () => {
+    roles.findOneBy.mockResolvedValue(null);
+
+    await expect(service.getRoleByName('unknown')).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
   });
 
   it.each([RoleScopeMode.SELF, RoleScopeMode.DESCENDANTS])(
@@ -80,10 +102,10 @@ describe('RolesService', () => {
       await expect(
         service.createRole({ ...input, scopeMode }),
       ).resolves.toEqual({
-        id: 1,
+        id: roleId,
         ...expected,
       });
-      expect(units.findOneBy).toHaveBeenCalledExactlyOnceWith({ id: 7 });
+      expect(units.findOneBy).toHaveBeenCalledExactlyOnceWith({ id: unitId });
       expect(provider.createRole).toHaveBeenCalledExactlyOnceWith(
         input.name,
         input.description,
@@ -131,20 +153,24 @@ describe('RolesService', () => {
 
   it('updates the provider first and saves its values with the requested unit and scope', async () => {
     const role = {
-      id: 12,
+      id: roleId,
       providerId: 'provider-role-id',
       name: 'Manager',
       description: 'original description',
       farsiName: 'مدیر قبلی',
-      unit: { id: 6 },
+      unit: { id: unitId },
       scopeMode: RoleScopeMode.SELF,
     };
     const updatedInput = {
       ...input,
-      unitId: 8,
+      unitId: updatedUnitId,
       scopeMode: RoleScopeMode.DESCENDANTS,
     };
-    const updatedUnit = { id: 8, name: 'Operations', type: 'department' };
+    const updatedUnit = {
+      id: updatedUnitId,
+      name: 'Operations',
+      type: 'department',
+    };
     roles.findOneBy.mockResolvedValue(role);
     units.findOneBy.mockResolvedValue(updatedUnit);
     provider.updateRole.mockImplementation(async () => {
@@ -156,7 +182,7 @@ describe('RolesService', () => {
       };
     });
 
-    await expect(service.updateRole(12, updatedInput)).resolves.toEqual({
+    await expect(service.updateRole(roleId, updatedInput)).resolves.toEqual({
       ...role,
       providerId: 'updated-provider-role-id',
       name: 'Updated Manager',
@@ -165,8 +191,10 @@ describe('RolesService', () => {
       unit: updatedUnit,
       scopeMode: RoleScopeMode.DESCENDANTS,
     });
-    expect(roles.findOneBy).toHaveBeenCalledExactlyOnceWith({ id: 12 });
-    expect(units.findOneBy).toHaveBeenCalledExactlyOnceWith({ id: 8 });
+    expect(roles.findOneBy).toHaveBeenCalledExactlyOnceWith({ id: roleId });
+    expect(units.findOneBy).toHaveBeenCalledExactlyOnceWith({
+      id: updatedUnitId,
+    });
     expect(provider.updateRole).toHaveBeenCalledExactlyOnceWith(
       'provider-role-id',
       updatedInput.name,
@@ -186,9 +214,9 @@ describe('RolesService', () => {
   it('does not look up the unit or call the provider when the role is missing', async () => {
     roles.findOneBy.mockResolvedValue(null);
 
-    await expect(service.updateRole(404, input)).rejects.toBeInstanceOf(
-      NotFoundException,
-    );
+    await expect(
+      service.updateRole(missingRoleId, input),
+    ).rejects.toBeInstanceOf(NotFoundException);
     expect(units.findOneBy).not.toHaveBeenCalled();
     expect(provider.updateRole).not.toHaveBeenCalled();
     expect(roles.save).not.toHaveBeenCalled();
@@ -196,12 +224,12 @@ describe('RolesService', () => {
 
   it('does not call the provider when the requested unit is missing', async () => {
     roles.findOneBy.mockResolvedValue({
-      id: 12,
+      id: roleId,
       providerId: 'provider-role-id',
     });
     units.findOneBy.mockResolvedValue(null);
 
-    await expect(service.updateRole(12, input)).rejects.toBeInstanceOf(
+    await expect(service.updateRole(roleId, input)).rejects.toBeInstanceOf(
       NotFoundException,
     );
     expect(provider.updateRole).not.toHaveBeenCalled();
@@ -210,19 +238,19 @@ describe('RolesService', () => {
 
   it('does not update the local role when the provider update fails', async () => {
     roles.findOneBy.mockResolvedValue({
-      id: 12,
+      id: roleId,
       providerId: 'provider-role-id',
     });
     const error = new Error('provider update failed');
     provider.updateRole.mockRejectedValue(error);
 
-    await expect(service.updateRole(12, input)).rejects.toBe(error);
+    await expect(service.updateRole(roleId, input)).rejects.toBe(error);
     expect(roles.save).not.toHaveBeenCalled();
   });
 
   it('deletes the local role only after provider deletion succeeds', async () => {
     roles.findOneBy.mockResolvedValue({
-      id: 12,
+      id: roleId,
       providerId: 'provider-role-id',
     });
     const calls: string[] = [];
@@ -235,19 +263,19 @@ describe('RolesService', () => {
       return { affected: 1 };
     });
 
-    await expect(service.deleteRole(12)).resolves.toBeUndefined();
-    expect(roles.findOneBy).toHaveBeenCalledExactlyOnceWith({ id: 12 });
+    await expect(service.deleteRole(roleId)).resolves.toBeUndefined();
+    expect(roles.findOneBy).toHaveBeenCalledExactlyOnceWith({ id: roleId });
     expect(provider.deleteRole).toHaveBeenCalledExactlyOnceWith(
       'provider-role-id',
     );
-    expect(roles.delete).toHaveBeenCalledExactlyOnceWith(12);
+    expect(roles.delete).toHaveBeenCalledExactlyOnceWith(roleId);
     expect(calls).toEqual(['provider', 'local']);
   });
 
   it('does not call the provider or delete locally when the role is missing', async () => {
     roles.findOneBy.mockResolvedValue(null);
 
-    await expect(service.deleteRole(404)).rejects.toBeInstanceOf(
+    await expect(service.deleteRole(missingRoleId)).rejects.toBeInstanceOf(
       NotFoundException,
     );
     expect(provider.deleteRole).not.toHaveBeenCalled();
@@ -256,24 +284,24 @@ describe('RolesService', () => {
 
   it('does not delete locally when provider role deletion fails', async () => {
     roles.findOneBy.mockResolvedValue({
-      id: 12,
+      id: roleId,
       providerId: 'provider-role-id',
     });
     const error = new Error('provider deletion failed');
     provider.deleteRole.mockRejectedValue(error);
 
-    await expect(service.deleteRole(12)).rejects.toBe(error);
+    await expect(service.deleteRole(roleId)).rejects.toBe(error);
     expect(roles.delete).not.toHaveBeenCalled();
   });
 
   it('returns not found if local role deletion affects no rows', async () => {
     roles.findOneBy.mockResolvedValue({
-      id: 12,
+      id: roleId,
       providerId: 'provider-role-id',
     });
     roles.delete.mockResolvedValue({ affected: 0 });
 
-    await expect(service.deleteRole(12)).rejects.toBeInstanceOf(
+    await expect(service.deleteRole(roleId)).rejects.toBeInstanceOf(
       NotFoundException,
     );
   });

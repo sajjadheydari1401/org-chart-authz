@@ -19,6 +19,12 @@ export class RolesService {
     return this.roles.find();
   }
 
+  async getRoleByName(name: string): Promise<Role> {
+    const role = await this.roles.findOneBy({ name });
+    if (!role) throw new NotFoundException();
+    return role;
+  }
+
   async createRole(input: CreateRoleDto): Promise<Role> {
     const unit = await this.units.findOneBy({ id: input.unitId });
     if (!unit) throw new NotFoundException();

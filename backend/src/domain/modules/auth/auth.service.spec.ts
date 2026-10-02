@@ -14,7 +14,8 @@ describe('AuthService', () => {
     loginWithUsernamePassword: ReturnType<typeof vi.fn>;
     deleteUser: ReturnType<typeof vi.fn>;
   };
-  let usersService: { createLocalUser: ReturnType<typeof vi.fn> };
+  let usersService: { createLocalUserWithRole: ReturnType<typeof vi.fn> };
+  let rolesService: { getRoleByName: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
     authProvider = {
@@ -25,14 +26,22 @@ describe('AuthService', () => {
       loginWithUsernamePassword: vi.fn(),
       deleteUser: vi.fn().mockResolvedValue(undefined),
     };
-    usersService = { createLocalUser: vi.fn().mockResolvedValue(undefined) };
+    usersService = {
+      createLocalUserWithRole: vi.fn().mockResolvedValue(undefined),
+    };
+    rolesService = {
+      getRoleByName: vi
+        .fn()
+        .mockResolvedValue({ id: 'role-id', name: 'member' }),
+    };
     service = new AuthService(
       authProvider as unknown as AuthProviderService,
       usersService as unknown as UsersService,
+      rolesService as never,
     );
   });
 
-  it('registers with the provider, then creates the local user', async () => {
+  it('registers with the provider, then creates the local user with its role', async () => {
     const input = {
       username: 'person',
       email: 'person@example.test',
@@ -47,7 +56,11 @@ describe('AuthService', () => {
     expect(
       authProvider.registerWithTwoFactorUsernamePassword,
     ).toHaveBeenCalledWith(input);
-    expect(usersService.createLocalUser).toHaveBeenCalledWith('person');
+    expect(rolesService.getRoleByName).toHaveBeenCalledWith('member');
+    expect(usersService.createLocalUserWithRole).toHaveBeenCalledWith(
+      'person',
+      'role-id',
+    );
     expect(authProvider.deleteUser).not.toHaveBeenCalled();
   });
 
@@ -62,13 +75,13 @@ describe('AuthService', () => {
         username: 'person',
       } as RegisterWithUsernamePasswordDto),
     ).rejects.toBe(providerError);
-    expect(usersService.createLocalUser).not.toHaveBeenCalled();
+    expect(usersService.createLocalUserWithRole).not.toHaveBeenCalled();
     expect(authProvider.deleteUser).not.toHaveBeenCalled();
   });
 
   it('deletes the provider user if local user creation fails', async () => {
     const persistenceError = new Error('local database failed');
-    usersService.createLocalUser.mockRejectedValue(persistenceError);
+    usersService.createLocalUserWithRole.mockRejectedValue(persistenceError);
 
     await expect(
       service.registerWithUsernamePassword({
@@ -80,7 +93,7 @@ describe('AuthService', () => {
 
   it('preserves the local creation error if provider cleanup fails', async () => {
     const persistenceError = new Error('local database failed');
-    usersService.createLocalUser.mockRejectedValue(persistenceError);
+    usersService.createLocalUserWithRole.mockRejectedValue(persistenceError);
     authProvider.deleteUser.mockRejectedValue(
       new Error('provider cleanup failed'),
     );

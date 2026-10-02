@@ -3,9 +3,11 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { AuthProviderService } from '../auth/auth-provider.service.js';
+import { Role } from '../authorization/roles/entities/role.entity.js';
+import { RoleAssignment } from '../authorization/role-assignments/entities/role-assignment.entity.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 import { User } from './entities/user.entity.js';
 
@@ -14,6 +16,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User) private readonly users: Repository<User>,
     private readonly authProvider: AuthProviderService,
+    @InjectDataSource() private readonly dataSource: DataSource,
   ) {}
 
   getAllUsers(): Promise<User[]> {
@@ -48,11 +51,28 @@ export class UsersService {
     if (!result.affected) throw new NotFoundException();
   }
 
-  async createLocalUser(username: string): Promise<void> {
-    const existingUser = await this.users.findOneBy({ username });
+  async createLocalUserWithRole(
+    username: string,
+    roleId: string,
+  ): Promise<User> {
+    return this.dataSource.transaction(async (manager) => {
+      const users = manager.getRepository(User);
+      const existingUser = await users.findOneBy({ username });
+      if (existingUser) throw new ConflictException();
 
-    if (existingUser) return;
+      const role = await manager.getRepository(Role).findOneBy({ id: roleId });
+      if (!role) throw new NotFoundException();
 
-    await this.users.save(this.users.create({ username }));
+      const user = await users.save(users.create({ username }));
+      const roleAssignments = manager.getRepository(RoleAssignment);
+      await roleAssignments.save(
+        roleAssignments.create({
+          user: { id: user.id },
+          role: { id: role.id },
+        }),
+      );
+
+      return user;
+    });
   }
 }

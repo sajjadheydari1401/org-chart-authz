@@ -33,11 +33,24 @@ export class UsersController {
     description: "Returns users assigned to units within the caller's scope.",
   })
   @ApiQuery({ name: 'unitId', required: false, format: 'uuid' })
+  @ApiQuery({ name: 'page', required: false, type: Number, minimum: 1 })
+  @ApiQuery({
+    name: 'pageSize',
+    required: false,
+    type: Number,
+    minimum: 1,
+    maximum: 100,
+  })
   getAllUsers(
     @Req() request: AuthenticatedRequest,
     @Query() query: ListUsersQueryDto,
   ) {
-    return this.usersService.getAllUsers(request.user.username, query.unitId);
+    return this.usersService.getAllUsers(
+      request.user.username,
+      query.unitId,
+      query.page,
+      query.pageSize,
+    );
   }
 
   @Get(':id')

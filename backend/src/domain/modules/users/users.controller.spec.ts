@@ -26,9 +26,16 @@ describe('UsersController', () => {
     await expect(
       controller.getAllUsers({ user: { username: 'reader' } } as never, {
         unitId,
+        page: 2,
+        pageSize: 30,
       }),
     ).resolves.toBe(users);
-    expect(usersService.getAllUsers).toHaveBeenCalledWith('reader', unitId);
+    expect(usersService.getAllUsers).toHaveBeenCalledWith(
+      'reader',
+      unitId,
+      2,
+      30,
+    );
   });
 
   it('delegates getSingleUser with the parsed local ID', async () => {

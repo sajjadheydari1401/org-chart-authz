@@ -11,6 +11,8 @@ import { AuthProviderService } from '../auth/auth-provider.service.js';
 import { Role } from '../authorization/roles/entities/role.entity.js';
 import { RoleAssignment } from '../authorization/role-assignments/entities/role-assignment.entity.js';
 import { EffectiveAccessService } from '../authorization/effective-access.service.js';
+import { paginatedResponse, pagination } from '../../../common/utils/tools.js';
+import type { PaginatedResponse } from '../../../common/types/pagination.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 import { User } from './entities/user.entity.js';
 import { GET_USERS_IN_UNITS_QUERY } from './queries/get-users-in-units.query.js';
@@ -38,7 +40,12 @@ export class UsersService {
     return roleName;
   }
 
-  async getAllUsers(username: string, unitId?: string): Promise<User[]> {
+  async getAllUsers(
+    username: string,
+    unitId?: string,
+    page?: number,
+    pageSize?: number,
+  ): Promise<PaginatedResponse<User>> {
     const allowedUnitIds = await this.getScopedUnitIds(
       username,
       '/users',
@@ -46,10 +53,16 @@ export class UsersService {
       unitId,
     );
 
-    return this.buildUsersInUnitsQuery(allowedUnitIds)
+    const query = this.buildUsersInUnitsQuery(allowedUnitIds);
+    const metadata = pagination(pageSize, page, await query.getCount());
+    const items = await query
       .orderBy('user.username', 'ASC')
       .addOrderBy('user.id', 'ASC')
+      .skip(metadata.skip)
+      .take(metadata.pageSize)
       .getMany();
+
+    return paginatedResponse(items, metadata);
   }
 
   async getSingleUser(id: string, username: string): Promise<User> {

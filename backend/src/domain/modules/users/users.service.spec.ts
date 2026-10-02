@@ -32,6 +32,9 @@ describe('UsersService', () => {
     andWhere: ReturnType<typeof vi.fn>;
     orderBy: ReturnType<typeof vi.fn>;
     addOrderBy: ReturnType<typeof vi.fn>;
+    skip: ReturnType<typeof vi.fn>;
+    take: ReturnType<typeof vi.fn>;
+    getCount: ReturnType<typeof vi.fn>;
     getMany: ReturnType<typeof vi.fn>;
     getOne: ReturnType<typeof vi.fn>;
   };
@@ -52,6 +55,9 @@ describe('UsersService', () => {
       andWhere: vi.fn().mockReturnThis(),
       orderBy: vi.fn().mockReturnThis(),
       addOrderBy: vi.fn().mockReturnThis(),
+      skip: vi.fn().mockReturnThis(),
+      take: vi.fn().mockReturnThis(),
+      getCount: vi.fn().mockResolvedValue(1),
       getMany: vi.fn(),
       getOne: vi.fn(),
     };
@@ -101,17 +107,64 @@ describe('UsersService', () => {
     },
   );
 
-  it("returns users assigned to units within the caller's grant scope", async () => {
+  it("returns a page of users assigned to units within the caller's grant scope", async () => {
     const users = [{ id: userId, username: 'person' } as User];
     queryBuilder.getMany.mockResolvedValue(users);
 
-    await expect(service.getAllUsers('reader')).resolves.toBe(users);
+    await expect(service.getAllUsers('reader')).resolves.toEqual({
+      items: users,
+      pagination: {
+        total: 1,
+        current: 1,
+        pageSize: 15,
+        skip: 0,
+        nextPage: null,
+      },
+    });
     expect(repository.createQueryBuilder).toHaveBeenCalledWith('user');
     expect(queryBuilder.where).toHaveBeenCalledWith(
       expect.stringContaining('"assigned_role"."unit_id" IN'),
       { allowedUnitIds: [unitId] },
     );
     expect(queryBuilder.orderBy).toHaveBeenCalledWith('user.username', 'ASC');
+    expect(queryBuilder.skip).toHaveBeenCalledWith(0);
+    expect(queryBuilder.take).toHaveBeenCalledWith(15);
+  });
+
+  it('applies the requested page and page size', async () => {
+    queryBuilder.getCount.mockResolvedValue(13);
+    queryBuilder.getMany.mockResolvedValue([]);
+
+    await expect(
+      service.getAllUsers('reader', undefined, 2, 5),
+    ).resolves.toMatchObject({
+      pagination: {
+        total: 13,
+        current: 2,
+        pageSize: 5,
+        skip: 5,
+        nextPage: 3,
+      },
+    });
+    expect(queryBuilder.skip).toHaveBeenCalledWith(5);
+    expect(queryBuilder.take).toHaveBeenCalledWith(5);
+  });
+
+  it('moves an out-of-range page to the last page', async () => {
+    queryBuilder.getCount.mockResolvedValue(13);
+    queryBuilder.getMany.mockResolvedValue([]);
+
+    await expect(
+      service.getAllUsers('reader', undefined, 99, 5),
+    ).resolves.toMatchObject({
+      pagination: {
+        current: 3,
+        pageSize: 5,
+        skip: 10,
+        nextPage: null,
+      },
+    });
+    expect(queryBuilder.skip).toHaveBeenCalledWith(10);
   });
 
   it('allows a requested unit only when its read grant is in scope', async () => {

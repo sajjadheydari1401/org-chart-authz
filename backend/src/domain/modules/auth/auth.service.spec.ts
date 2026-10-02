@@ -57,10 +57,12 @@ describe('AuthService', () => {
       authProvider.registerWithTwoFactorUsernamePassword,
     ).toHaveBeenCalledWith(input);
     expect(rolesService.getRoleByName).toHaveBeenCalledWith('member');
-    expect(usersService.createLocalUserWithRole).toHaveBeenCalledWith(
-      'person',
-      'role-id',
-    );
+    expect(usersService.createLocalUserWithRole).toHaveBeenCalledWith({
+      username: 'person',
+      email: 'person@example.test',
+      mobile: '09123456789',
+      roleId: 'role-id',
+    });
     expect(authProvider.deleteUser).not.toHaveBeenCalled();
   });
 

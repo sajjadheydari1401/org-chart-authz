@@ -51,19 +51,29 @@ export class UsersService {
     if (!result.affected) throw new NotFoundException();
   }
 
-  async createLocalUserWithRole(
-    username: string,
-    roleId: string,
-  ): Promise<User> {
+  async createLocalUserWithRole(input: {
+    username: string;
+    email: string;
+    mobile: string;
+    roleId: string;
+  }): Promise<User> {
     return this.dataSource.transaction(async (manager) => {
       const users = manager.getRepository(User);
-      const existingUser = await users.findOneBy({ username });
+      const existingUser = await users.findOneBy({ username: input.username });
       if (existingUser) throw new ConflictException();
 
-      const role = await manager.getRepository(Role).findOneBy({ id: roleId });
+      const role = await manager
+        .getRepository(Role)
+        .findOneBy({ id: input.roleId });
       if (!role) throw new NotFoundException();
 
-      const user = await users.save(users.create({ username }));
+      const user = await users.save(
+        users.create({
+          username: input.username,
+          email: input.email,
+          mobile: input.mobile,
+        }),
+      );
       const roleAssignments = manager.getRepository(RoleAssignment);
       await roleAssignments.save(
         roleAssignments.create({

@@ -21,7 +21,12 @@ export class AuthService {
     await this.authProvider.registerWithTwoFactorUsernamePassword(input);
 
     try {
-      await this.usersService.createLocalUserWithRole(input.username, role.id);
+      await this.usersService.createLocalUserWithRole({
+        username: input.username,
+        email: input.email,
+        mobile: input.mobile,
+        roleId: role.id,
+      });
       return { success: true };
     } catch (error) {
       try {

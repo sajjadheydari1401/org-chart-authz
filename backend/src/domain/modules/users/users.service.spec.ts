@@ -162,10 +162,20 @@ describe('UsersService', () => {
     );
 
     await expect(
-      service.createLocalUserWithRole('person', 'role-id'),
+      service.createLocalUserWithRole({
+        username: 'person',
+        email: 'person@example.test',
+        mobile: '09123456789',
+        roleId: 'role-id',
+      }),
     ).resolves.toBe(user);
 
     expect(dataSource.transaction).toHaveBeenCalledOnce();
+    expect(transactionUsers.create).toHaveBeenCalledWith({
+      username: 'person',
+      email: 'person@example.test',
+      mobile: '09123456789',
+    });
     expect(transactionRoles.findOneBy).toHaveBeenCalledWith({ id: 'role-id' });
     expect(transactionAssignments.create).toHaveBeenCalledWith({
       user: { id: user.id },

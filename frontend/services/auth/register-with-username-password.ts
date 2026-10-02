@@ -15,6 +15,7 @@ export async function registerWithUsernamePassword(
     username: input.username,
     password: input.password,
     mobile: input.mobile,
+    role: input.role,
   };
 
   try {

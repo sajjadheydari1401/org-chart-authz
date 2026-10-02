@@ -48,6 +48,9 @@ export async function registerWithUsernamePasswordAction(
         ...(errors.properties?.email?.errors[0] && {
           email: errors.properties.email.errors[0],
         }),
+        ...(errors.properties?.role?.errors[0] && {
+          role: errors.properties.role.errors[0],
+        }),
         ...(errors.properties?.username?.errors[0] && {
           username: errors.properties.username.errors[0],
         }),

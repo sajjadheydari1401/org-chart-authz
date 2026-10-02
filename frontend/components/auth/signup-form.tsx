@@ -8,8 +8,11 @@ import { TRANSPORT_ERROR_MESSAGE } from '@/lib/api/transport-error';
 
 import { registerWithUsernamePasswordAction } from '@/app/actions/auth';
 import { AppButton } from '@/components/common/ui/app-button';
+import { AppCombobox } from '@/components/common/ui/app-combobox/app-combobox';
+import { AppControlledFormField } from '@/components/common/ui/app-controlled-form-field';
 import { AppFormField } from '@/components/common/ui/app-form-field';
 import { AppInput } from '@/components/common/ui/app-input';
+import { useRoles } from '@/hooks/authorization/use-roles';
 import {
   signupSchema,
   type SignupFormData,
@@ -18,7 +21,28 @@ import {
 
 export function SignupForm() {
   const router = useRouter();
+
   const {
+    data: roles,
+    isError: rolesFailed,
+    isPending: rolesLoading,
+  } = useRoles();
+
+  const roleOptions = (roles ?? []).map((role) => ({
+    label: role.farsiName,
+    value: role.name,
+  }));
+
+  const roleHint = rolesLoading
+    ? 'در حال دریافت نقش‌ها...'
+    : rolesFailed
+      ? 'دریافت فهرست نقش‌ها ناموفق بود.'
+      : roleOptions.length === 0
+        ? 'نقشی برای انتخاب در دسترس نیست.'
+        : undefined;
+
+  const {
+    control,
     register,
     handleSubmit,
     setError,
@@ -27,6 +51,7 @@ export function SignupForm() {
     resolver: zodResolver(signupSchema),
     defaultValues: {
       email: '',
+      role: '',
       username: '',
       password: '',
       mobile: '',
@@ -52,6 +77,13 @@ export function SignupForm() {
       setError('email', {
         type: 'server',
         message: fieldErrors.email,
+      });
+    }
+
+    if (fieldErrors?.role) {
+      setError('role', {
+        type: 'server',
+        message: fieldErrors.role,
       });
     }
 
@@ -132,6 +164,29 @@ export function SignupForm() {
           {...register('mobile')}
         />
       </AppFormField>
+
+      <AppControlledFormField
+        label="نقش"
+        htmlFor="role"
+        hint={roleHint}
+        error={errors.role?.message}
+        required
+        name="role"
+        control={control}
+        render={({ field, fieldState }) => (
+          <AppCombobox
+            id="role"
+            options={roleOptions}
+            value={field.value}
+            onChange={field.onChange}
+            onBlur={field.onBlur}
+            placeholder="انتخاب نقش"
+            emptyMessage="نقشی با این نام پیدا نشد."
+            disabled={rolesLoading || roleOptions.length === 0}
+            invalid={fieldState.invalid}
+          />
+        )}
+      />
 
       <AppFormField
         label="رمز عبور"

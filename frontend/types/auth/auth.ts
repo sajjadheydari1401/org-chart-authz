@@ -3,6 +3,7 @@ export interface RegisterWithUsernamePasswordRequest {
   email: string;
   password: string;
   mobile: string;
+  role: string;
 }
 
 export interface LoginWithUsernamePasswordRequest {

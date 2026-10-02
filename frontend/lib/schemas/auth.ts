@@ -9,6 +9,8 @@ function normalizeDigits(value: string): string {
 export const signupSchema = z.object({
   email: z.string().trim().email('لطفاً یک آدرس ایمیل معتبر وارد کنید'),
 
+  role: z.string().trim().min(1, 'لطفاً یک نقش معتبر انتخاب کنید'),
+
   username: z
     .string()
     .trim()

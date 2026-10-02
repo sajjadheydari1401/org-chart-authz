@@ -1,5 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import type { DataSource } from 'typeorm';
+import { COUNT_UNIT_BY_ID_QUERY } from '../queries/count-unit-by-id.query.js';
+import { DELETE_UNIT_SUBTREE_QUERY } from '../queries/delete-unit-subtree.query.js';
 
 /**
  * Deletes a unit and every descendant under it.
@@ -41,36 +43,11 @@ export async function deleteUnitSubtree(
   dataSource: Pick<DataSource, 'query'>,
   unitId: string,
 ): Promise<void> {
-  const [{ count }] = await dataSource.query(
-    'SELECT COUNT(*)::int AS count FROM units WHERE id = $1',
-    [unitId],
-  );
+  const [{ count }] = await dataSource.query(COUNT_UNIT_BY_ID_QUERY, [unitId]);
 
   if (count === 0) {
     throw new NotFoundException();
   }
 
-  await dataSource.query(
-    `
-      WITH RECURSIVE unit_tree AS (
-        -- Anchor: start from the unit we want to remove.
-        SELECT id
-        FROM units
-        WHERE id = $1
-
-        -- UNION ALL keeps expanding the tree by adding each child row to the
-        -- current result set until there are no more descendants left.
-        UNION ALL
-
-        -- Recursive step: follow every child of the current node until the
-        -- whole subtree is collected.
-        SELECT child.id
-        FROM units AS child
-        INNER JOIN unit_tree AS parent ON parent.id = child.parent_id
-      )
-      DELETE FROM units
-      WHERE id IN (SELECT id FROM unit_tree)
-    `,
-    [unitId],
-  );
+  await dataSource.query(DELETE_UNIT_SUBTREE_QUERY, [unitId]);
 }

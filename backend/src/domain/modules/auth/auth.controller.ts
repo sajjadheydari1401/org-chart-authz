@@ -1,10 +1,19 @@
-import { Body, Controller, Post, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service.js';
 import { ConfirmRegistrationBySmsDto } from './dto/confirm-registration-by-sms.dto.js';
 import { LoginWithUsernamePasswordDto } from './dto/login-with-username-password.dto.js';
 import { RegisterWithUsernamePasswordDto } from './dto/register-with-username-password.dto.js';
 import { FormatResponseInterceptor } from '../../../common/utils/interceptor/format-response.interceptor.js';
+import { Public } from '../../../common/decorator/public.decorator.js';
+import { AccessGuard } from '../../../common/guard/authorization.guard.js';
+import { RequireAccess } from '../../../common/decorator/require-access.decorator.js';
 
 @ApiTags('Authentication')
 @UseInterceptors(FormatResponseInterceptor)
@@ -13,6 +22,11 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register/username-password')
+  @UseGuards(AccessGuard)
+  @RequireAccess({
+    route: '/auth/register/username-password',
+    methodName: 'POST',
+  })
   @ApiOperation({
     summary: 'Register with username and password',
     description:
@@ -23,6 +37,8 @@ export class AuthController {
   }
 
   @Post('register/confirm-sms')
+  @UseGuards(AccessGuard)
+  @RequireAccess({ route: '/auth/register/confirm-sms', methodName: 'POST' })
   @ApiOperation({
     summary: 'Confirm registration by SMS',
     description: 'Confirms a new account using the SMS verification code.',
@@ -32,6 +48,7 @@ export class AuthController {
   }
 
   @Post('login/username-password')
+  @Public()
   @ApiOperation({
     summary: 'Log in with username and password',
     description: 'Validates credentials and returns an access token.',

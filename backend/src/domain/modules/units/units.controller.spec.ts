@@ -1,10 +1,20 @@
 import { describe, expect, it, vi } from 'vitest';
+import { UnitType } from '../../../types/unit.js';
 import { UnitsController } from './units.controller.js';
 import { UnitsService } from './units.service.js';
 
 describe('UnitsController', () => {
+  const unitId = '550e8400-e29b-41d4-a716-446655440008';
+
   it('delegates listing units to the service', async () => {
-    const units = [{ id: 1, name: 'Head Office', type: 'building' }];
+    const units = [
+      {
+        id: 'unit-id',
+        name: 'Head Office',
+        type: 'MANAGEMENT',
+        parentId: null,
+      },
+    ];
     const unitsService = { getAllUnits: vi.fn().mockResolvedValue(units) };
     const controller = new UnitsController(
       unitsService as unknown as UnitsService,
@@ -15,19 +25,19 @@ describe('UnitsController', () => {
   });
 
   it('delegates getting a single unit by id to the service', async () => {
-    const unit = { id: 8, name: 'Floor 1', type: 'floor' };
+    const unit = { id: unitId, name: 'Team 1', type: UnitType.TEAM };
     const unitsService = { getSingleUnit: vi.fn().mockResolvedValue(unit) };
     const controller = new UnitsController(
       unitsService as unknown as UnitsService,
     );
 
-    await expect(controller.getSingleUnit(8)).resolves.toBe(unit);
-    expect(unitsService.getSingleUnit).toHaveBeenCalledExactlyOnceWith(8);
+    await expect(controller.getSingleUnit(unitId)).resolves.toBe(unit);
+    expect(unitsService.getSingleUnit).toHaveBeenCalledExactlyOnceWith(unitId);
   });
 
   it('delegates unit creation to the local service', async () => {
-    const input = { name: 'Head Office', type: 'building' };
-    const unit = { id: 1, ...input, parent: null };
+    const input = { name: 'Head Office', type: UnitType.MANAGEMENT };
+    const unit = { id: unitId, ...input, parent: null };
     const unitsService = { createUnit: vi.fn().mockResolvedValue(unit) };
     const controller = new UnitsController(
       unitsService as unknown as UnitsService,
@@ -39,14 +49,17 @@ describe('UnitsController', () => {
 
   it('delegates unit updates with the local ID and partial input', async () => {
     const input = { name: 'Renamed Floor' };
-    const unit = { id: 8, name: input.name, type: 'floor' };
+    const unit = { id: unitId, name: input.name, type: UnitType.TEAM };
     const unitsService = { updateUnit: vi.fn().mockResolvedValue(unit) };
     const controller = new UnitsController(
       unitsService as unknown as UnitsService,
     );
 
-    await expect(controller.updateUnit(8, input)).resolves.toBe(unit);
-    expect(unitsService.updateUnit).toHaveBeenCalledExactlyOnceWith(8, input);
+    await expect(controller.updateUnit(unitId, input)).resolves.toBe(unit);
+    expect(unitsService.updateUnit).toHaveBeenCalledExactlyOnceWith(
+      unitId,
+      input,
+    );
   });
 
   it('delegates unit deletion with the local ID', async () => {
@@ -55,7 +68,7 @@ describe('UnitsController', () => {
       unitsService as unknown as UnitsService,
     );
 
-    await expect(controller.deleteUnit(8)).resolves.toBeUndefined();
-    expect(unitsService.deleteUnit).toHaveBeenCalledExactlyOnceWith(8);
+    await expect(controller.deleteUnit(unitId)).resolves.toBeUndefined();
+    expect(unitsService.deleteUnit).toHaveBeenCalledExactlyOnceWith(unitId);
   });
 });

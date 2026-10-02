@@ -10,8 +10,14 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FormatResponseInterceptor } from '../../../common/utils/interceptor/format-response.interceptor.js';
-import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CreateUnitDto } from './dto/create-unit.dto.js';
+import { UnitResponseDto } from './dto/unit-response.dto.js';
 import { UpdateUnitDto } from './dto/update-unit.dto.js';
 import { UnitsService } from './units.service.js';
 import { RequireAccess } from '../../../common/decorator/require-access.decorator.js';
@@ -26,8 +32,9 @@ export class UnitsController {
   @RequireAccess({ route: '/units', methodName: 'GET' })
   @ApiOperation({
     summary: 'List organizational units',
-    description: 'Returns all units from the local hierarchy.',
+    description: 'Returns flat unit records, including each parent UUID.',
   })
+  @ApiOkResponse({ type: UnitResponseDto, isArray: true })
   getAllUnits() {
     return this.unitsService.getAllUnits();
   }

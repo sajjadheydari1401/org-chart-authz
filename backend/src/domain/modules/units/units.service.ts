@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { CreateUnitDto } from './dto/create-unit.dto.js';
+import { UnitResponseDto } from './dto/unit-response.dto.js';
 import { UpdateUnitDto } from './dto/update-unit.dto.js';
 import { Unit } from './entities/unit.entity.js';
 import { deleteUnitSubtree } from './utils/delete-unit-subtree.js';
@@ -14,8 +15,25 @@ export class UnitsService {
     @InjectDataSource() private readonly dataSource: DataSource,
   ) {}
 
-  getAllUnits(): Promise<Unit[]> {
-    return this.units.find();
+  // Return each unit's details and parent ID, including root units, sorted by name.
+  async getAllUnits(): Promise<UnitResponseDto[]> {
+    const units = await this.units.find({
+      select: {
+        id: true,
+        name: true,
+        type: true,
+        parent: { id: true },
+      },
+      relations: { parent: true },
+      order: { name: 'ASC', id: 'ASC' },
+    });
+
+    return units.map(({ id, name, type, parent }) => ({
+      id,
+      name,
+      type,
+      parentId: parent?.id ?? null,
+    }));
   }
 
   async getSingleUnit(id: string): Promise<Unit> {

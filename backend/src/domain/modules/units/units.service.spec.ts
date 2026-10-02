@@ -1,8 +1,16 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { UnitType } from '../../../types/unit.js';
+import { COUNT_UNIT_BY_ID_QUERY } from './queries/count-unit-by-id.query.js';
+import { DELETE_UNIT_SUBTREE_QUERY } from './queries/delete-unit-subtree.query.js';
 import { UnitsService } from './units.service.js';
 
 describe('UnitsService', () => {
+  const unitId = '550e8400-e29b-41d4-a716-446655440008';
+  const parentId = '550e8400-e29b-41d4-a716-446655440005';
+  const childId = '550e8400-e29b-41d4-a716-446655440009';
+  const missingUnitId = '550e8400-e29b-41d4-a716-446655440404';
+
   let units: {
     find: ReturnType<typeof vi.fn>;
     findOneBy: ReturnType<typeof vi.fn>;
@@ -19,43 +27,73 @@ describe('UnitsService', () => {
       find: vi.fn(),
       findOneBy: vi.fn(),
       findOne: vi.fn(),
-      create: vi.fn((value) => value),
-      save: vi.fn(async (unit) => ({ id: 1, ...unit })),
+      create: vi.fn((unit) => unit),
+      save: vi.fn(async (unit) => ({ id: unitId, ...unit })),
       delete: vi.fn(),
     };
-    dataSource = {
-      query: vi.fn(),
-    };
+    dataSource = { query: vi.fn() };
     service = new UnitsService(units as never, dataSource as never);
   });
 
-  it('lists all units from the local repository', async () => {
-    const localUnits = [{ id: 1, name: 'Head Office', type: 'building' }];
-    units.find.mockResolvedValue(localUnits);
+  it('returns flat unit records with parent IDs in a stable order', async () => {
+    units.find.mockResolvedValue([
+      {
+        id: unitId,
+        name: 'Head Office',
+        type: UnitType.MANAGEMENT,
+        parent: null,
+      },
+      {
+        id: childId,
+        name: 'Sales',
+        type: UnitType.DEPARTMENT,
+        parent: { id: unitId },
+      },
+    ]);
 
-    await expect(service.getAllUnits()).resolves.toBe(localUnits);
-    expect(units.find).toHaveBeenCalledExactlyOnceWith();
+    await expect(service.getAllUnits()).resolves.toEqual([
+      {
+        id: unitId,
+        name: 'Head Office',
+        type: UnitType.MANAGEMENT,
+        parentId: null,
+      },
+      {
+        id: childId,
+        name: 'Sales',
+        type: UnitType.DEPARTMENT,
+        parentId: unitId,
+      },
+    ]);
+    expect(units.find).toHaveBeenCalledExactlyOnceWith({
+      select: {
+        id: true,
+        name: true,
+        type: true,
+        parent: { id: true },
+      },
+      relations: { parent: true },
+      order: { name: 'ASC', id: 'ASC' },
+    });
   });
 
-  it('gets a single unit by local ID and throws when it does not exist', async () => {
-    const localUnit = { id: 8, name: 'Floor 1', type: 'floor' };
-    units.findOneBy.mockResolvedValue(localUnit);
+  it('gets a unit by ID and throws when it does not exist', async () => {
+    const unit = { id: unitId, name: 'Team 1', type: UnitType.TEAM };
+    units.findOneBy.mockResolvedValueOnce(unit).mockResolvedValueOnce(null);
 
-    await expect(service.getSingleUnit(8)).resolves.toBe(localUnit);
-    expect(units.findOneBy).toHaveBeenCalledExactlyOnceWith({ id: 8 });
-
-    units.findOneBy.mockResolvedValue(null);
-    await expect(service.getSingleUnit(404)).rejects.toBeInstanceOf(
+    await expect(service.getSingleUnit(unitId)).resolves.toBe(unit);
+    expect(units.findOneBy).toHaveBeenNthCalledWith(1, { id: unitId });
+    await expect(service.getSingleUnit(missingUnitId)).rejects.toBeInstanceOf(
       NotFoundException,
     );
   });
 
-  it('creates a root unit locally when no parent is provided', async () => {
-    const input = { name: 'Head Office', type: 'building' };
-    const expected = { name: input.name, type: input.type, parent: null };
+  it('creates a root unit when no parent is provided', async () => {
+    const input = { name: 'Head Office', type: UnitType.MANAGEMENT };
+    const expected = { ...input, parent: null };
 
     await expect(service.createUnit(input)).resolves.toEqual({
-      id: 1,
+      id: unitId,
       ...expected,
     });
     expect(units.findOneBy).not.toHaveBeenCalled();
@@ -63,150 +101,171 @@ describe('UnitsService', () => {
     expect(units.save).toHaveBeenCalledExactlyOnceWith(expected);
   });
 
-  it('creates a child unit using its local parent relation', async () => {
+  it('creates a child unit using its existing parent', async () => {
     const parent = {
-      id: 5,
+      id: parentId,
       name: 'Head Office',
-      type: 'building',
+      type: UnitType.MANAGEMENT,
       parent: null,
     };
-    units.findOneBy.mockResolvedValue(parent);
-    const input = { name: 'Floor 1', type: 'floor', parentId: 5 };
+    const input = { name: 'Team 1', type: UnitType.TEAM, parentId };
     const expected = { name: input.name, type: input.type, parent };
+    units.findOneBy.mockResolvedValue(parent);
 
     await expect(service.createUnit(input)).resolves.toEqual({
-      id: 1,
+      id: unitId,
       ...expected,
     });
-    expect(units.findOneBy).toHaveBeenCalledExactlyOnceWith({ id: 5 });
+    expect(units.findOneBy).toHaveBeenCalledExactlyOnceWith({ id: parentId });
     expect(units.create).toHaveBeenCalledExactlyOnceWith(expected);
     expect(units.save).toHaveBeenCalledExactlyOnceWith(expected);
   });
 
-  it('does not create a unit when the requested parent does not exist', async () => {
+  it('does not create a unit when its requested parent is missing', async () => {
     units.findOneBy.mockResolvedValue(null);
 
     await expect(
-      service.createUnit({ name: 'Floor 1', type: 'floor', parentId: 404 }),
+      service.createUnit({
+        name: 'Team 1',
+        type: UnitType.TEAM,
+        parentId: missingUnitId,
+      }),
     ).rejects.toBeInstanceOf(NotFoundException);
     expect(units.create).not.toHaveBeenCalled();
     expect(units.save).not.toHaveBeenCalled();
   });
 
-  it('updates only the supplied scalar fields', async () => {
-    const unit = { id: 8, name: 'Floor 1', type: 'floor' };
+  it('updates only the supplied unit fields', async () => {
+    const unit = { id: unitId, name: 'Team 1', type: UnitType.TEAM };
     units.findOneBy.mockResolvedValue(unit);
     units.save.mockImplementation(async (updatedUnit) => updatedUnit);
 
     await expect(
-      service.updateUnit(8, { name: 'Upper Floor' }),
-    ).resolves.toEqual({ ...unit, name: 'Upper Floor' });
+      service.updateUnit(unitId, { name: 'Upper Team' }),
+    ).resolves.toEqual({ ...unit, name: 'Upper Team' });
     expect(units.save).toHaveBeenCalledExactlyOnceWith({
       ...unit,
-      name: 'Upper Floor',
+      name: 'Upper Team',
     });
     expect(units.findOne).not.toHaveBeenCalled();
   });
 
-  it('changes the parent after verifying the new parent exists', async () => {
-    const unit = { id: 8, name: 'Floor 1', type: 'floor' };
+  it('changes the parent after confirming the new parent exists', async () => {
+    const unit = { id: unitId, name: 'Team 1', type: UnitType.TEAM };
     const parent = {
-      id: 5,
+      id: parentId,
       name: 'Head Office',
-      type: 'building',
+      type: UnitType.MANAGEMENT,
       parent: null,
     };
     units.findOneBy.mockResolvedValue(unit);
     units.findOne.mockResolvedValue(parent);
     units.save.mockImplementation(async (updatedUnit) => updatedUnit);
 
-    await expect(service.updateUnit(8, { parentId: 5 })).resolves.toEqual({
+    await expect(service.updateUnit(unitId, { parentId })).resolves.toEqual({
       ...unit,
       parent,
     });
     expect(units.findOne).toHaveBeenCalledExactlyOnceWith({
-      where: { id: 5 },
+      where: { id: parentId },
       relations: { parent: true },
     });
   });
 
   it('clears the parent when parentId is null', async () => {
-    const unit = { id: 8, name: 'Floor 1', type: 'floor', parent: { id: 5 } };
+    const unit = {
+      id: unitId,
+      name: 'Team 1',
+      type: UnitType.TEAM,
+      parent: { id: parentId },
+    };
     units.findOneBy.mockResolvedValue(unit);
     units.save.mockImplementation(async (updatedUnit) => updatedUnit);
 
-    await expect(service.updateUnit(8, { parentId: null })).resolves.toEqual({
-      ...unit,
-      parent: null,
-    });
+    await expect(
+      service.updateUnit(unitId, { parentId: null }),
+    ).resolves.toEqual({ ...unit, parent: null });
     expect(units.findOne).not.toHaveBeenCalled();
   });
 
-  it('moves a unit to a new parent and saves it', async () => {
-    const unit = { id: 8, name: 'Floor 1', type: 'floor', parent: null };
+  it('moves a unit under an existing parent', async () => {
+    const unit = {
+      id: unitId,
+      name: 'Team 1',
+      type: UnitType.TEAM,
+      parent: null,
+    };
     const parent = {
-      id: 5,
+      id: parentId,
       name: 'Head Office',
-      type: 'building',
+      type: UnitType.MANAGEMENT,
       parent: null,
     };
     units.findOneBy.mockResolvedValue(unit);
     units.findOne.mockResolvedValue(parent);
     units.save.mockImplementation(async (movedUnit) => movedUnit);
 
-    await expect(service.moveUnit(8, 5)).resolves.toEqual({ ...unit, parent });
-    expect(units.findOneBy).toHaveBeenCalledExactlyOnceWith({ id: 8 });
+    await expect(service.moveUnit(unitId, parentId)).resolves.toEqual({
+      ...unit,
+      parent,
+    });
+    expect(units.findOneBy).toHaveBeenCalledExactlyOnceWith({ id: unitId });
     expect(units.save).toHaveBeenCalledExactlyOnceWith({ ...unit, parent });
   });
 
   it('moves a unit to the root when parentId is null', async () => {
-    const unit = { id: 8, name: 'Floor 1', type: 'floor', parent: { id: 5 } };
+    const unit = {
+      id: unitId,
+      name: 'Team 1',
+      type: UnitType.TEAM,
+      parent: { id: parentId },
+    };
     units.findOneBy.mockResolvedValue(unit);
     units.save.mockImplementation(async (movedUnit) => movedUnit);
 
-    await expect(service.moveUnit(8, null)).resolves.toEqual({
+    await expect(service.moveUnit(unitId, null)).resolves.toEqual({
       ...unit,
       parent: null,
     });
     expect(units.findOne).not.toHaveBeenCalled();
   });
 
-  it('deletes the whole unit subtree with a recursive CTE when the unit exists', async () => {
-    units.findOne.mockResolvedValue({ id: 8, parent: { id: 1 } });
+  it('deletes a unit subtree when the unit exists and is not root', async () => {
+    units.findOne.mockResolvedValue({ id: unitId, parent: { id: parentId } });
     dataSource.query
       .mockResolvedValueOnce([{ count: 1 }])
       .mockResolvedValueOnce(undefined);
 
-    await expect(service.deleteUnit(8)).resolves.toBeUndefined();
+    await expect(service.deleteUnit(unitId)).resolves.toBeUndefined();
     expect(units.findOne).toHaveBeenCalledExactlyOnceWith({
-      where: { id: 8 },
+      where: { id: unitId },
       relations: { parent: true },
     });
-    expect(dataSource.query).toHaveBeenCalledTimes(2);
     expect(dataSource.query).toHaveBeenNthCalledWith(
       1,
-      'SELECT COUNT(*)::int AS count FROM units WHERE id = $1',
-      [8],
+      COUNT_UNIT_BY_ID_QUERY,
+      [unitId],
     );
-    expect(dataSource.query.mock.calls[1][0]).toContain(
-      'WITH RECURSIVE unit_tree',
+    expect(dataSource.query).toHaveBeenNthCalledWith(
+      2,
+      DELETE_UNIT_SUBTREE_QUERY,
+      [unitId],
     );
-    expect(dataSource.query.mock.calls[1][1]).toEqual([8]);
   });
 
   it('throws not found when the unit to delete does not exist', async () => {
     units.findOne.mockResolvedValue(null);
 
-    await expect(service.deleteUnit(404)).rejects.toBeInstanceOf(
+    await expect(service.deleteUnit(missingUnitId)).rejects.toBeInstanceOf(
       NotFoundException,
     );
     expect(dataSource.query).not.toHaveBeenCalled();
   });
 
-  it('throws not found when the unit to delete is the root', async () => {
-    units.findOne.mockResolvedValue({ id: 1, parent: null });
+  it('does not delete a root unit', async () => {
+    units.findOne.mockResolvedValue({ id: unitId, parent: null });
 
-    await expect(service.deleteUnit(1)).rejects.toBeInstanceOf(
+    await expect(service.deleteUnit(unitId)).rejects.toBeInstanceOf(
       NotFoundException,
     );
     expect(dataSource.query).not.toHaveBeenCalled();
@@ -215,9 +274,9 @@ describe('UnitsService', () => {
   it('throws not found when the unit to move does not exist', async () => {
     units.findOneBy.mockResolvedValue(null);
 
-    await expect(service.moveUnit(404, 5)).rejects.toBeInstanceOf(
-      NotFoundException,
-    );
+    await expect(
+      service.moveUnit(missingUnitId, parentId),
+    ).rejects.toBeInstanceOf(NotFoundException);
     expect(units.save).not.toHaveBeenCalled();
   });
 
@@ -225,75 +284,74 @@ describe('UnitsService', () => {
     units.findOneBy.mockResolvedValue(null);
 
     await expect(
-      service.updateUnit(404, { name: 'Unknown' }),
+      service.updateUnit(missingUnitId, { name: 'Unknown' }),
     ).rejects.toBeInstanceOf(NotFoundException);
     expect(units.save).not.toHaveBeenCalled();
   });
 
   it('throws not found when the new parent does not exist', async () => {
     units.findOneBy.mockResolvedValue({
-      id: 8,
-      name: 'Floor 1',
-      type: 'floor',
+      id: unitId,
+      name: 'Team 1',
+      type: UnitType.TEAM,
     });
     units.findOne.mockResolvedValue(null);
 
     await expect(
-      service.updateUnit(8, { parentId: 404 }),
+      service.updateUnit(unitId, { parentId }),
     ).rejects.toBeInstanceOf(NotFoundException);
     expect(units.save).not.toHaveBeenCalled();
   });
 
-  it('rejects a parent change that would create a hierarchy cycle', async () => {
-    units.findOneBy.mockResolvedValue({
-      id: 8,
-      name: 'Floor 1',
-      type: 'floor',
-    });
+  it('rejects moving a unit under one of its descendants', async () => {
+    const unit = { id: unitId, name: 'Team 1', type: UnitType.TEAM };
+    units.findOneBy.mockResolvedValue(unit);
     units.findOne
       .mockResolvedValueOnce({
-        id: 9,
-        name: 'Child',
-        type: 'floor',
-        parent: { id: 8 },
+        id: parentId,
+        name: 'Department',
+        type: UnitType.DEPARTMENT,
+        parent: { id: unitId },
       })
-      .mockResolvedValueOnce({ id: 8, name: 'Floor 1', type: 'floor' });
+      .mockResolvedValueOnce({
+        id: unitId,
+        name: 'Team 1',
+        type: UnitType.TEAM,
+        parent: null,
+      });
 
-    await expect(service.updateUnit(8, { parentId: 9 })).rejects.toBeInstanceOf(
-      BadRequestException,
-    );
+    await expect(
+      service.updateUnit(unitId, { parentId }),
+    ).rejects.toBeInstanceOf(BadRequestException);
     expect(units.save).not.toHaveBeenCalled();
   });
 
-  it('rejects a proposed parent with an already-cyclic ancestor chain', async () => {
-    units.findOneBy.mockResolvedValue({
-      id: 8,
-      name: 'Floor 1',
-      type: 'floor',
-    });
+  it('rejects a proposed parent whose ancestor chain already has a cycle', async () => {
+    const unit = { id: unitId, name: 'Team 1', type: UnitType.TEAM };
+    units.findOneBy.mockResolvedValue(unit);
     units.findOne
       .mockResolvedValueOnce({
-        id: 9,
-        name: 'Child',
-        type: 'floor',
-        parent: { id: 10 },
+        id: parentId,
+        name: 'Department',
+        type: UnitType.DEPARTMENT,
+        parent: { id: childId },
       })
       .mockResolvedValueOnce({
-        id: 10,
-        name: 'Other',
-        type: 'floor',
-        parent: { id: 9 },
+        id: childId,
+        name: 'Team 2',
+        type: UnitType.TEAM,
+        parent: { id: parentId },
       })
       .mockResolvedValueOnce({
-        id: 9,
-        name: 'Child',
-        type: 'floor',
-        parent: { id: 10 },
+        id: parentId,
+        name: 'Department',
+        type: UnitType.DEPARTMENT,
+        parent: { id: childId },
       });
 
-    await expect(service.updateUnit(8, { parentId: 9 })).rejects.toBeInstanceOf(
-      BadRequestException,
-    );
+    await expect(
+      service.updateUnit(unitId, { parentId }),
+    ).rejects.toBeInstanceOf(BadRequestException);
     expect(units.save).not.toHaveBeenCalled();
   });
 });

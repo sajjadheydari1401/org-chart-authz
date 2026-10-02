@@ -7,6 +7,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { UnitType } from '../../../../types/unit.js';
 
 @Entity({ name: 'units' })
 @Index('IDX_units_parent_id', ['parent'])
@@ -24,6 +25,10 @@ export class Unit {
   @Column({ type: 'varchar', length: 255 })
   name!: string;
 
-  @Column({ type: 'varchar', length: 50 })
-  type!: string;
+  @Column({
+    type: 'enum',
+    enum: UnitType,
+    enumName: 'units_type_enum',
+  })
+  type!: UnitType;
 }

@@ -1,4 +1,4 @@
-export type OrgUnitType = 'root' | 'department' | 'team';
+export type OrgUnitType = 'MANAGEMENT' | 'DEPARTMENT' | 'TEAM';
 
 export interface IOrgUnit {
   id: number;

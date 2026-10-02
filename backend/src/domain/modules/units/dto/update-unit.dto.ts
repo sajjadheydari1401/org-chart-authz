@@ -1,5 +1,6 @@
-import { IsString, IsUUID, Length, ValidateIf } from 'class-validator';
+import { IsEnum, IsString, IsUUID, Length, ValidateIf } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { UnitType } from '../../../../types/unit.js';
 
 export class UpdateUnitDto {
   // Skip validation when this PATCH field is omitted.
@@ -17,14 +18,12 @@ export class UpdateUnitDto {
   // Skip validation when this PATCH field is omitted.
   @ApiPropertyOptional({
     description: 'New unit type.',
-    example: 'department',
-    minLength: 1,
-    maxLength: 50,
+    enum: UnitType,
+    example: UnitType.DEPARTMENT,
   })
   @ValidateIf((_object, value) => value !== undefined)
-  @IsString()
-  @Length(1, 50)
-  type?: string;
+  @IsEnum(UnitType)
+  type?: UnitType;
 
   // Omitted leaves the parent unchanged; null explicitly clears it.
   @ApiPropertyOptional({

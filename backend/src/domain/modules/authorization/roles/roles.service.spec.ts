@@ -1,6 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AuthorizationProviderService } from '../authorization-provider.service.js';
+import { UnitType } from '../../../../types/unit.js';
 import { RoleScopeMode } from './entities/role.entity.js';
 import { RolesService } from './roles.service.js';
 
@@ -16,7 +17,7 @@ describe('RolesService', () => {
     unitId,
     scopeMode: RoleScopeMode.SELF,
   };
-  const unit = { id: unitId, name: 'Finance', type: 'department' };
+  const unit = { id: unitId, name: 'Finance', type: UnitType.DEPARTMENT };
   let roles: {
     find: ReturnType<typeof vi.fn>;
     findOneBy: ReturnType<typeof vi.fn>;
@@ -169,7 +170,7 @@ describe('RolesService', () => {
     const updatedUnit = {
       id: updatedUnitId,
       name: 'Operations',
-      type: 'department',
+      type: UnitType.DEPARTMENT,
     };
     roles.findOneBy.mockResolvedValue(role);
     units.findOneBy.mockResolvedValue(updatedUnit);

@@ -2,12 +2,14 @@
 
 import { useState, type ReactNode } from 'react';
 import { ArrowLeft, Check, Sparkles } from 'lucide-react';
+import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
 import { AppButton } from '@/components/common/ui/app-button';
 import { AppBadge } from '@/components/common/ui/app-badge';
 import { AppCheckbox } from '@/components/common/ui/app-checkbox';
 import { AppCombobox } from '@/components/common/ui/app-combobox/app-combobox';
+import { AppControlledFormField } from '@/components/common/ui/app-controlled-form-field';
 import { AppConfirmDialog } from '@/components/common/ui/app-confirm-dialog';
 import { AppDialog } from '@/components/common/ui/app-dialog';
 import { AppFormError } from '@/components/common/ui/app-form-error';
@@ -130,11 +132,9 @@ export function ComponentShowcase() {
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [inputValue, setInputValue] = useState('Simorgh workspace');
   const [selectValue, setSelectValue] = useState('engineering');
-  const [comboboxValue, setComboboxValue] = useState('engineering');
   const [paginationPage, setPaginationPage] = useState(4);
   const [paginationPageSize, setPaginationPageSize] = useState(10);
   const [radioValue, setRadioValue] = useState('design');
-  const [multiValue, setMultiValue] = useState(['engineering', 'design']);
   const [tabValue, setTabValue] = useState<'overview' | 'members' | 'locked'>(
     'overview',
   );
@@ -142,6 +142,12 @@ export function ComponentShowcase() {
   const [showEmptyTable, setShowEmptyTable] = useState(false);
   const [checkboxChecked, setCheckboxChecked] = useState(true);
   const [switchChecked, setSwitchChecked] = useState(true);
+  const { control: comboboxControl } = useForm<{ value: string }>({
+    defaultValues: { value: 'engineering' },
+  });
+  const { control: multiSelectControl } = useForm<{ value: string[] }>({
+    defaultValues: { value: ['engineering', 'design'] },
+  });
 
   const memberColumns: AppTableColumn<PreviewMember>[] = [
     { key: 'name', header: 'نام' },
@@ -437,6 +443,7 @@ export function ComponentShowcase() {
             'AppCheckbox',
             'AppSwitch',
             'AppSelect',
+            'AppControlledFormField',
             'AppCombobox',
             'AppRadioGroup',
             'AppMultiSelect',
@@ -521,19 +528,24 @@ export function ComponentShowcase() {
               />
             </Sample>
             <Sample title="AppCombobox · جست‌وجو و انتخاب کنترل‌شده">
-              <AppFormField
+              <AppControlledFormField
+                name="value"
+                control={comboboxControl}
                 label="واحد سازمانی"
                 htmlFor="preview-combobox"
                 hint="نام واحد را جست‌وجو کنید؛ با کلیدهای جهت‌نما و Enter هم قابل انتخاب است."
-              >
-                <AppCombobox
-                  id="preview-combobox"
-                  options={options}
-                  value={comboboxValue}
-                  onChange={setComboboxValue}
-                  placeholder="جست‌وجو یا انتخاب واحد"
-                />
-              </AppFormField>
+                render={({ field, fieldState }) => (
+                  <AppCombobox
+                    id="preview-combobox"
+                    options={options}
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    placeholder="جست‌وجو یا انتخاب واحد"
+                    invalid={fieldState.invalid}
+                  />
+                )}
+              />
               <AppFormField
                 label="انتخاب نامعتبر"
                 htmlFor="preview-invalid-combobox"
@@ -579,19 +591,29 @@ export function ComponentShowcase() {
               />
             </Sample>
             <Sample title="AppMultiSelect · مقدار کنترل‌شده">
-              <AppFormField
+              <AppControlledFormField
+                control={multiSelectControl}
+                name="value"
                 label="واحدهای همکار"
                 htmlFor="preview-multi-select"
                 hint="جست‌وجو کنید و چند گزینه را انتخاب کنید."
-              >
-                <AppMultiSelect
-                  id="preview-multi-select"
-                  options={options}
-                  value={multiValue}
-                  onChange={setMultiValue}
-                  placeholder="انتخاب واحدها"
-                />
-              </AppFormField>
+                render={({ field, fieldState }) => {
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Keep preview-only field inference cast local.
+                  const value = field.value as any;
+
+                  return (
+                    <AppMultiSelect
+                      id="preview-multi-select"
+                      options={options}
+                      value={value}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      placeholder="انتخاب واحدها"
+                      invalid={fieldState.invalid}
+                    />
+                  );
+                }}
+              />
             </Sample>
             <Sample title="AppMultiSelect · خطا و غیرفعال">
               <AppFormField

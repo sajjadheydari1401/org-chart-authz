@@ -48,14 +48,24 @@ describe('UsersController', () => {
     const user = { id: userId, username: 'renamed' };
     usersService.updateUser.mockResolvedValue(user);
 
-    await expect(controller.updateUser(userId, input)).resolves.toBe(user);
-    expect(usersService.updateUser).toHaveBeenCalledWith(userId, input);
+    await expect(
+      controller.updateUser(userId, input, {
+        user: { username: 'owner' },
+      } as never),
+    ).resolves.toBe(user);
+    expect(usersService.updateUser).toHaveBeenCalledWith(
+      userId,
+      input,
+      'owner',
+    );
   });
 
   it('delegates local user deletion with the parsed ID', async () => {
     usersService.deleteUser.mockResolvedValue(undefined);
 
-    await expect(controller.deleteUser(userId)).resolves.toBeUndefined();
-    expect(usersService.deleteUser).toHaveBeenCalledWith(userId);
+    await expect(
+      controller.deleteUser(userId, { user: { username: 'owner' } } as never),
+    ).resolves.toBeUndefined();
+    expect(usersService.deleteUser).toHaveBeenCalledWith(userId, 'owner');
   });
 });

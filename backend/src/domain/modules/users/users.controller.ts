@@ -74,8 +74,9 @@ export class UsersController {
   updateUser(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() input: UpdateUserDto,
+    @Req() request: AuthenticatedRequest,
   ) {
-    return this.usersService.updateUser(id, input);
+    return this.usersService.updateUser(id, input, request.user.username);
   }
 
   @Delete(':id')
@@ -91,7 +92,10 @@ export class UsersController {
     description:
       'Deletes the user from the authentication provider and then from the local database.',
   })
-  deleteUser(@Param('id', ParseUUIDPipe) id: string) {
-    return this.usersService.deleteUser(id);
+  deleteUser(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    return this.usersService.deleteUser(id, request.user.username);
   }
 }

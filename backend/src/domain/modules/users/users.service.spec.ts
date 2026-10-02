@@ -60,6 +60,8 @@ describe('UsersService', () => {
       getEffectiveAccessesForUsername: vi.fn().mockResolvedValue([
         { route: '/users', methodName: 'GET', unitIds: [unitId] },
         { route: '/users/:id', methodName: 'GET', unitIds: [unitId] },
+        { route: '/users/:id', methodName: 'PATCH', unitIds: [unitId] },
+        { route: '/users/:id', methodName: 'DELETE', unitIds: [unitId] },
       ]),
     };
     service = new UsersService(
@@ -151,33 +153,59 @@ describe('UsersService', () => {
 
   it('updates a local username', async () => {
     const user = { id: userId, username: 'person' } as User;
-    repository.findOneBy
-      .mockResolvedValueOnce(user)
-      .mockResolvedValueOnce(null);
+    queryBuilder.getOne.mockResolvedValue(user);
+    repository.findOneBy.mockResolvedValueOnce(null);
     repository.save.mockImplementation(async (savedUser) => savedUser);
 
     await expect(
-      service.updateUser(userId, { username: 'renamed' } as UpdateUserDto),
+      service.updateUser(
+        userId,
+        { username: 'renamed' } as UpdateUserDto,
+        'reader',
+      ),
     ).resolves.toMatchObject({ id: userId, username: 'renamed' });
+    expect(queryBuilder.andWhere).toHaveBeenCalledWith('user.id = :userId', {
+      userId,
+    });
     expect(repository.save).toHaveBeenCalledWith({
       id: userId,
       username: 'renamed',
     });
   });
 
-  it('rejects a username already owned by another local user', async () => {
-    repository.findOneBy
-      .mockResolvedValueOnce({ id: userId, username: 'person' })
-      .mockResolvedValueOnce({ id: otherUserId, username: 'renamed' });
+  it("does not update a user outside the caller's unit scope", async () => {
+    queryBuilder.getOne.mockResolvedValue(null);
+    repository.findOneBy.mockResolvedValue({ id: userId, username: 'person' });
 
     await expect(
-      service.updateUser(userId, { username: 'renamed' } as UpdateUserDto),
+      service.updateUser(
+        userId,
+        { username: 'renamed' } as UpdateUserDto,
+        'reader',
+      ),
+    ).rejects.toBeInstanceOf(ForbiddenException);
+    expect(repository.save).not.toHaveBeenCalled();
+  });
+
+  it('rejects a username already owned by another local user', async () => {
+    repository.findOneBy.mockResolvedValueOnce({
+      id: otherUserId,
+      username: 'renamed',
+    });
+    queryBuilder.getOne.mockResolvedValue({ id: userId, username: 'person' });
+
+    await expect(
+      service.updateUser(
+        userId,
+        { username: 'renamed' } as UpdateUserDto,
+        'reader',
+      ),
     ).rejects.toMatchObject({ status: 409 });
     expect(repository.save).not.toHaveBeenCalled();
   });
 
   it('deletes the provider account before deleting the local user', async () => {
-    repository.findOneBy.mockResolvedValue({
+    queryBuilder.getOne.mockResolvedValue({
       id: userId,
       username: 'person',
     });
@@ -190,15 +218,29 @@ describe('UsersService', () => {
       return { affected: 1 };
     });
 
-    await expect(service.deleteUser(userId)).resolves.toBeUndefined();
+    await expect(service.deleteUser(userId, 'reader')).resolves.toBeUndefined();
 
     expect(calls).toEqual(['provider', 'local']);
     expect(authProvider.deleteUser).toHaveBeenCalledWith('person');
+    expect(queryBuilder.andWhere).toHaveBeenCalledWith('user.id = :userId', {
+      userId,
+    });
     expect(repository.delete).toHaveBeenCalledWith(userId);
   });
 
+  it("does not delete a user outside the caller's unit scope", async () => {
+    queryBuilder.getOne.mockResolvedValue(null);
+    repository.findOneBy.mockResolvedValue({ id: userId, username: 'person' });
+
+    await expect(service.deleteUser(userId, 'reader')).rejects.toBeInstanceOf(
+      ForbiddenException,
+    );
+    expect(authProvider.deleteUser).not.toHaveBeenCalled();
+    expect(repository.delete).not.toHaveBeenCalled();
+  });
+
   it('keeps the local user if provider deletion fails', async () => {
-    repository.findOneBy.mockResolvedValue({
+    queryBuilder.getOne.mockResolvedValue({
       id: userId,
       username: 'person',
     });
@@ -206,7 +248,7 @@ describe('UsersService', () => {
       new Error('provider delete failed'),
     );
 
-    await expect(service.deleteUser(userId)).rejects.toThrow(
+    await expect(service.deleteUser(userId, 'reader')).rejects.toThrow(
       'provider delete failed',
     );
     expect(repository.delete).not.toHaveBeenCalled();
@@ -215,9 +257,9 @@ describe('UsersService', () => {
   it('does not call provider deletion when the local user is missing', async () => {
     repository.findOneBy.mockResolvedValue(null);
 
-    await expect(service.deleteUser(missingUserId)).rejects.toBeInstanceOf(
-      NotFoundException,
-    );
+    await expect(
+      service.deleteUser(missingUserId, 'reader'),
+    ).rejects.toBeInstanceOf(NotFoundException);
     expect(authProvider.deleteUser).not.toHaveBeenCalled();
     expect(repository.delete).not.toHaveBeenCalled();
   });

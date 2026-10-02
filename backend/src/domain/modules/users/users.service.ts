@@ -13,6 +13,7 @@ import { RoleAssignment } from '../authorization/role-assignments/entities/role-
 import { EffectiveAccessService } from '../authorization/effective-access.service.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 import { User } from './entities/user.entity.js';
+import { GET_USERS_IN_UNITS_QUERY } from './queries/get-users-in-units.query.js';
 
 @Injectable()
 export class UsersService {
@@ -45,40 +46,21 @@ export class UsersService {
       unitId,
     );
 
-    return this.createUsersInUnitsQuery(allowedUnitIds)
+    return this.buildUsersInUnitsQuery(allowedUnitIds)
       .orderBy('user.username', 'ASC')
       .addOrderBy('user.id', 'ASC')
       .getMany();
   }
 
   async getSingleUser(id: string, username: string): Promise<User> {
-    const allowedUnitIds = await this.getScopedUnitIds(
-      username,
-      '/users/:id',
-      'GET',
-    );
-    const user = await this.createUsersInUnitsQuery(allowedUnitIds)
-      .andWhere('user.id = :userId', { userId: id })
-      .getOne();
-    if (user) return user;
-
-    const existingUser = await this.users.findOneBy({ id });
-    if (!existingUser) throw new NotFoundException();
-    throw new ForbiddenException();
+    return this.findSingleUserInScope(id, username, 'GET');
   }
 
-  private createUsersInUnitsQuery(unitIds: string[]) {
-    return this.users.createQueryBuilder('user').where(
-      `EXISTS (
-        SELECT 1
-        FROM "role_assignments" "assignment"
-        INNER JOIN "roles" "assigned_role"
-          ON "assigned_role"."id" = "assignment"."role_id"
-        WHERE "assignment"."user_id" = "user"."id"
-          AND "assigned_role"."unit_id" IN (:...allowedUnitIds)
-      )`,
-      { allowedUnitIds: unitIds },
-    );
+  // Only return users whose assigned roles belong to an allowed unit.
+  private buildUsersInUnitsQuery(unitIds: string[]) {
+    return this.users
+      .createQueryBuilder('user')
+      .where(GET_USERS_IN_UNITS_QUERY, { allowedUnitIds: unitIds });
   }
 
   private async getScopedUnitIds(
@@ -103,14 +85,34 @@ export class UsersService {
     return requestedUnitId ? [requestedUnitId] : unitIds;
   }
 
-  private async findSingleUser(id: string): Promise<User> {
-    const user = await this.users.findOneBy({ id });
-    if (!user) throw new NotFoundException();
-    return user;
+  // Find the user only if they belong to a unit this caller can access.
+  private async findSingleUserInScope(
+    id: string,
+    username: string,
+    methodName: 'GET' | 'PATCH' | 'DELETE',
+  ): Promise<User> {
+    const allowedUnitIds = await this.getScopedUnitIds(
+      username,
+      '/users/:id',
+      methodName,
+    );
+    const user = await this.buildUsersInUnitsQuery(allowedUnitIds)
+      .andWhere('user.id = :userId', { userId: id })
+      .getOne();
+    if (user) return user;
+
+    // Return 404 if the user is missing, or 403 if the caller cannot access them.
+    const existingUser = await this.users.findOneBy({ id });
+    if (!existingUser) throw new NotFoundException();
+    throw new ForbiddenException();
   }
 
-  async updateUser(id: string, input: UpdateUserDto): Promise<User> {
-    const user = await this.findSingleUser(id);
+  async updateUser(
+    id: string,
+    input: UpdateUserDto,
+    username: string,
+  ): Promise<User> {
+    const user = await this.findSingleUserInScope(id, username, 'PATCH');
     const existingUser = await this.users.findOneBy({
       username: input.username,
     });
@@ -123,8 +125,8 @@ export class UsersService {
     return this.users.save(updatedUser);
   }
 
-  async deleteUser(id: string): Promise<void> {
-    const user = await this.findSingleUser(id);
+  async deleteUser(id: string, username: string): Promise<void> {
+    const user = await this.findSingleUserInScope(id, username, 'DELETE');
     await this.authProvider.deleteUser(user.username);
 
     const result = await this.users.delete(id);

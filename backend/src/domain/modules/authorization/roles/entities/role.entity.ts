@@ -5,6 +5,7 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  RelationId,
 } from 'typeorm';
 import { Unit } from '../../../units/entities/unit.entity.js';
 
@@ -25,6 +26,10 @@ export class Role {
   @ManyToOne(() => Unit, { nullable: false })
   @JoinColumn({ name: 'unit_id' })
   unit!: Unit;
+
+  // Exposes the existing unit_id; this adds no database column or migration.
+  @RelationId((role: Role) => role.unit)
+  unit_id!: string;
 
   @Column({ type: 'varchar', length: 100 })
   name!: string;

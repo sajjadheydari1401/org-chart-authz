@@ -4,7 +4,7 @@ import type { AppApiResponse } from '@/lib/api/server';
 import type {
   AuthTokenResponse,
   LoginWithUsernamePasswordRequest,
-} from '@/types/auth';
+} from '@/types/auth/auth';
 
 export function loginWithUsernamePassword(
   input: LoginWithUsernamePasswordRequest,

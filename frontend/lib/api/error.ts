@@ -1,4 +1,4 @@
-﻿import type { AuthActionError } from '@/types/auth';
+﻿import type { AuthActionError } from '@/types/auth/auth';
 import { redirect } from 'next/navigation';
 import { TRANSPORT_ERROR_MESSAGE } from './transport-error';
 

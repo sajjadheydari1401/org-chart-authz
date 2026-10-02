@@ -3,7 +3,7 @@ import { AppApi } from '@/lib/api/server';
 import { toActionError } from '@/lib/api/error';
 import { getPendingUsername } from '@/lib/auth/session';
 import type { VerifySmsFormData } from '@/lib/schemas/auth';
-import type { AuthActionResult } from '@/types/auth';
+import type { AuthActionResult } from '@/types/auth/auth';
 
 export async function confirmRegistrationBySms(
   input: VerifySmsFormData,

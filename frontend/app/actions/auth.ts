@@ -25,7 +25,7 @@ import type {
   AuthActionResult,
   AuthTokenResponse,
   LoginWithUsernamePasswordRequest,
-} from '@/types/auth';
+} from '@/types/auth/auth';
 
 /*
 |--------------------------------------------------------------------------

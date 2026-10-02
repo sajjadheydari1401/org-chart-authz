@@ -5,7 +5,7 @@ import type { SignupFormData } from '@/lib/schemas/auth';
 import type {
   AuthActionResult,
   RegisterWithUsernamePasswordRequest,
-} from '@/types/auth';
+} from '@/types/auth/auth';
 
 export async function registerWithUsernamePassword(
   input: SignupFormData,

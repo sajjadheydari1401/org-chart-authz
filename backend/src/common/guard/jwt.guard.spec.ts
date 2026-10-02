@@ -12,6 +12,7 @@ import { AccessGuard } from './authorization.guard.js';
 import { JwtAuthGuard } from './jwt.guard.js';
 import { JwtStrategy } from '../jwt_strategy/jwt.sterategy.js';
 import { EffectiveAccessService } from '../../domain/modules/authorization/effective-access.service.js';
+import { CurrentUserController } from '../../domain/modules/authorization/current-user.controller.js';
 import type { EffectiveAccess } from '../../types/effective-access.js';
 
 const jwtSecret = 'test-jwt-secret-that-is-long-enough';
@@ -61,7 +62,7 @@ describe('JwtAuthGuard', () => {
         PassportModule.register({ defaultStrategy: 'jwt' }),
         JwtModule.register({ secret: jwtSecret }),
       ],
-      controllers: [GuardTestController],
+      controllers: [GuardTestController, CurrentUserController],
       providers: [
         {
           provide: ConfigService,
@@ -129,5 +130,23 @@ describe('JwtAuthGuard', () => {
       .get('/guard-test/missing-permission')
       .set('Authorization', `Bearer ${token}`)
       .expect(403);
+  });
+
+  it('requires a JWT to read the current user access list', async () => {
+    await request(app.getHttpServer()).get('/me/accesses').expect(401);
+  });
+
+  it('returns the current user access list with a valid JWT', async () => {
+    const token = await jwtService.signAsync({ sub: 'person' });
+
+    const response = await request(app.getHttpServer())
+      .get('/me/accesses')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+
+    expect(response.body.data).toEqual([requiredGrant]);
+    expect(
+      effectiveAccessService.getEffectiveAccessesForUsername,
+    ).toHaveBeenCalledWith('person');
   });
 });

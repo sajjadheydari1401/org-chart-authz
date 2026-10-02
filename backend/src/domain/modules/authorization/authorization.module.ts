@@ -5,6 +5,7 @@ import { RoleAssignmentsModule } from './role-assignments/role-assignments.modul
 import { ResourcesModule } from './resources/resources.module.js';
 import { RolesModule } from './roles/roles.module.js';
 import { EffectiveAccessModule } from './effective-access.module.js';
+import { CurrentUserController } from './current-user.controller.js';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { EffectiveAccessModule } from './effective-access.module.js';
     AccessesModule,
     EffectiveAccessModule,
   ],
+  controllers: [CurrentUserController],
   exports: [EffectiveAccessModule],
 })
 export class AuthorizationModule {}

@@ -8,6 +8,7 @@ import { Reflector } from '@nestjs/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { AccessRequirement } from '../../types/effective-access.js';
 import { AppController } from '../../app.controller.js';
+import { AUTHENTICATED_ONLY_KEY } from '../decorator/authenticated-only.decorator.js';
 import { IS_PUBLIC_KEY } from '../decorator/public.decorator.js';
 import { REQUIRED_ACCESS_METADATA } from '../decorator/require-access.decorator.js';
 import { AccessGuard } from './authorization.guard.js';
@@ -19,6 +20,7 @@ import { RoleAssignmentsController } from '../../domain/modules/authorization/ro
 import { RolesController } from '../../domain/modules/authorization/roles/roles.controller.js';
 import { UnitsController } from '../../domain/modules/units/units.controller.js';
 import { UsersController } from '../../domain/modules/users/users.controller.js';
+import { CurrentUserController } from '../../domain/modules/authorization/current-user.controller.js';
 
 const routeControllers = [
   AppController,
@@ -30,6 +32,7 @@ const routeControllers = [
   RolesController,
   UnitsController,
   UsersController,
+  CurrentUserController,
 ];
 
 function normalizeRoutePath(
@@ -47,6 +50,7 @@ describe('AccessGuard', () => {
   const handler = vi.fn();
   const controller = vi.fn();
   let requiredAccess: AccessRequirement | undefined;
+  let authenticatedOnly: boolean;
   let request: { user?: { username?: string } };
   let effectiveAccess: {
     getEffectiveAccessesForUsername: ReturnType<typeof vi.fn>;
@@ -55,13 +59,18 @@ describe('AccessGuard', () => {
 
   beforeEach(() => {
     requiredAccess = { route: '/users', methodName: 'GET' };
+    authenticatedOnly = false;
     request = { user: { username: 'person' } };
     effectiveAccess = {
       getEffectiveAccessesForUsername: vi.fn().mockResolvedValue([]),
     };
     const reflector = {
       getAllAndOverride: vi.fn((key: string) =>
-        key === REQUIRED_ACCESS_METADATA ? requiredAccess : undefined,
+        key === REQUIRED_ACCESS_METADATA
+          ? requiredAccess
+          : key === AUTHENTICATED_ONLY_KEY
+            ? authenticatedOnly
+            : undefined,
       ),
     } as unknown as Reflector;
     guard = new AccessGuard(
@@ -113,10 +122,31 @@ describe('AccessGuard', () => {
     );
   });
 
+  it('allows authenticated-only routes without a route grant', async () => {
+    authenticatedOnly = true;
+    requiredAccess = undefined;
+
+    await expect(guard.canActivate(createContext())).resolves.toBe(true);
+    expect(
+      effectiveAccess.getEffectiveAccessesForUsername,
+    ).not.toHaveBeenCalled();
+  });
+
+  it('still requires a username on authenticated-only routes', async () => {
+    authenticatedOnly = true;
+    request = {};
+
+    await expect(guard.canActivate(createContext())).rejects.toBeInstanceOf(
+      UnauthorizedException,
+    );
+  });
+
   it('declares the matching permission for every non-public HTTP handler', () => {
     for (const controller of routeControllers) {
       const classIsPublic =
         Reflect.getMetadata(IS_PUBLIC_KEY, controller) === true;
+      const classIsAuthenticatedOnly =
+        Reflect.getMetadata(AUTHENTICATED_ONLY_KEY, controller) === true;
       const controllerPath = Reflect.getMetadata(PATH_METADATA, controller) as
         string | string[] | undefined;
 
@@ -133,7 +163,10 @@ describe('AccessGuard', () => {
 
         const isPublic =
           classIsPublic || Reflect.getMetadata(IS_PUBLIC_KEY, handler) === true;
-        if (isPublic) continue;
+        const isAuthenticatedOnly =
+          classIsAuthenticatedOnly ||
+          Reflect.getMetadata(AUTHENTICATED_ONLY_KEY, handler) === true;
+        if (isPublic || isAuthenticatedOnly) continue;
 
         const requiredAccess = Reflect.getMetadata(
           REQUIRED_ACCESS_METADATA,

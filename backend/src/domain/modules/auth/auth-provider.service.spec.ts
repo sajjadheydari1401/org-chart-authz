@@ -80,7 +80,7 @@ describe('AuthProviderService', () => {
     });
   });
 
-  it('returns only username and token from provider login', async () => {
+  it('returns the provider username without exposing its token', async () => {
     providerPost.mockResolvedValueOnce({
       data: {
         success: true,
@@ -101,7 +101,7 @@ describe('AuthProviderService', () => {
         },
         'manager',
       ),
-    ).resolves.toEqual({ accessToken: 'access-token', username: 'person' });
+    ).resolves.toEqual({ username: 'person' });
     expect(providerPost).toHaveBeenCalledWith(LOGIN_UP_URL, {
       systemUsername: 'system-user',
       systemPassword: 'system-password',

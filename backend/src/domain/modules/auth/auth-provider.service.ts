@@ -47,7 +47,7 @@ export class AuthProviderService {
   async loginWithUsernamePassword(
     input: LoginWithUsernamePasswordDto,
     roleName: string,
-  ): Promise<{ accessToken: string; username: string }> {
+  ): Promise<{ username: string }> {
     const data = await postToProvider<LoginUpResult>(
       providerUrl(this.config, '/auth/login_UP'),
       {
@@ -58,18 +58,18 @@ export class AuthProviderService {
       },
     );
 
-    const accessToken = data.result?.token;
+    const providerToken = data.result?.token;
     const username = data.result?.username;
     if (
-      typeof accessToken !== 'string' ||
-      !accessToken.trim() ||
+      typeof providerToken !== 'string' ||
+      !providerToken.trim() ||
       typeof username !== 'string' ||
       !username.trim()
     ) {
       throw new BadGatewayException();
     }
 
-    return { accessToken, username };
+    return { username };
   }
 
   async deleteUser(username: string): Promise<void> {

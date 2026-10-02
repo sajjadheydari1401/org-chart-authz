@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { JwtService } from '@nestjs/jwt';
 import { AuthProviderService } from './auth-provider.service.js';
 import { AuthService } from './auth.service.js';
 import type { ConfirmRegistrationBySmsDto } from './dto/confirm-registration-by-sms.dto.js';
@@ -19,6 +20,7 @@ describe('AuthService', () => {
     getLoginRoleName: ReturnType<typeof vi.fn>;
   };
   let rolesService: { getRoleByName: ReturnType<typeof vi.fn> };
+  let jwtService: { signAsync: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
     authProvider = {
@@ -26,7 +28,9 @@ describe('AuthService', () => {
         .fn()
         .mockResolvedValue(undefined),
       confirmRegistrationBySms: vi.fn().mockResolvedValue(undefined),
-      loginWithUsernamePassword: vi.fn(),
+      loginWithUsernamePassword: vi.fn().mockResolvedValue({
+        username: 'person',
+      }),
       deleteUser: vi.fn().mockResolvedValue(undefined),
     };
     usersService = {
@@ -38,10 +42,12 @@ describe('AuthService', () => {
         .fn()
         .mockResolvedValue({ id: 'role-id', name: 'member' }),
     };
+    jwtService = { signAsync: vi.fn().mockResolvedValue('app-access-token') };
     service = new AuthService(
       authProvider as unknown as AuthProviderService,
       usersService as unknown as UsersService,
       rolesService as never,
+      jwtService as unknown as JwtService,
     );
   });
 
@@ -123,21 +129,20 @@ describe('AuthService', () => {
     expect(authProvider.confirmRegistrationBySms).toHaveBeenCalledWith(input);
   });
 
-  it('returns the provider login result', async () => {
+  it('returns an app token after provider login succeeds', async () => {
     const input = {
       username: 'person',
       password: 'secret',
     } as LoginWithUsernamePasswordDto;
-    const result = { accessToken: 'token', username: 'person' };
-    authProvider.loginWithUsernamePassword.mockResolvedValue(result);
-
-    await expect(service.loginWithUsernamePassword(input)).resolves.toEqual(
-      result,
-    );
+    await expect(service.loginWithUsernamePassword(input)).resolves.toEqual({
+      accessToken: 'app-access-token',
+      username: 'person',
+    });
     expect(usersService.getLoginRoleName).toHaveBeenCalledWith('person');
     expect(authProvider.loginWithUsernamePassword).toHaveBeenCalledWith(
       input,
       'member',
     );
+    expect(jwtService.signAsync).toHaveBeenCalledWith({ sub: 'person' });
   });
 });

@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
@@ -11,16 +11,16 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
 
-      /* jwt کلید امضای  */
+      // This is the app's signing key, not a provider JWT secret.
       secretOrKey: config.getOrThrow<string>('JWT_SECRET'),
-
-      /*زمان انقضای توکن*/
-      expiresIn: config.getOrThrow<string>('JWT_EXPIRES_IN'),
-    } as any);
+    });
   }
 
-  /*تابع تایید توکن و استخراج اطلاعات درون توکن(وجود الزامی) */
-  async validate(payload: any) {
+  async validate(payload: { sub?: unknown }) {
+    if (typeof payload.sub !== 'string' || !payload.sub.trim()) {
+      throw new UnauthorizedException();
+    }
+
     return {
       username: payload.sub,
     };

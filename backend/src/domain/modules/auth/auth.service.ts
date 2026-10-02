@@ -1,4 +1,5 @@
 ﻿import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { ConfirmRegistrationBySmsDto } from './dto/confirm-registration-by-sms.dto.js';
 import { LoginWithUsernamePasswordDto } from './dto/login-with-username-password.dto.js';
 import { RegisterWithUsernamePasswordDto } from './dto/register-with-username-password.dto.js';
@@ -12,6 +13,7 @@ export class AuthService {
     private readonly authProvider: AuthProviderService,
     private readonly usersService: UsersService,
     private readonly rolesService: RolesService,
+    private readonly jwtService: JwtService,
   ) {}
 
   async registerWithUsernamePassword(
@@ -51,6 +53,14 @@ export class AuthService {
     input: LoginWithUsernamePasswordDto,
   ): Promise<{ accessToken: string; username: string }> {
     const roleName = await this.usersService.getLoginRoleName(input.username);
-    return this.authProvider.loginWithUsernamePassword(input, roleName);
+    const providerLogin = await this.authProvider.loginWithUsernamePassword(
+      input,
+      roleName,
+    );
+    const accessToken = await this.jwtService.signAsync({
+      sub: providerLogin.username,
+    });
+
+    return { accessToken, username: providerLogin.username };
   }
 }

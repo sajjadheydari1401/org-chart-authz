@@ -6,7 +6,7 @@ import {
 import { METHOD_METADATA, PATH_METADATA } from '@nestjs/common/constants';
 import { Reflector } from '@nestjs/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { EffectiveAccess } from '../../types/effective-access.js';
+import type { AccessRequirement } from '../../types/effective-access.js';
 import { AppController } from '../../app.controller.js';
 import { IS_PUBLIC_KEY } from '../decorator/public.decorator.js';
 import { REQUIRED_ACCESS_METADATA } from '../decorator/require-access.decorator.js';
@@ -46,7 +46,7 @@ function normalizeRoutePath(
 describe('AccessGuard', () => {
   const handler = vi.fn();
   const controller = vi.fn();
-  let requiredAccess: EffectiveAccess | undefined;
+  let requiredAccess: AccessRequirement | undefined;
   let request: { user?: { username?: string } };
   let effectiveAccess: {
     getEffectiveAccessesForUsername: ReturnType<typeof vi.fn>;
@@ -80,7 +80,7 @@ describe('AccessGuard', () => {
 
   it('allows a matching effective route and HTTP method', async () => {
     effectiveAccess.getEffectiveAccessesForUsername.mockResolvedValue([
-      { route: '/users', methodName: 'GET' },
+      { route: '/users', methodName: 'GET', unitIds: ['unit-id'] },
     ]);
 
     await expect(guard.canActivate(createContext())).resolves.toBe(true);
@@ -91,7 +91,7 @@ describe('AccessGuard', () => {
 
   it('denies when the user lacks the exact route and method access', async () => {
     effectiveAccess.getEffectiveAccessesForUsername.mockResolvedValue([
-      { route: '/users', methodName: 'POST' },
+      { route: '/users', methodName: 'POST', unitIds: ['unit-id'] },
     ]);
 
     await expect(guard.canActivate(createContext())).resolves.toBe(false);
@@ -138,7 +138,7 @@ describe('AccessGuard', () => {
         const requiredAccess = Reflect.getMetadata(
           REQUIRED_ACCESS_METADATA,
           handler,
-        ) as EffectiveAccess | undefined;
+        ) as AccessRequirement | undefined;
         const handlerPath = Reflect.getMetadata(PATH_METADATA, handler) as
           string | string[] | undefined;
         const requestMethod = Reflect.getMetadata(

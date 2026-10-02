@@ -1,4 +1,4 @@
-import { NotFoundException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AuthProviderService } from '../auth/auth-provider.service.js';
 import { Role } from '../authorization/roles/entities/role.entity.js';
@@ -10,6 +10,8 @@ import { UsersService } from './users.service.js';
 describe('UsersService', () => {
   const userId = '550e8400-e29b-41d4-a716-446655440001';
   const otherUserId = '550e8400-e29b-41d4-a716-446655440002';
+  const unitId = '550e8400-e29b-41d4-a716-446655440003';
+  const otherUnitId = '550e8400-e29b-41d4-a716-446655440004';
   const missingUserId = '550e8400-e29b-41d4-a716-446655440404';
   let service: UsersService;
   let repository: {
@@ -18,9 +20,21 @@ describe('UsersService', () => {
     findOneBy: ReturnType<typeof vi.fn>;
     save: ReturnType<typeof vi.fn>;
     delete: ReturnType<typeof vi.fn>;
+    createQueryBuilder: ReturnType<typeof vi.fn>;
   };
   let authProvider: { deleteUser: ReturnType<typeof vi.fn> };
   let dataSource: { transaction: ReturnType<typeof vi.fn> };
+  let effectiveAccess: {
+    getEffectiveAccessesForUsername: ReturnType<typeof vi.fn>;
+  };
+  let queryBuilder: {
+    where: ReturnType<typeof vi.fn>;
+    andWhere: ReturnType<typeof vi.fn>;
+    orderBy: ReturnType<typeof vi.fn>;
+    addOrderBy: ReturnType<typeof vi.fn>;
+    getMany: ReturnType<typeof vi.fn>;
+    getOne: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(() => {
     repository = {
@@ -29,13 +43,30 @@ describe('UsersService', () => {
       findOneBy: vi.fn(),
       save: vi.fn(),
       delete: vi.fn().mockResolvedValue({ affected: 1 }),
+      createQueryBuilder: vi.fn(),
     };
     authProvider = { deleteUser: vi.fn().mockResolvedValue(undefined) };
     dataSource = { transaction: vi.fn() };
+    queryBuilder = {
+      where: vi.fn().mockReturnThis(),
+      andWhere: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockReturnThis(),
+      addOrderBy: vi.fn().mockReturnThis(),
+      getMany: vi.fn(),
+      getOne: vi.fn(),
+    };
+    repository.createQueryBuilder.mockReturnValue(queryBuilder);
+    effectiveAccess = {
+      getEffectiveAccessesForUsername: vi.fn().mockResolvedValue([
+        { route: '/users', methodName: 'GET', unitIds: [unitId] },
+        { route: '/users/:id', methodName: 'GET', unitIds: [unitId] },
+      ]),
+    };
     service = new UsersService(
       repository as never,
       authProvider as unknown as AuthProviderService,
       dataSource as never,
+      effectiveAccess as never,
     );
   });
 
@@ -68,28 +99,54 @@ describe('UsersService', () => {
     },
   );
 
-  it('returns users from the local repository', async () => {
+  it("returns users assigned to units within the caller's grant scope", async () => {
     const users = [{ id: userId, username: 'person' } as User];
-    repository.find.mockResolvedValue(users);
+    queryBuilder.getMany.mockResolvedValue(users);
 
-    await expect(service.getAllUsers()).resolves.toBe(users);
-    expect(repository.find).toHaveBeenCalledOnce();
+    await expect(service.getAllUsers('reader')).resolves.toBe(users);
+    expect(repository.createQueryBuilder).toHaveBeenCalledWith('user');
+    expect(queryBuilder.where).toHaveBeenCalledWith(
+      expect.stringContaining('"assigned_role"."unit_id" IN'),
+      { allowedUnitIds: [unitId] },
+    );
+    expect(queryBuilder.orderBy).toHaveBeenCalledWith('user.username', 'ASC');
   });
 
-  it('returns a local user by ID', async () => {
-    const user = { id: userId, username: 'person' } as User;
-    repository.findOneBy.mockResolvedValue(user);
+  it('allows a requested unit only when its read grant is in scope', async () => {
+    queryBuilder.getMany.mockResolvedValue([]);
 
-    await expect(service.getSingleUser(userId)).resolves.toBe(user);
-    expect(repository.findOneBy).toHaveBeenCalledWith({ id: userId });
+    await expect(
+      service.getAllUsers('reader', otherUnitId),
+    ).rejects.toBeInstanceOf(ForbiddenException);
+    expect(repository.createQueryBuilder).not.toHaveBeenCalled();
+  });
+
+  it('returns a user by ID when an assigned role places them in scope', async () => {
+    const user = { id: userId, username: 'person' } as User;
+    queryBuilder.getOne.mockResolvedValue(user);
+
+    await expect(service.getSingleUser(userId, 'reader')).resolves.toBe(user);
+    expect(queryBuilder.andWhere).toHaveBeenCalledWith('user.id = :userId', {
+      userId,
+    });
+  });
+
+  it("forbids a user outside the caller's unit scope", async () => {
+    queryBuilder.getOne.mockResolvedValue(null);
+    repository.findOneBy.mockResolvedValue({ id: userId, username: 'person' });
+
+    await expect(
+      service.getSingleUser(userId, 'reader'),
+    ).rejects.toBeInstanceOf(ForbiddenException);
   });
 
   it('throws not found when the local user ID does not exist', async () => {
+    queryBuilder.getOne.mockResolvedValue(null);
     repository.findOneBy.mockResolvedValue(null);
 
-    await expect(service.getSingleUser(missingUserId)).rejects.toBeInstanceOf(
-      NotFoundException,
-    );
+    await expect(
+      service.getSingleUser(missingUserId, 'reader'),
+    ).rejects.toBeInstanceOf(NotFoundException);
   });
 
   it('updates a local username', async () => {

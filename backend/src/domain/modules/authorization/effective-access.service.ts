@@ -52,23 +52,25 @@ export class EffectiveAccessService {
       }
     }
 
-    // Collect accesses attached to the direct and descendant-unit roles.
+    // Preserve the unit that supplied each grant so data queries can enforce scope.
     const roleAccesses = await this.roleAccesses.find({
       where: { roleId: In([...roleIds]) },
-      relations: { access: { resource: true } },
+      relations: { role: { unit: true }, access: { resource: true } },
     });
 
-    // Return each exact route/method pair once, even when multiple roles grant it.
+    // Return each route/method once while retaining every granting unit.
     const distinctAccesses = new Map<string, EffectiveAccess>();
-    for (const { access } of roleAccesses) {
-      const effectiveAccess = {
+    for (const { role, access } of roleAccesses) {
+      const key = `${access.resource.route}\0${access.methodName}`;
+      const effectiveAccess = distinctAccesses.get(key) ?? {
         route: access.resource.route,
         methodName: access.methodName,
+        unitIds: [],
       };
-      distinctAccesses.set(
-        `${effectiveAccess.route}\0${effectiveAccess.methodName}`,
-        effectiveAccess,
-      );
+      if (!effectiveAccess.unitIds.includes(role.unit.id)) {
+        effectiveAccess.unitIds.push(role.unit.id);
+      }
+      distinctAccesses.set(key, effectiveAccess);
     }
 
     return [...distinctAccesses.values()];

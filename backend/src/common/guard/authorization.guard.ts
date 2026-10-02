@@ -7,7 +7,7 @@
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
-import type { EffectiveAccess } from '../../types/effective-access.js';
+import type { AccessRequirement } from '../../types/effective-access.js';
 import { EffectiveAccessService } from '../../domain/modules/authorization/effective-access.service.js';
 import { IS_PUBLIC_KEY } from '../decorator/public.decorator.js';
 import { REQUIRED_ACCESS_METADATA } from '../decorator/require-access.decorator.js';
@@ -27,7 +27,7 @@ export class AccessGuard implements CanActivate {
     ]);
     if (isPublic) return true;
 
-    const requiredAccess = this.reflector.getAllAndOverride<EffectiveAccess>(
+    const requiredAccess = this.reflector.getAllAndOverride<AccessRequirement>(
       REQUIRED_ACCESS_METADATA,
       [context.getHandler(), context.getClass()],
     );

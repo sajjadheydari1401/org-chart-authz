@@ -3,6 +3,8 @@ import { UsersController } from './users.controller.js';
 import { UsersService } from './users.service.js';
 
 describe('UsersController', () => {
+  const userId = '550e8400-e29b-41d4-a716-446655440001';
+  const unitId = '550e8400-e29b-41d4-a716-446655440003';
   const usersService = {
     getAllUsers: vi.fn(),
     getSingleUser: vi.fn(),
@@ -18,34 +20,42 @@ describe('UsersController', () => {
   });
 
   it('delegates getAllUsers to the service', async () => {
-    const users = [{ id: 1, username: 'person' }];
+    const users = [{ id: userId, username: 'person' }];
     usersService.getAllUsers.mockResolvedValue(users);
 
-    await expect(controller.getAllUsers()).resolves.toBe(users);
-    expect(usersService.getAllUsers).toHaveBeenCalledOnce();
+    await expect(
+      controller.getAllUsers({ user: { username: 'reader' } } as never, {
+        unitId,
+      }),
+    ).resolves.toBe(users);
+    expect(usersService.getAllUsers).toHaveBeenCalledWith('reader', unitId);
   });
 
   it('delegates getSingleUser with the parsed local ID', async () => {
-    const user = { id: 7, username: 'person' };
+    const user = { id: userId, username: 'person' };
     usersService.getSingleUser.mockResolvedValue(user);
 
-    await expect(controller.getSingleUser(7)).resolves.toBe(user);
-    expect(usersService.getSingleUser).toHaveBeenCalledWith(7);
+    await expect(
+      controller.getSingleUser(userId, {
+        user: { username: 'reader' },
+      } as never),
+    ).resolves.toBe(user);
+    expect(usersService.getSingleUser).toHaveBeenCalledWith(userId, 'reader');
   });
 
   it('delegates username updates with the local ID and input', async () => {
     const input = { username: 'renamed' };
-    const user = { id: 7, username: 'renamed' };
+    const user = { id: userId, username: 'renamed' };
     usersService.updateUser.mockResolvedValue(user);
 
-    await expect(controller.updateUser(7, input)).resolves.toBe(user);
-    expect(usersService.updateUser).toHaveBeenCalledWith(7, input);
+    await expect(controller.updateUser(userId, input)).resolves.toBe(user);
+    expect(usersService.updateUser).toHaveBeenCalledWith(userId, input);
   });
 
   it('delegates local user deletion with the parsed ID', async () => {
     usersService.deleteUser.mockResolvedValue(undefined);
 
-    await expect(controller.deleteUser(7)).resolves.toBeUndefined();
-    expect(usersService.deleteUser).toHaveBeenCalledWith(7);
+    await expect(controller.deleteUser(userId)).resolves.toBeUndefined();
+    expect(usersService.deleteUser).toHaveBeenCalledWith(userId);
   });
 });

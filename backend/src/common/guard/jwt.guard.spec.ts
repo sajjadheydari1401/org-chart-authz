@@ -12,9 +12,14 @@ import { AccessGuard } from './authorization.guard.js';
 import { JwtAuthGuard } from './jwt.guard.js';
 import { JwtStrategy } from '../jwt_strategy/jwt.sterategy.js';
 import { EffectiveAccessService } from '../../domain/modules/authorization/effective-access.service.js';
+import type { EffectiveAccess } from '../../types/effective-access.js';
 
 const jwtSecret = 'test-jwt-secret-that-is-long-enough';
-const requiredGrant = { route: '/guard-test/protected', methodName: 'GET' };
+const requiredGrant: EffectiveAccess = {
+  route: '/guard-test/protected',
+  methodName: 'GET',
+  unitIds: ['unit-id'],
+};
 const effectiveAccessService = {
   getEffectiveAccessesForUsername: vi.fn(),
 };

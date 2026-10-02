@@ -6,13 +6,19 @@ import {
   Patch,
   Param,
   ParseUUIDPipe,
+  Query,
+  Req,
   UseInterceptors,
 } from '@nestjs/common';
 import { FormatResponseInterceptor } from '../../../common/utils/interceptor/format-response.interceptor.js';
-import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 import { UsersService } from './users.service.js';
 import { RequireAccess } from '../../../common/decorator/require-access.decorator.js';
+import { ListUsersQueryDto } from './dto/list-users-query.dto.js';
+import type { Request } from 'express';
+
+type AuthenticatedRequest = Request & { user: { username: string } };
 
 @UseInterceptors(FormatResponseInterceptor)
 @ApiTags('Users')
@@ -24,10 +30,14 @@ export class UsersController {
   @RequireAccess({ route: '/users', methodName: 'GET' })
   @ApiOperation({
     summary: 'List users',
-    description: 'Returns all users stored in the local database.',
+    description: "Returns users assigned to units within the caller's scope.",
   })
-  getAllUsers() {
-    return this.usersService.getAllUsers();
+  @ApiQuery({ name: 'unitId', required: false, format: 'uuid' })
+  getAllUsers(
+    @Req() request: AuthenticatedRequest,
+    @Query() query: ListUsersQueryDto,
+  ) {
+    return this.usersService.getAllUsers(request.user.username, query.unitId);
   }
 
   @Get(':id')
@@ -42,8 +52,11 @@ export class UsersController {
     summary: 'Get a user',
     description: 'Returns one local user by UUID.',
   })
-  getSingleUser(@Param('id', ParseUUIDPipe) id: string) {
-    return this.usersService.getSingleUser(id);
+  getSingleUser(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    return this.usersService.getSingleUser(id, request.user.username);
   }
 
   @Patch(':id')

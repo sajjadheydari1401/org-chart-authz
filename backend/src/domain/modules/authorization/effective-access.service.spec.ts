@@ -46,6 +46,7 @@ describe('EffectiveAccessService', () => {
     ]);
     roleAccesses.find.mockResolvedValue([
       {
+        role: { unit: { id: parentUnitId } },
         access: {
           methodName: 'read',
           resource: { route: '/users' },
@@ -55,10 +56,15 @@ describe('EffectiveAccessService', () => {
 
     await expect(
       service.getEffectiveAccessesForUsername('person'),
-    ).resolves.toEqual([{ route: '/users', methodName: 'read' }]);
+    ).resolves.toEqual([
+      { route: '/users', methodName: 'read', unitIds: [parentUnitId] },
+    ]);
     expect(dataSource.query).not.toHaveBeenCalled();
     expect(roleAccesses.find).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { roleId: expect.anything() } }),
+      expect.objectContaining({
+        where: { roleId: expect.anything() },
+        relations: { role: { unit: true }, access: { resource: true } },
+      }),
     );
   });
 
@@ -76,18 +82,21 @@ describe('EffectiveAccessService', () => {
     roles.find.mockResolvedValue([{ id: 'role-child' }]);
     roleAccesses.find.mockResolvedValue([
       {
+        role: { unit: { id: parentUnitId } },
         access: {
           methodName: 'read',
           resource: { route: '/users' },
         },
       },
       {
+        role: { unit: { id: childUnitId } },
         access: {
           methodName: 'read',
           resource: { route: '/users' },
         },
       },
       {
+        role: { unit: { id: childUnitId } },
         access: {
           methodName: 'write',
           resource: { route: '/users' },
@@ -98,8 +107,12 @@ describe('EffectiveAccessService', () => {
     await expect(
       service.getEffectiveAccessesForUsername('person'),
     ).resolves.toEqual([
-      { route: '/users', methodName: 'read' },
-      { route: '/users', methodName: 'write' },
+      {
+        route: '/users',
+        methodName: 'read',
+        unitIds: [parentUnitId, childUnitId],
+      },
+      { route: '/users', methodName: 'write', unitIds: [childUnitId] },
     ]);
     expect(dataSource.query).toHaveBeenCalledOnce();
     expect(roles.find).toHaveBeenCalledWith({

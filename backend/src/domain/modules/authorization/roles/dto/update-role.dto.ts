@@ -39,7 +39,7 @@ export class UpdateRoleDto {
 
   @ApiProperty({
     description:
-      'Whether the role applies to its unit only or its descendants.',
+      'SELF grants accesses linked directly to this role. DESCENDANTS also grants accesses linked to roles whose units are descendants of this role unit.',
     enum: RoleScopeMode,
     example: RoleScopeMode.DESCENDANTS,
   })

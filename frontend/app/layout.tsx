@@ -3,6 +3,7 @@ import localFont from 'next/font/local';
 import 'react-toastify/dist/ReactToastify.css';
 import './globals.css';
 import { AppToast } from '@/components/common/ui/app-toast';
+import { QueryProvider } from '@/components/providers/query-provider';
 
 export const metadata: Metadata = {
   title: 'چارت سازمانی سیمرغ',
@@ -23,7 +24,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
       className={`${peyda.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        {children}
+        <QueryProvider>{children}</QueryProvider>
         <AppToast />
       </body>
     </html>

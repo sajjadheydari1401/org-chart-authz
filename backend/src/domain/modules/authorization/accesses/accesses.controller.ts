@@ -14,6 +14,7 @@ import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AccessesService } from './accesses.service.js';
 import { CreateAccessDto } from './dto/create-access.dto.js';
 import { UpdateAccessDto } from './dto/update-access.dto.js';
+import { RequireAccess } from '../../../../common/decorator/require-access.decorator.js';
 
 @UseInterceptors(FormatResponseInterceptor)
 @ApiTags('Accesses')
@@ -22,6 +23,7 @@ export class AccessesController {
   constructor(private readonly accessesService: AccessesService) {}
 
   @Delete(':id')
+  @RequireAccess({ route: '/accesses/:id', methodName: 'DELETE' })
   @ApiParam({
     name: 'id',
     type: String,
@@ -37,6 +39,7 @@ export class AccessesController {
   }
 
   @Patch(':id')
+  @RequireAccess({ route: '/accesses/:id', methodName: 'PATCH' })
   @ApiParam({
     name: 'id',
     type: String,
@@ -56,6 +59,7 @@ export class AccessesController {
   }
 
   @Get()
+  @RequireAccess({ route: '/accesses', methodName: 'GET' })
   @ApiOperation({
     summary: 'List accesses',
     description: 'Returns accesses stored in the local database.',
@@ -65,6 +69,7 @@ export class AccessesController {
   }
 
   @Post()
+  @RequireAccess({ route: '/accesses', methodName: 'POST' })
   @ApiOperation({
     summary: 'Create an access',
     description:

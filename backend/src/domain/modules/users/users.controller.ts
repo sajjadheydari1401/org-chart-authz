@@ -12,6 +12,7 @@ import { FormatResponseInterceptor } from '../../../common/utils/interceptor/for
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 import { UsersService } from './users.service.js';
+import { RequireAccess } from '../../../common/decorator/require-access.decorator.js';
 
 @UseInterceptors(FormatResponseInterceptor)
 @ApiTags('Users')
@@ -20,6 +21,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
+  @RequireAccess({ route: '/users', methodName: 'GET' })
   @ApiOperation({
     summary: 'List users',
     description: 'Returns all users stored in the local database.',
@@ -29,6 +31,7 @@ export class UsersController {
   }
 
   @Get(':id')
+  @RequireAccess({ route: '/users/:id', methodName: 'GET' })
   @ApiParam({
     name: 'id',
     type: String,
@@ -44,6 +47,7 @@ export class UsersController {
   }
 
   @Patch(':id')
+  @RequireAccess({ route: '/users/:id', methodName: 'PATCH' })
   @ApiParam({
     name: 'id',
     type: String,
@@ -62,6 +66,7 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @RequireAccess({ route: '/users/:id', methodName: 'DELETE' })
   @ApiParam({
     name: 'id',
     type: String,

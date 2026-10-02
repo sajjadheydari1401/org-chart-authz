@@ -14,6 +14,7 @@ import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CreateUnitDto } from './dto/create-unit.dto.js';
 import { UpdateUnitDto } from './dto/update-unit.dto.js';
 import { UnitsService } from './units.service.js';
+import { RequireAccess } from '../../../common/decorator/require-access.decorator.js';
 
 @UseInterceptors(FormatResponseInterceptor)
 @ApiTags('Organizational Units')
@@ -22,6 +23,7 @@ export class UnitsController {
   constructor(private readonly unitsService: UnitsService) {}
 
   @Get()
+  @RequireAccess({ route: '/units', methodName: 'GET' })
   @ApiOperation({
     summary: 'List organizational units',
     description: 'Returns all units from the local hierarchy.',
@@ -31,6 +33,7 @@ export class UnitsController {
   }
 
   @Get(':id')
+  @RequireAccess({ route: '/units/:id', methodName: 'GET' })
   @ApiParam({
     name: 'id',
     type: String,
@@ -46,6 +49,7 @@ export class UnitsController {
   }
 
   @Post()
+  @RequireAccess({ route: '/units', methodName: 'POST' })
   @ApiOperation({
     summary: 'Create an organizational unit',
     description: 'Creates a unit, optionally under an existing parent unit.',
@@ -55,6 +59,7 @@ export class UnitsController {
   }
 
   @Patch(':id')
+  @RequireAccess({ route: '/units/:id', methodName: 'PATCH' })
   @ApiParam({
     name: 'id',
     type: String,
@@ -73,6 +78,7 @@ export class UnitsController {
   }
 
   @Delete(':id')
+  @RequireAccess({ route: '/units/:id', methodName: 'DELETE' })
   @ApiParam({
     name: 'id',
     type: String,

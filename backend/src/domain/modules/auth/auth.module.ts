@@ -8,14 +8,12 @@ import { AuthService } from './auth.service.js';
 import { UsersModule } from '../users/users.module.js';
 import { RolesModule } from '../authorization/roles/roles.module.js';
 import { JwtStrategy } from '../../../common/jwt_strategy/jwt.sterategy.js';
-import { EffectiveAccessModule } from '../authorization/effective-access.module.js';
 
 @Module({
   imports: [
     AuthProviderModule,
     UsersModule,
     RolesModule,
-    EffectiveAccessModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       inject: [ConfigService],

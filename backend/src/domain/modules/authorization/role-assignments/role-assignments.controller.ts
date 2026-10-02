@@ -14,6 +14,7 @@ import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CreateRoleAssignmentDto } from './dto/create-role-assignment.dto.js';
 import { UpdateRoleAssignmentDto } from './dto/update-role-assignment.dto.js';
 import { RoleAssignmentsService } from './role-assignments.service.js';
+import { RequireAccess } from '../../../../common/decorator/require-access.decorator.js';
 
 @UseInterceptors(FormatResponseInterceptor)
 @ApiTags('Role Assignments')
@@ -24,6 +25,7 @@ export class RoleAssignmentsController {
   ) {}
 
   @Post()
+  @RequireAccess({ route: '/role-assignments', methodName: 'POST' })
   @ApiOperation({
     summary: 'Assign a role to a user',
     description:
@@ -34,6 +36,7 @@ export class RoleAssignmentsController {
   }
 
   @Get()
+  @RequireAccess({ route: '/role-assignments', methodName: 'GET' })
   @ApiOperation({
     summary: 'List role assignments',
     description: 'Returns local role assignments with their users and roles.',
@@ -43,6 +46,7 @@ export class RoleAssignmentsController {
   }
 
   @Get(':id')
+  @RequireAccess({ route: '/role-assignments/:id', methodName: 'GET' })
   @ApiParam({
     name: 'id',
     type: String,
@@ -58,6 +62,7 @@ export class RoleAssignmentsController {
   }
 
   @Patch(':id')
+  @RequireAccess({ route: '/role-assignments/:id', methodName: 'PATCH' })
   @ApiParam({
     name: 'id',
     type: String,
@@ -76,6 +81,7 @@ export class RoleAssignmentsController {
   }
 
   @Delete(':id')
+  @RequireAccess({ route: '/role-assignments/:id', methodName: 'DELETE' })
   @ApiParam({
     name: 'id',
     type: String,

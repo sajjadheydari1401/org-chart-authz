@@ -14,6 +14,7 @@ import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CreateRoleDto } from './dto/create-role.dto.js';
 import { UpdateRoleDto } from './dto/update-role.dto.js';
 import { RolesService } from './roles.service.js';
+import { RequireAccess } from '../../../../common/decorator/require-access.decorator.js';
 
 @UseInterceptors(FormatResponseInterceptor)
 @ApiTags('Roles')
@@ -22,6 +23,7 @@ export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
   @Get()
+  @RequireAccess({ route: '/roles', methodName: 'GET' })
   @ApiOperation({
     summary: 'List roles',
     description: 'Returns roles stored in the local database.',
@@ -31,6 +33,7 @@ export class RolesController {
   }
 
   @Post()
+  @RequireAccess({ route: '/roles', methodName: 'POST' })
   @ApiOperation({
     summary: 'Create a role',
     description: 'Creates a role in the provider and stores its local scope.',
@@ -40,6 +43,7 @@ export class RolesController {
   }
 
   @Patch(':id')
+  @RequireAccess({ route: '/roles/:id', methodName: 'PATCH' })
   @ApiParam({
     name: 'id',
     type: String,
@@ -58,6 +62,7 @@ export class RolesController {
   }
 
   @Delete(':id')
+  @RequireAccess({ route: '/roles/:id', methodName: 'DELETE' })
   @ApiParam({
     name: 'id',
     type: String,

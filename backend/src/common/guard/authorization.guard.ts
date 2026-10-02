@@ -9,6 +9,7 @@ import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
 import type { EffectiveAccess } from '../../types/effective-access.js';
 import { EffectiveAccessService } from '../../domain/modules/authorization/effective-access.service.js';
+import { IS_PUBLIC_KEY } from '../decorator/public.decorator.js';
 import { REQUIRED_ACCESS_METADATA } from '../decorator/require-access.decorator.js';
 
 @Injectable()
@@ -20,6 +21,12 @@ export class AccessGuard implements CanActivate {
 
   /** Enforces the exact route/method grant declared with @RequireAccess. */
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    if (isPublic) return true;
+
     const requiredAccess = this.reflector.getAllAndOverride<EffectiveAccess>(
       REQUIRED_ACCESS_METADATA,
       [context.getHandler(), context.getClass()],

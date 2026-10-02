@@ -12,6 +12,7 @@ import { FormatResponseInterceptor } from '../../../../common/utils/interceptor/
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CreateRoleAccessDto } from './dto/create-role-access.dto.js';
 import { RoleAccessesService } from './role-accesses.service.js';
+import { RequireAccess } from '../../../../common/decorator/require-access.decorator.js';
 
 @UseInterceptors(FormatResponseInterceptor)
 @ApiTags('Role Accesses')
@@ -20,6 +21,7 @@ export class RoleAccessesController {
   constructor(private readonly roleAccessesService: RoleAccessesService) {}
 
   @Get('role-accesses')
+  @RequireAccess({ route: '/role-accesses/role-accesses', methodName: 'GET' })
   @ApiOperation({
     summary: 'List role-access links',
     description:
@@ -30,6 +32,7 @@ export class RoleAccessesController {
   }
 
   @Post('role-accesses')
+  @RequireAccess({ route: '/role-accesses/role-accesses', methodName: 'POST' })
   @ApiOperation({
     summary: 'Link an access to a role',
     description: 'Creates a provider role-access link and stores it locally.',
@@ -39,6 +42,10 @@ export class RoleAccessesController {
   }
 
   @Delete(':roleId/accesses/:accessId')
+  @RequireAccess({
+    route: '/role-accesses/:roleId/accesses/:accessId',
+    methodName: 'DELETE',
+  })
   @ApiParam({
     name: 'roleId',
     type: String,

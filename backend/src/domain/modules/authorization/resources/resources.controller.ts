@@ -14,6 +14,7 @@ import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CreateResourceDto } from './dto/create-resource.dto.js';
 import { UpdateResourceDto } from './dto/update-resource.dto.js';
 import { ResourcesService } from './resources.service.js';
+import { RequireAccess } from '../../../../common/decorator/require-access.decorator.js';
 
 @UseInterceptors(FormatResponseInterceptor)
 @ApiTags('Resources')
@@ -22,6 +23,7 @@ export class ResourcesController {
   constructor(private readonly resourcesService: ResourcesService) {}
 
   @Delete(':id')
+  @RequireAccess({ route: '/resources/:id', methodName: 'DELETE' })
   @ApiParam({
     name: 'id',
     type: String,
@@ -37,6 +39,7 @@ export class ResourcesController {
   }
 
   @Get()
+  @RequireAccess({ route: '/resources', methodName: 'GET' })
   @ApiOperation({
     summary: 'List resources',
     description: 'Returns resources stored in the local database.',
@@ -46,6 +49,7 @@ export class ResourcesController {
   }
 
   @Post()
+  @RequireAccess({ route: '/resources', methodName: 'POST' })
   @ApiOperation({
     summary: 'Create a resource',
     description: 'Creates a route resource in the provider and local database.',
@@ -55,6 +59,7 @@ export class ResourcesController {
   }
 
   @Patch(':id')
+  @RequireAccess({ route: '/resources/:id', methodName: 'PATCH' })
   @ApiParam({
     name: 'id',
     type: String,

@@ -13,6 +13,8 @@ import { createTypeOrmConfig } from './config/typeOrmConfig.js';
 import { DatabaseConnectionLogger } from './common/logger/database-connection-logger.js';
 import { UnitsModule } from './domain/modules/units/units.module.js';
 import { JwtAuthGuard } from './common/guard/jwt.guard.js';
+import { AccessGuard } from './common/guard/authorization.guard.js';
+import { EffectiveAccessModule } from './domain/modules/authorization/effective-access.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -28,6 +30,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     }),
     AuthModule,
     AuthorizationModule,
+    EffectiveAccessModule,
     UnitsModule,
   ],
   controllers: [AppController],
@@ -36,6 +39,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     DatabaseConnectionLogger,
     { provide: APP_FILTER, useClass: HttpExceptionFilter },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
+    { provide: APP_GUARD, useClass: AccessGuard },
   ],
 })
 export class AppModule {}

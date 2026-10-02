@@ -16,6 +16,8 @@ export const workspaceNavigation: readonly WorkspaceNavigationSection[] = [
     items: [
       { href: '/org-units', label: 'واحدهای مجتمع', icon: 'building' },
       { href: '/organization-chart', label: 'چارت مجتمع', icon: 'orgChart' },
+      { href: '/users', label: 'کاربران', icon: 'users' },
+      { href: '/access/roles', label: 'نقش‌ها و دسترسی‌ها', icon: 'role' },
       { href: '/owners-tenants', label: 'مالکان و مستأجران', icon: 'users' },
       { href: '/vacancies', label: 'واحدهای خالی', icon: 'vacancy' },
     ],
@@ -86,11 +88,7 @@ export const workspaceNavigation: readonly WorkspaceNavigationSection[] = [
   },
   {
     label: 'مدیریت و گزارش‌ها',
-    items: [
-      { href: '/users', label: 'کاربران', icon: 'users' },
-      { href: '/access/roles', label: 'نقش‌ها و دسترسی‌ها', icon: 'role' },
-      { href: '/reports', label: 'گزارش‌ها', icon: 'report' },
-    ],
+    items: [{ href: '/reports', label: 'گزارش‌ها', icon: 'report' }],
   },
 ];
 

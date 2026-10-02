@@ -1,44 +1,21 @@
-import { Eye, Pencil, Trash2 } from 'lucide-react';
+import type { ReactNode } from 'react';
+
+import { AppButton } from '../app-button';
 
 interface AppTableActionsProps {
-  onView?: () => void;
-  onEdit?: () => void;
-  onDelete?: () => void;
+  title: string;
+  onClick: () => void;
+  icon: ReactNode;
 }
 
 export function AppTableActions({
-  onView,
-  onEdit,
-  onDelete,
+  title,
+  onClick,
+  icon,
 }: AppTableActionsProps) {
   return (
-    <div className="flex items-center justify-center gap-3">
-      {onView && (
-        <Eye
-          size={18}
-          aria-label="مشاهده"
-          className="cursor-pointer hover:opacity-70"
-          onClick={onView}
-        />
-      )}
-
-      {onEdit && (
-        <Pencil
-          size={18}
-          aria-label="ویرایش"
-          className="cursor-pointer hover:opacity-70"
-          onClick={onEdit}
-        />
-      )}
-
-      {onDelete && (
-        <Trash2
-          size={18}
-          aria-label="حذف"
-          className="cursor-pointer text-destructive hover:opacity-70"
-          onClick={onDelete}
-        />
-      )}
-    </div>
+    <AppButton type="button" startIcon={icon} onClick={onClick}>
+      {title}
+    </AppButton>
   );
 }

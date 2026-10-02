@@ -5,7 +5,7 @@ import {
   AppTable,
   type AppTableColumn,
 } from '@/components/common/ui/app-table/app-table';
-import { AppTableActions } from '@/components/common/ui/app-table/AppTableActions';
+import { AppTableRowActions } from '@/components/common/ui/app-table/AppTableRowActions';
 import { managers } from '@/data/managers';
 import type { IManager } from '@/types/user';
 
@@ -32,7 +32,7 @@ const columns: AppTableColumn<IManager>[] = [
     header: 'عملیات',
     className: 'text-center',
     render: (manager) => (
-      <AppTableActions
+      <AppTableRowActions
         onView={() => console.log('View:', manager)}
         onEdit={() => console.log('Edit:', manager)}
         onDelete={() => console.log('Delete:', manager)}

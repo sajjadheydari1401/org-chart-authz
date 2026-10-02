@@ -1,7 +1,6 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { showError, showSuccess } from '@/lib/api/show-error';
 import { TRANSPORT_ERROR_MESSAGE } from '@/lib/api/transport-error';
@@ -19,9 +18,7 @@ import {
   type SignupFormInput,
 } from '@/lib/schemas/auth';
 
-export function SignupForm() {
-  const router = useRouter();
-
+export function AddUserForm({ onSuccess }: { onSuccess: () => void }) {
   const {
     data: roles,
     isError: rolesFailed,
@@ -67,7 +64,7 @@ export function SignupForm() {
 
     if (result.success) {
       if (result.message) showSuccess(result.message);
-      router.push('/verify-sms');
+      onSuccess();
       return;
     }
 
@@ -205,7 +202,7 @@ export function SignupForm() {
       </AppFormField>
 
       <AppButton type="submit" loading={isSubmitting} className="w-full">
-        ایجاد حساب
+        افزودن کاربر
       </AppButton>
     </form>
   );

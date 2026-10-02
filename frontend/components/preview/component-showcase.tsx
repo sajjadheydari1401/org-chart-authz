@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, type ReactNode } from 'react';
-import { ArrowLeft, Check, Sparkles } from 'lucide-react';
+import { ArrowLeft, Check, Sparkles, UserPlus } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
@@ -30,6 +30,7 @@ import {
   type AppTableColumn,
 } from '@/components/common/ui/app-table/app-table';
 import { AppTableActions } from '@/components/common/ui/app-table/AppTableActions';
+import { AppTableRowActions } from '@/components/common/ui/app-table/AppTableRowActions';
 import { AppTab } from '@/components/common/ui/app-tab/app-tab';
 import { AppTextarea } from '@/components/common/ui/app-textarea';
 import { AppCard } from '@/components/common/ui/card/app-card';
@@ -169,7 +170,7 @@ export function ComponentShowcase() {
       key: 'actions',
       header: 'عملیات',
       render: (member) => (
-        <AppTableActions
+        <AppTableRowActions
           onView={() => toast.info(`نمایش ${member.name}`)}
           onEdit={() => toast.info(`ویرایش ${member.name}`)}
           onDelete={() => toast.error(`حذف ${member.name}`)}
@@ -776,11 +777,12 @@ export function ComponentShowcase() {
 
         <DemoSection
           id="data"
-          title="AppTable · AppTableActions · AppCard"
+          title="AppTable · AppTableActions · AppTableRowActions · AppCard"
           parts={[
             'AppTableHeader',
             'AppTableBody',
             'AppTableActions',
+            'AppTableRowActions',
             'AppCardHeader',
             'AppCardContent',
             'AppCardDescription',
@@ -790,18 +792,28 @@ export function ComponentShowcase() {
           <div className="space-y-8">
             <Sample title="AppTable · انتخاب ردیف، عملیات و حالت خالی">
               <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
-                <label className="flex min-h-11 items-center gap-3 text-sm">
-                  <AppSwitch
-                    checked={showEmptyTable}
-                    onChange={(event) =>
-                      setShowEmptyTable(event.target.checked)
-                    }
-                  />
-                  نمایش جدول خالی
-                </label>
-                <p aria-live="polite" className="text-sm text-muted-foreground">
-                  {selectedMembers.length} ردیف انتخاب شده
-                </p>
+                <div className="flex flex-wrap items-center gap-4">
+                  <label className="flex min-h-11 items-center gap-3 text-sm">
+                    <AppSwitch
+                      checked={showEmptyTable}
+                      onChange={(event) =>
+                        setShowEmptyTable(event.target.checked)
+                      }
+                    />
+                    نمایش جدول خالی
+                  </label>
+                  <p
+                    aria-live="polite"
+                    className="text-sm text-muted-foreground"
+                  >
+                    {selectedMembers.length} ردیف انتخاب شده
+                  </p>
+                </div>
+                <AppTableActions
+                  title="افزودن عضو"
+                  icon={<UserPlus />}
+                  onClick={() => toast.info('فرم افزودن عضو')}
+                />
               </div>
               <AppTable
                 caption="اعضای نمونه‌ی سازمان"

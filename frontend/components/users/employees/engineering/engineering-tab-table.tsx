@@ -6,7 +6,7 @@ import {
   AppTableColumn,
 } from '@/components/common/ui/app-table/app-table';
 import { IEmployee } from '@/types/user';
-import { AppTableActions } from '@/components/common/ui/app-table/AppTableActions';
+import { AppTableRowActions } from '@/components/common/ui/app-table/AppTableRowActions';
 
 const columns: AppTableColumn<IEmployee>[] = [
   { key: 'id', header: 'شناسه' },
@@ -26,7 +26,7 @@ const columns: AppTableColumn<IEmployee>[] = [
     header: 'عملیات',
     className: 'text-center',
     render: (employee) => (
-      <AppTableActions
+      <AppTableRowActions
         onView={() => console.log('View:', employee)}
         onEdit={() => console.log('Edit:', employee)}
         onDelete={() => console.log('Delete:', employee)}

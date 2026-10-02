@@ -46,12 +46,13 @@ export class AuthProviderService {
 
   async loginWithUsernamePassword(
     input: LoginWithUsernamePasswordDto,
+    roleName: string,
   ): Promise<{ accessToken: string; username: string }> {
     const data = await postToProvider<LoginUpResult>(
       providerUrl(this.config, '/auth/login_UP'),
       {
         ...systemCredentials(this.config),
-        roleName: this.config.getOrThrow<string>('AUTH_ROLE_NAME'),
+        roleName,
         username: input.username,
         password: input.password,
       },

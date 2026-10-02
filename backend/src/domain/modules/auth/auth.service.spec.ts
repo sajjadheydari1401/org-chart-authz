@@ -14,7 +14,10 @@ describe('AuthService', () => {
     loginWithUsernamePassword: ReturnType<typeof vi.fn>;
     deleteUser: ReturnType<typeof vi.fn>;
   };
-  let usersService: { createLocalUserWithRole: ReturnType<typeof vi.fn> };
+  let usersService: {
+    createLocalUserWithRole: ReturnType<typeof vi.fn>;
+    getLoginRoleName: ReturnType<typeof vi.fn>;
+  };
   let rolesService: { getRoleByName: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
@@ -28,6 +31,7 @@ describe('AuthService', () => {
     };
     usersService = {
       createLocalUserWithRole: vi.fn().mockResolvedValue(undefined),
+      getLoginRoleName: vi.fn().mockResolvedValue('member'),
     };
     rolesService = {
       getRoleByName: vi
@@ -130,6 +134,10 @@ describe('AuthService', () => {
     await expect(service.loginWithUsernamePassword(input)).resolves.toEqual(
       result,
     );
-    expect(authProvider.loginWithUsernamePassword).toHaveBeenCalledWith(input);
+    expect(usersService.getLoginRoleName).toHaveBeenCalledWith('person');
+    expect(authProvider.loginWithUsernamePassword).toHaveBeenCalledWith(
+      input,
+      'member',
+    );
   });
 });

@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
@@ -18,6 +19,20 @@ export class UsersService {
     private readonly authProvider: AuthProviderService,
     @InjectDataSource() private readonly dataSource: DataSource,
   ) {}
+
+  async getLoginRoleName(username: string): Promise<string> {
+    const user = await this.users.findOne({
+      where: { username },
+      relations: { providerLoginRole: true },
+    });
+    const roleName = user?.providerLoginRole?.name;
+
+    if (!roleName?.trim()) {
+      throw new UnauthorizedException();
+    }
+
+    return roleName;
+  }
 
   getAllUsers(): Promise<User[]> {
     return this.users.find();
@@ -72,6 +87,7 @@ export class UsersService {
           username: input.username,
           email: input.email,
           mobile: input.mobile,
+          providerLoginRole: role,
         }),
       );
       const roleAssignments = manager.getRepository(RoleAssignment);

@@ -22,7 +22,6 @@ const configuration: Record<string, string> = {
   AUTH_BASE_URL: PROVIDER_BASE_URL,
   AUTH_SYSTEM_USERNAME: 'system-user',
   AUTH_SYSTEM_PASSWORD: 'system-password',
-  AUTH_ROLE_NAME: 'user',
   AUTH_SMS_TEMPLATE: 'sms-template',
   AUTH_PATTERN_NAME: 'register',
   AUTH_SMS_SYSTEM_NAME: 'auth-system',
@@ -95,15 +94,18 @@ describe('AuthProviderService', () => {
     } as never);
 
     await expect(
-      service.loginWithUsernamePassword({
-        username: 'person',
-        password: 'secret',
-      }),
+      service.loginWithUsernamePassword(
+        {
+          username: 'person',
+          password: 'secret',
+        },
+        'manager',
+      ),
     ).resolves.toEqual({ accessToken: 'access-token', username: 'person' });
     expect(providerPost).toHaveBeenCalledWith(LOGIN_UP_URL, {
       systemUsername: 'system-user',
       systemPassword: 'system-password',
-      roleName: 'user',
+      roleName: 'manager',
       username: 'person',
       password: 'secret',
     });

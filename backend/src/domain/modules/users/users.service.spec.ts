@@ -14,6 +14,7 @@ describe('UsersService', () => {
   let service: UsersService;
   let repository: {
     find: ReturnType<typeof vi.fn>;
+    findOne: ReturnType<typeof vi.fn>;
     findOneBy: ReturnType<typeof vi.fn>;
     save: ReturnType<typeof vi.fn>;
     delete: ReturnType<typeof vi.fn>;
@@ -24,6 +25,7 @@ describe('UsersService', () => {
   beforeEach(() => {
     repository = {
       find: vi.fn(),
+      findOne: vi.fn(),
       findOneBy: vi.fn(),
       save: vi.fn(),
       delete: vi.fn().mockResolvedValue({ affected: 1 }),
@@ -36,6 +38,35 @@ describe('UsersService', () => {
       dataSource as never,
     );
   });
+
+  it('resolves the provider login role from the user', async () => {
+    repository.findOne.mockResolvedValue({
+      providerLoginRole: { name: 'provider-user' },
+    });
+
+    await expect(service.getLoginRoleName('person')).resolves.toBe(
+      'provider-user',
+    );
+    expect(repository.findOne).toHaveBeenCalledWith({
+      where: { username: 'person' },
+      relations: { providerLoginRole: true },
+    });
+  });
+
+  it.each([
+    null,
+    { providerLoginRole: null },
+    { providerLoginRole: { name: '  ' } },
+  ])(
+    'rejects login role resolution when the user has no provider role',
+    async (user) => {
+      repository.findOne.mockResolvedValue(user);
+
+      await expect(service.getLoginRoleName('person')).rejects.toMatchObject({
+        status: 401,
+      });
+    },
+  );
 
   it('returns users from the local repository', async () => {
     const users = [{ id: userId, username: 'person' } as User];
@@ -175,6 +206,7 @@ describe('UsersService', () => {
       username: 'person',
       email: 'person@example.test',
       mobile: '09123456789',
+      providerLoginRole: role,
     });
     expect(transactionRoles.findOneBy).toHaveBeenCalledWith({ id: 'role-id' });
     expect(transactionAssignments.create).toHaveBeenCalledWith({

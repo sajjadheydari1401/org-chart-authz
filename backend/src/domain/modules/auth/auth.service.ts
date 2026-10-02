@@ -50,6 +50,7 @@ export class AuthService {
   async loginWithUsernamePassword(
     input: LoginWithUsernamePasswordDto,
   ): Promise<{ accessToken: string; username: string }> {
-    return this.authProvider.loginWithUsernamePassword(input);
+    const roleName = await this.usersService.getLoginRoleName(input.username);
+    return this.authProvider.loginWithUsernamePassword(input, roleName);
   }
 }

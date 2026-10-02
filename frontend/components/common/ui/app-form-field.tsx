@@ -30,7 +30,7 @@ export function AppFormField({
     <div {...props} className={cn('min-w-0 space-y-2', className)}>
       <label
         htmlFor={htmlFor}
-        className="block text-sm font-medium text-foreground [overflow-wrap:anywhere]"
+        className="block text-sm font-medium text-foreground wrap-anywhere"
       >
         {label}
         {required && <span className="ms-1 text-destructive">*</span>}
@@ -39,7 +39,7 @@ export function AppFormField({
       {error ? (
         <AppFormError message={error} />
       ) : hint ? (
-        <p className="text-sm leading-6 text-muted-foreground [overflow-wrap:anywhere]">
+        <p className="text-sm leading-6 text-muted-foreground wrap-anywhere">
           {hint}
         </p>
       ) : null}

@@ -38,6 +38,7 @@ describe('AuthService', () => {
       email: 'person@example.test',
       password: 'secret',
       mobile: '09123456789',
+      role: 'member',
     } as RegisterWithUsernamePasswordDto;
 
     await expect(service.registerWithUsernamePassword(input)).resolves.toEqual({

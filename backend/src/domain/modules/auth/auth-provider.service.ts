@@ -22,7 +22,7 @@ export class AuthProviderService {
       providerUrl(this.config, '/auth/2FA_register_UP'),
       {
         ...systemCredentials(this.config),
-        roleName: this.config.getOrThrow<string>('AUTH_ROLE_NAME'),
+        roleName: input.role,
         smsTemplate: this.config.getOrThrow<string>('AUTH_SMS_TEMPLATE'),
         patternName: this.config.getOrThrow<string>('AUTH_PATTERN_NAME'),
         smsSystemName: this.config.getOrThrow<string>('AUTH_SMS_SYSTEM_NAME'),

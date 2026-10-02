@@ -48,6 +48,7 @@ describe('AuthProviderService', () => {
       email: 'person@example.test',
       password: 'secret',
       mobile: '09123456789',
+      role: 'manager',
     };
 
     await service.registerWithTwoFactorUsernamePassword(input);
@@ -55,7 +56,7 @@ describe('AuthProviderService', () => {
     expect(providerPost).toHaveBeenCalledWith(REGISTER_WITH_TWO_FACTOR_URL, {
       systemUsername: 'system-user',
       systemPassword: 'system-password',
-      roleName: 'user',
+      roleName: input.role,
       smsTemplate: 'sms-template',
       patternName: 'register',
       smsSystemName: 'auth-system',

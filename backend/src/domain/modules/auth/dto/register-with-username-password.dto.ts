@@ -11,6 +11,15 @@ export class RegisterWithUsernamePasswordDto {
   email: string;
 
   @ApiProperty({
+    description: 'English name of the role requested for the new account.',
+    example: 'member',
+  })
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @IsString()
+  @Length(1, 100)
+  role: string;
+
+  @ApiProperty({
     description: 'Account username. Must be 2 to 40 characters.',
     example: 'sajjad',
   })

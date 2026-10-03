@@ -139,6 +139,10 @@ export function hasRequiredAccess(
   requiredAccess: AccessRequirement,
   accesses: readonly EffectiveAccess[],
 ): boolean {
+  if (accesses.some((access) => access.unitIds.includes('owner'))) {
+    return true;
+  }
+
   return accesses.some(
     (access) =>
       access.route === requiredAccess.route &&
@@ -150,6 +154,13 @@ export function hasRequiredAccess(
 export function getVisibleWorkspaceNavigation(
   accesses: readonly EffectiveAccess[],
 ): WorkspaceNavigationSection[] {
+  if (accesses.some((access) => access.unitIds.includes('owner'))) {
+    return [...workspaceNavigation].map((section) => ({
+      ...section,
+      items: [...section.items],
+    }));
+  }
+
   return workspaceNavigation
     .map((section) => ({
       ...section,

@@ -1,8 +1,10 @@
 import { OrganizationGraph } from '@/components/units-chart/organization-graph';
 import { requireWorkspaceAccess } from '@/lib/auth/workspace-access';
+import { getUnits } from '@/services/units/units.service';
 
 export default async function OrganizationChartPage() {
   await requireWorkspaceAccess('/organization-chart');
+  const units = await getUnits();
 
   return (
     <div className="space-y-5">
@@ -16,7 +18,7 @@ export default async function OrganizationChartPage() {
         </p>
       </header>
       <section aria-label="نمودار ساختار مجتمع">
-        <OrganizationGraph />
+        <OrganizationGraph units={units} />
       </section>
     </div>
   );

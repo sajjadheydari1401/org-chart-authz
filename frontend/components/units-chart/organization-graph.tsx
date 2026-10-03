@@ -4,7 +4,7 @@ import { Panel, ReactFlow, useReactFlow, type NodeTypes } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
 import { AppButton } from '@/components/common/ui/app-button';
-import { rawUnits } from '@/data/org-units';
+import type { IOrgUnit } from '@/types/org-unit';
 import { createGraph } from '@/utils/create-graph';
 import { UnitCard } from './unit-card';
 
@@ -53,8 +53,8 @@ function GraphControls() {
   );
 }
 
-export function OrganizationGraph() {
-  const { nodes, edges } = createGraph(rawUnits);
+export function OrganizationGraph({ units }: { units: readonly IOrgUnit[] }) {
+  const { nodes, edges } = createGraph(units);
 
   return (
     <div className="h-[65svh] min-h-80 max-h-150 w-full min-w-0">

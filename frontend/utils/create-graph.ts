@@ -7,7 +7,7 @@ import type { IOrgUnit } from '@/types/org-unit';
 const NODE_WIDTH = 220;
 const NODE_HEIGHT = 60;
 
-export function createGraph(units: IOrgUnit[]) {
+export function createGraph(units: readonly IOrgUnit[]) {
   const graph = new dagre.graphlib.Graph();
 
   // Dagre expects edge metadata even when we don't need custom edge data.
@@ -25,7 +25,7 @@ export function createGraph(units: IOrgUnit[]) {
   // React Flow needs flat nodes. Positions start at zero because
   // Dagre will calculate the actual coordinates later.
   const nodes: UnitNode[] = units.map((unit) => ({
-    id: String(unit.id),
+    id: unit.id,
     type: 'unit',
     style: { width: NODE_WIDTH, height: NODE_HEIGHT },
     data: {
@@ -40,8 +40,8 @@ export function createGraph(units: IOrgUnit[]) {
     .filter((unit) => unit.parentId !== null)
     .map((unit) => ({
       id: `${unit.parentId}-${unit.id}`,
-      source: String(unit.parentId),
-      target: String(unit.id),
+      source: unit.parentId,
+      target: unit.id,
     }));
 
   // Dagre needs node dimensions to calculate spacing and avoid overlaps.

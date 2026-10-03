@@ -105,6 +105,12 @@ const pageAccessRequirements: Record<string, AccessRequirement> = {
   '/accesses': { route: '/accesses', methodName: 'GET' },
 };
 
+const rolesSectionReadRequirements: AccessRequirement[] = [
+  { route: '/roles', methodName: 'GET' },
+  { route: '/role-accesses/role-accesses', methodName: 'GET' },
+  { route: '/role-assignments', methodName: 'GET' },
+];
+
 export function getWorkspaceAccessRequirement(href: string): AccessRequirement {
   return (
     pageAccessRequirements[href] ?? {
@@ -119,8 +125,20 @@ export function hasWorkspaceAccess(
   accesses: readonly EffectiveAccess[],
 ): boolean {
   if (href === workspaceDashboardItem.href) return accesses.length > 0;
+  if (href === '/roles') {
+    return rolesSectionReadRequirements.some((requirement) =>
+      hasRequiredAccess(requirement, accesses),
+    );
+  }
 
   const requiredAccess = getWorkspaceAccessRequirement(href);
+  return hasRequiredAccess(requiredAccess, accesses);
+}
+
+export function hasRequiredAccess(
+  requiredAccess: AccessRequirement,
+  accesses: readonly EffectiveAccess[],
+): boolean {
   return accesses.some(
     (access) =>
       access.route === requiredAccess.route &&

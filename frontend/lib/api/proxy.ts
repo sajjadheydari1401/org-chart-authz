@@ -1,14 +1,19 @@
 import 'server-only';
 
+import type { AxiosRequestConfig } from 'axios';
 import { ApiError } from './api-error';
 import { AppApi } from './server';
 import { TRANSPORT_ERROR_MESSAGE } from './transport-error';
 
 const privateHeaders = { 'Cache-Control': 'private, no-store' };
+type ProxyOptions = Pick<AxiosRequestConfig, 'method' | 'data'>;
 
-export async function proxyAppApi<T>(path: string): Promise<Response> {
+export async function proxyAppApi<T = unknown>(
+  path: string,
+  options: ProxyOptions = {},
+): Promise<Response> {
   try {
-    const response = await AppApi<T>(path);
+    const response = await AppApi<T>(path, options);
     return Response.json(
       {
         status: 'success',

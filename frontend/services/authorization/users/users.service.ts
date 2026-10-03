@@ -6,7 +6,7 @@ export interface ListUsersOptions {
   unitId?: string;
   page: number;
   pageSize: number;
-  isManager: boolean;
+  isManager?: boolean;
 }
 
 export async function getUsers({
@@ -20,7 +20,7 @@ export async function getUsers({
     pageSize: String(pageSize),
   });
   if (unitId) query.set('unitId', unitId);
-  query.set('isManager', String(isManager));
+  if (isManager !== undefined) query.set('isManager', String(isManager));
 
   const response = await AppApi<PaginatedResponse<UserDirectoryRecord>>(
     `/users?${query.toString()}`,

@@ -14,7 +14,8 @@ export type WorkspaceIconKey =
   | 'inbox'
   | 'workflow'
   | 'report'
-  | 'role';
+  | 'role'
+  | 'access';
 
 export interface WorkspaceNavigationItem {
   href: string;

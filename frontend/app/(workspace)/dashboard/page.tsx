@@ -7,11 +7,14 @@ import {
   HandCoins,
   Wrench,
 } from 'lucide-react';
+import { notFound } from 'next/navigation';
 
 import { AppBadge } from '@/components/common/ui/app-badge';
 import { AppLink } from '@/components/common/ui/app-link';
 import { AppCard } from '@/components/common/ui/card/app-card';
 import { AppCardContent } from '@/components/common/ui/card/app-card-content';
+import { getWorkspaceAccesses } from '@/lib/auth/workspace-access';
+import { hasWorkspaceAccess } from '@/lib/workspace-navigation';
 
 const metrics = [
   {
@@ -51,7 +54,18 @@ const quickLinks = [
   },
 ];
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const accesses = await getWorkspaceAccesses();
+  if (!hasWorkspaceAccess('/dashboard', accesses)) notFound();
+
+  const canViewUnits = hasWorkspaceAccess('/org-units', accesses);
+  const visibleMetrics = metrics.filter(({ href }) =>
+    hasWorkspaceAccess(href, accesses),
+  );
+  const visibleQuickLinks = quickLinks.filter(({ href }) =>
+    hasWorkspaceAccess(href, accesses),
+  );
+
   return (
     <div className="space-y-8">
       <header className="flex flex-wrap items-end justify-between gap-5">
@@ -67,77 +81,83 @@ export default function DashboardPage() {
             دنبال کنید.
           </p>
         </div>
-        <AppLink href="/org-units" variant="primary" className="gap-2">
-          <Building2 className="size-4" aria-hidden="true" />
-          مشاهده واحدها
-        </AppLink>
+        {canViewUnits && (
+          <AppLink href="/org-units" variant="primary" className="gap-2">
+            <Building2 className="size-4" aria-hidden="true" />
+            مشاهده واحدها
+          </AppLink>
+        )}
       </header>
 
-      <section aria-labelledby="overview-heading" className="space-y-4">
-        <div>
-          <h2 id="overview-heading" className="text-lg font-semibold">
-            شاخص‌های مجتمع
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            پس از اتصال اطلاعات عملیاتی، مقدارهای به‌روز در این بخش نمایش داده
-            می‌شوند.
-          </p>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          {metrics.map(({ label, detail, href, icon: Icon }) => (
-            <AppLink
-              key={label}
-              href={href}
-              variant="unstyled"
-              className="group block rounded-xl"
-            >
-              <AppCard className="h-full transition-colors group-hover:bg-muted">
-                <AppCardContent className="flex h-full min-h-36 flex-col p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <span className="inline-flex size-9 items-center justify-center rounded-lg bg-accent text-accent-foreground">
-                      <Icon className="size-4" aria-hidden="true" />
-                    </span>
-                    <AppBadge>بدون داده</AppBadge>
-                  </div>
-                  <p className="mt-4 text-sm font-medium text-muted-foreground">
-                    {label}
-                  </p>
-                  <p className="mt-1 text-2xl font-semibold text-foreground">
-                    —
-                  </p>
-                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                    {detail}
-                  </p>
-                </AppCardContent>
-              </AppCard>
-            </AppLink>
-          ))}
-        </div>
-      </section>
+      {visibleMetrics.length > 0 && (
+        <section aria-labelledby="overview-heading" className="space-y-4">
+          <div>
+            <h2 id="overview-heading" className="text-lg font-semibold">
+              شاخص‌های مجتمع
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              پس از اتصال اطلاعات عملیاتی، مقدارهای به‌روز در این بخش نمایش داده
+              می‌شوند.
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {visibleMetrics.map(({ label, detail, href, icon: Icon }) => (
+              <AppLink
+                key={label}
+                href={href}
+                variant="unstyled"
+                className="group block rounded-xl"
+              >
+                <AppCard className="h-full transition-colors group-hover:bg-muted">
+                  <AppCardContent className="flex h-full min-h-36 flex-col p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <span className="inline-flex size-9 items-center justify-center rounded-lg bg-accent text-accent-foreground">
+                        <Icon className="size-4" aria-hidden="true" />
+                      </span>
+                      <AppBadge>بدون داده</AppBadge>
+                    </div>
+                    <p className="mt-4 text-sm font-medium text-muted-foreground">
+                      {label}
+                    </p>
+                    <p className="mt-1 text-2xl font-semibold text-foreground">
+                      —
+                    </p>
+                    <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                      {detail}
+                    </p>
+                  </AppCardContent>
+                </AppCard>
+              </AppLink>
+            ))}
+          </div>
+        </section>
+      )}
 
-      <section aria-labelledby="quick-links-heading" className="space-y-4">
-        <div>
-          <h2 id="quick-links-heading" className="text-lg font-semibold">
-            دسترسی سریع
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            رفتن مستقیم به بخش‌های پرتردد سامانه.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {quickLinks.map(({ label, href, icon: Icon }) => (
-            <AppLink
-              key={href}
-              href={href}
-              variant="secondary"
-              className="gap-2"
-            >
-              <Icon className="size-4" aria-hidden="true" />
-              {label}
-            </AppLink>
-          ))}
-        </div>
-      </section>
+      {visibleQuickLinks.length > 0 && (
+        <section aria-labelledby="quick-links-heading" className="space-y-4">
+          <div>
+            <h2 id="quick-links-heading" className="text-lg font-semibold">
+              دسترسی سریع
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              رفتن مستقیم به بخش‌های پرتردد سامانه.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {visibleQuickLinks.map(({ label, href, icon: Icon }) => (
+              <AppLink
+                key={href}
+                href={href}
+                variant="secondary"
+                className="gap-2"
+              >
+                <Icon className="size-4" aria-hidden="true" />
+                {label}
+              </AppLink>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section
         aria-label="وضعیت فعالیت‌های مجتمع"

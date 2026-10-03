@@ -1,6 +1,9 @@
 import { OrganizationGraph } from '@/components/units-chart/organization-graph';
+import { requireWorkspaceAccess } from '@/lib/auth/workspace-access';
 
-export default function OrganizationChartPage() {
+export default async function OrganizationChartPage() {
+  await requireWorkspaceAccess('/organization-chart');
+
   return (
     <div className="space-y-5">
       <header>

@@ -3,6 +3,10 @@ import {
   WorkspaceNavigationSection,
   WorkspaceBreadcrumb,
 } from '@/types/menu';
+import type {
+  AccessRequirement,
+  EffectiveAccess,
+} from '@/types/authorization/access';
 
 export const workspaceDashboardItem: WorkspaceNavigationItem = {
   href: '/dashboard',
@@ -17,7 +21,8 @@ export const workspaceNavigation: readonly WorkspaceNavigationSection[] = [
       { href: '/org-units', label: 'واحدهای مجتمع', icon: 'building' },
       { href: '/organization-chart', label: 'چارت مجتمع', icon: 'orgChart' },
       { href: '/users', label: 'کاربران', icon: 'users' },
-      { href: '/access/roles', label: 'نقش‌ها و دسترسی‌ها', icon: 'role' },
+      { href: '/roles', label: 'نقش‌ها', icon: 'role' },
+      { href: '/accesses', label: 'دسترسی‌ها', icon: 'access' },
       { href: '/owners-tenants', label: 'مالکان و مستأجران', icon: 'users' },
       { href: '/vacancies', label: 'واحدهای خالی', icon: 'vacancy' },
     ],
@@ -91,6 +96,51 @@ export const workspaceNavigation: readonly WorkspaceNavigationSection[] = [
     items: [{ href: '/reports', label: 'گزارش‌ها', icon: 'report' }],
   },
 ];
+
+const pageAccessRequirements: Record<string, AccessRequirement> = {
+  '/org-units': { route: '/units', methodName: 'GET' },
+  '/organization-chart': { route: '/units', methodName: 'GET' },
+  '/users': { route: '/users', methodName: 'GET' },
+  '/roles': { route: '/roles', methodName: 'GET' },
+  '/accesses': { route: '/accesses', methodName: 'GET' },
+};
+
+export function getWorkspaceAccessRequirement(href: string): AccessRequirement {
+  return (
+    pageAccessRequirements[href] ?? {
+      route: href,
+      methodName: 'GET',
+    }
+  );
+}
+
+export function hasWorkspaceAccess(
+  href: string,
+  accesses: readonly EffectiveAccess[],
+): boolean {
+  if (href === workspaceDashboardItem.href) return accesses.length > 0;
+
+  const requiredAccess = getWorkspaceAccessRequirement(href);
+  return accesses.some(
+    (access) =>
+      access.route === requiredAccess.route &&
+      access.methodName === requiredAccess.methodName &&
+      access.unitIds.length > 0,
+  );
+}
+
+export function getVisibleWorkspaceNavigation(
+  accesses: readonly EffectiveAccess[],
+): WorkspaceNavigationSection[] {
+  return workspaceNavigation
+    .map((section) => ({
+      ...section,
+      items: section.items.filter((item) =>
+        hasWorkspaceAccess(item.href, accesses),
+      ),
+    }))
+    .filter((section) => section.items.length > 0);
+}
 
 const workspacePageTitles = new Map(
   [

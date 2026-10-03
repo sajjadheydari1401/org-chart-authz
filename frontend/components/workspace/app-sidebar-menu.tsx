@@ -1,17 +1,22 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { usePathname } from 'next/navigation';
 import { Building2, X } from 'lucide-react';
 
 import { AppButton } from '@/components/common/ui/app-button';
 import { AppLink } from '@/components/common/ui/app-link';
+import { ApiError } from '@/lib/api/api-error';
+import { AppApi } from '@/lib/api/client';
 import {
   workspaceDashboardItem,
-  workspaceNavigation,
+  getVisibleWorkspaceNavigation,
 } from '@/lib/workspace-navigation';
 import { cn } from '@/lib/cn';
 import { AppSidebarMenuItem } from './app-sidebar-menu-item';
 import { AppSidebarMenuSection } from './app-sidebar-menu-section';
+import type { EffectiveAccess } from '@/types/authorization/access';
 
 interface AppSideBarMenuProps {
   mobileOpen: boolean;
@@ -20,6 +25,35 @@ interface AppSideBarMenuProps {
 
 export function AppSideBarMenu({ mobileOpen, onClose }: AppSideBarMenuProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [accesses, setAccesses] = useState<EffectiveAccess[] | null>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadAccesses() {
+      try {
+        const response = await AppApi<EffectiveAccess[]>('/me/accesses');
+        if (active) setAccesses(response.data);
+      } catch (error) {
+        if (error instanceof ApiError && error.status === 401) {
+          router.replace('/login');
+          return;
+        }
+        if (active) setAccesses([]);
+      }
+    }
+
+    void loadAccesses();
+    return () => {
+      active = false;
+    };
+  }, [router]);
+
+  const visibleSections = accesses
+    ? getVisibleWorkspaceNavigation(accesses)
+    : [];
+  const showDashboard = Boolean(accesses?.length);
 
   return (
     <>
@@ -65,16 +99,18 @@ export function AppSideBarMenu({ mobileOpen, onClose }: AppSideBarMenuProps) {
           aria-label="منوی اصلی"
           className="min-h-0 flex-1 overflow-y-auto px-3 pb-5"
         >
-          <ul className="space-y-1 border-b border-border pb-3">
-            <li>
-              <AppSidebarMenuItem
-                item={workspaceDashboardItem}
-                pathname={pathname}
-                onNavigate={onClose}
-              />
-            </li>
-          </ul>
-          {workspaceNavigation.map((section, index) => (
+          {showDashboard && (
+            <ul className="space-y-1 border-b border-border pb-3">
+              <li>
+                <AppSidebarMenuItem
+                  item={workspaceDashboardItem}
+                  pathname={pathname}
+                  onNavigate={onClose}
+                />
+              </li>
+            </ul>
+          )}
+          {visibleSections.map((section, index) => (
             <AppSidebarMenuSection
               key={section.label}
               section={section}

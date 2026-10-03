@@ -1,7 +1,10 @@
 ﻿import { AddUserDialog } from '@/components/users/add-user-dialog';
 import { UsersTabs } from '@/components/users/users-tabs';
+import { requireWorkspaceAccess } from '@/lib/auth/workspace-access';
 
-export default function UsersPage() {
+export default async function UsersPage() {
+  await requireWorkspaceAccess('/users');
+
   return (
     <div className="space-y-8">
       <header className="flex flex-wrap items-center justify-between gap-4">

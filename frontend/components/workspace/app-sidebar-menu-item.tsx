@@ -12,6 +12,7 @@ import {
   Inbox,
   KeyRound,
   Network,
+  ShieldCheck,
   UsersRound,
   Warehouse,
   Wrench,
@@ -39,6 +40,7 @@ const icons: Record<WorkspaceIconKey, LucideIcon> = {
   workflow: ClipboardList,
   report: ChartNoAxesCombined,
   role: KeyRound,
+  access: ShieldCheck,
 };
 
 interface AppSidebarMenuItemProps {

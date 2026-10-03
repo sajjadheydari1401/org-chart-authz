@@ -28,6 +28,7 @@ describe('UsersController', () => {
         unitId,
         page: 2,
         pageSize: 30,
+        isManager: true,
       }),
     ).resolves.toBe(users);
     expect(usersService.getAllUsers).toHaveBeenCalledWith(
@@ -35,6 +36,7 @@ describe('UsersController', () => {
       unitId,
       2,
       30,
+      true,
     );
   });
 

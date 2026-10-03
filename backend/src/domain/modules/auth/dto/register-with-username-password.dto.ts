@@ -1,6 +1,14 @@
 import { Transform } from 'class-transformer';
-import { IsEmail, IsString, Length, Matches, MinLength } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsBoolean,
+  IsEmail,
+  IsOptional,
+  IsString,
+  Length,
+  Matches,
+  MinLength,
+} from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class RegisterWithUsernamePasswordDto {
   @ApiProperty({
@@ -53,4 +61,12 @@ export class RegisterWithUsernamePasswordDto {
   )
   @Matches(/^09\d{9}$/)
   mobile: string;
+
+  @ApiPropertyOptional({
+    description: 'Whether the new user is a manager. Defaults to false.',
+    default: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  isManager?: boolean;
 }

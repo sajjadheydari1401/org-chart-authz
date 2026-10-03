@@ -25,6 +25,7 @@ import { AddFarsiNameToRoles20261001000001 } from '../database/migrations/202610
 import { SetUnitTypeEnum20261002000000 } from '../database/migrations/20261002000000-SetUnitTypeEnum.js';
 import { AddEmailAndMobileToUsers20261002000001 } from '../database/migrations/20261002000001-AddEmailAndMobileToUsers.js';
 import { AddProviderLoginRoleToUsers20261002000002 } from '../database/migrations/20261002000002-AddProviderLoginRoleToUsers.js';
+import { AddIsManagerToUsers20261003000000 } from '../database/migrations/20261003000000-AddIsManagerToUsers.js';
 import { Access } from '../domain/modules/authorization/accesses/entities/access.entity.js';
 import { Resource } from '../domain/modules/authorization/resources/entities/resource.entity.js';
 import { RoleAssignment } from '../domain/modules/authorization/role-assignments/entities/role-assignment.entity.js';
@@ -69,6 +70,7 @@ export function createTypeOrmConfig(
       SetUnitTypeEnum20261002000000,
       AddEmailAndMobileToUsers20261002000001,
       AddProviderLoginRoleToUsers20261002000002,
+      AddIsManagerToUsers20261003000000,
     ],
     migrationsRun: true,
     synchronize: false,

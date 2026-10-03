@@ -34,6 +34,7 @@ export class UsersController {
   })
   @ApiQuery({ name: 'unitId', required: false, format: 'uuid' })
   @ApiQuery({ name: 'page', required: false, type: Number, minimum: 1 })
+  @ApiQuery({ name: 'isManager', required: false, type: Boolean })
   @ApiQuery({
     name: 'pageSize',
     required: false,
@@ -50,6 +51,7 @@ export class UsersController {
       query.unitId,
       query.page,
       query.pageSize,
+      query.isManager,
     );
   }
 

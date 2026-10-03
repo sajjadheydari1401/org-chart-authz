@@ -81,11 +81,13 @@ describe('UsersService', () => {
   it('resolves the provider login role from the user', async () => {
     repository.findOne.mockResolvedValue({
       providerLoginRole: { name: 'provider-user' },
+      isManager: true,
     });
 
-    await expect(service.getLoginRoleName('person')).resolves.toBe(
-      'provider-user',
-    );
+    await expect(service.getLoginDetails('person')).resolves.toEqual({
+      roleName: 'provider-user',
+      isManager: true,
+    });
     expect(repository.findOne).toHaveBeenCalledWith({
       where: { username: 'person' },
       relations: { providerLoginRole: true },
@@ -97,11 +99,11 @@ describe('UsersService', () => {
     { providerLoginRole: null },
     { providerLoginRole: { name: '  ' } },
   ])(
-    'rejects login role resolution when the user has no provider role',
+    'rejects login detail resolution when the user has no provider role',
     async (user) => {
       repository.findOne.mockResolvedValue(user);
 
-      await expect(service.getLoginRoleName('person')).rejects.toMatchObject({
+      await expect(service.getLoginDetails('person')).rejects.toMatchObject({
         status: 401,
       });
     },
@@ -149,6 +151,20 @@ describe('UsersService', () => {
     expect(queryBuilder.skip).toHaveBeenCalledWith(5);
     expect(queryBuilder.take).toHaveBeenCalledWith(5);
   });
+
+  it.each([true, false])(
+    'filters users by manager status %s',
+    async (isManager) => {
+      queryBuilder.getMany.mockResolvedValue([]);
+
+      await service.getAllUsers('reader', undefined, 1, 25, isManager);
+
+      expect(queryBuilder.andWhere).toHaveBeenCalledWith(
+        'user.isManager = :isManager',
+        { isManager },
+      );
+    },
+  );
 
   it('moves an out-of-range page to the last page', async () => {
     queryBuilder.getCount.mockResolvedValue(13);
@@ -359,6 +375,7 @@ describe('UsersService', () => {
       email: 'person@example.test',
       mobile: '09123456789',
       providerLoginRole: role,
+      isManager: false,
     });
     expect(transactionRoles.findOneBy).toHaveBeenCalledWith({ id: 'role-id' });
     expect(transactionAssignments.create).toHaveBeenCalledWith({

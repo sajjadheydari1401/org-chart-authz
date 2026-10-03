@@ -17,7 +17,7 @@ describe('AuthService', () => {
   };
   let usersService: {
     createLocalUserWithRole: ReturnType<typeof vi.fn>;
-    getLoginRoleName: ReturnType<typeof vi.fn>;
+    getLoginDetails: ReturnType<typeof vi.fn>;
   };
   let rolesService: { getRoleByName: ReturnType<typeof vi.fn> };
   let jwtService: { signAsync: ReturnType<typeof vi.fn> };
@@ -35,7 +35,10 @@ describe('AuthService', () => {
     };
     usersService = {
       createLocalUserWithRole: vi.fn().mockResolvedValue(undefined),
-      getLoginRoleName: vi.fn().mockResolvedValue('member'),
+      getLoginDetails: vi.fn().mockResolvedValue({
+        roleName: 'member',
+        isManager: false,
+      }),
     };
     rolesService = {
       getRoleByName: vi
@@ -72,6 +75,7 @@ describe('AuthService', () => {
       email: 'person@example.test',
       mobile: '09123456789',
       roleId: 'role-id',
+      isManager: false,
     });
     expect(authProvider.deleteUser).not.toHaveBeenCalled();
   });
@@ -137,8 +141,9 @@ describe('AuthService', () => {
     await expect(service.loginWithUsernamePassword(input)).resolves.toEqual({
       accessToken: 'app-access-token',
       username: 'person',
+      isManager: false,
     });
-    expect(usersService.getLoginRoleName).toHaveBeenCalledWith('person');
+    expect(usersService.getLoginDetails).toHaveBeenCalledWith('person');
     expect(authProvider.loginWithUsernamePassword).toHaveBeenCalledWith(
       input,
       'member',

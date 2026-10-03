@@ -28,6 +28,7 @@ export class AuthService {
         email: input.email,
         mobile: input.mobile,
         roleId: role.id,
+        isManager: input.isManager ?? false,
       });
       return { success: true };
     } catch (error) {
@@ -51,8 +52,10 @@ export class AuthService {
 
   async loginWithUsernamePassword(
     input: LoginWithUsernamePasswordDto,
-  ): Promise<{ accessToken: string; username: string }> {
-    const roleName = await this.usersService.getLoginRoleName(input.username);
+  ): Promise<{ accessToken: string; username: string; isManager: boolean }> {
+    const { roleName, isManager } = await this.usersService.getLoginDetails(
+      input.username,
+    );
     const providerLogin = await this.authProvider.loginWithUsernamePassword(
       input,
       roleName,
@@ -61,6 +64,6 @@ export class AuthService {
       sub: providerLogin.username,
     });
 
-    return { accessToken, username: providerLogin.username };
+    return { accessToken, username: providerLogin.username, isManager };
   }
 }

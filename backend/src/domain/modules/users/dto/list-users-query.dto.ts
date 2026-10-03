@@ -1,6 +1,13 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsInt, IsOptional, IsUUID, Max, Min } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import {
+  IsBoolean,
+  IsInt,
+  IsOptional,
+  IsUUID,
+  Max,
+  Min,
+} from 'class-validator';
 
 export class ListUsersQueryDto {
   @ApiPropertyOptional({
@@ -10,6 +17,14 @@ export class ListUsersQueryDto {
   @IsOptional()
   @IsUUID()
   unitId?: string;
+
+  @ApiPropertyOptional({ description: 'Filter by manager status.' })
+  @IsOptional()
+  @Transform(({ value }) =>
+    value === 'true' ? true : value === 'false' ? false : value,
+  )
+  @IsBoolean()
+  isManager?: boolean;
 
   @ApiPropertyOptional({ description: 'Page number.', minimum: 1, default: 1 })
   @IsOptional()

@@ -23,6 +23,9 @@ export class User {
   @Column({ type: 'varchar', length: 11, nullable: true })
   mobile!: string | null;
 
+  @Column({ name: 'is_manager', type: 'boolean', default: false })
+  isManager!: boolean;
+
   // Provider login uses one role; local RBAC assignments remain separate.
   @ManyToOne(() => Role, { nullable: true })
   @JoinColumn({ name: 'provider_login_role_id' })

@@ -26,7 +26,9 @@ export class UsersService {
     private readonly effectiveAccess: EffectiveAccessService,
   ) {}
 
-  async getLoginRoleName(username: string): Promise<string> {
+  async getLoginDetails(
+    username: string,
+  ): Promise<{ roleName: string; isManager: boolean }> {
     const user = await this.users.findOne({
       where: { username },
       relations: { providerLoginRole: true },
@@ -37,7 +39,7 @@ export class UsersService {
       throw new UnauthorizedException();
     }
 
-    return roleName;
+    return { roleName, isManager: user?.isManager ?? false };
   }
 
   async getAllUsers(
@@ -45,6 +47,7 @@ export class UsersService {
     unitId?: string,
     page?: number,
     pageSize?: number,
+    isManager?: boolean,
   ): Promise<PaginatedResponse<User>> {
     const allowedUnitIds = await this.getScopedUnitIds(
       username,
@@ -54,6 +57,9 @@ export class UsersService {
     );
 
     const query = this.buildUsersInUnitsQuery(allowedUnitIds);
+    if (isManager !== undefined) {
+      query.andWhere('user.isManager = :isManager', { isManager });
+    }
     const metadata = pagination(pageSize, page, await query.getCount());
     const items = await query
       .orderBy('user.username', 'ASC')
@@ -151,6 +157,7 @@ export class UsersService {
     email: string;
     mobile: string;
     roleId: string;
+    isManager?: boolean;
   }): Promise<User> {
     return this.dataSource.transaction(async (manager) => {
       const users = manager.getRepository(User);
@@ -168,6 +175,7 @@ export class UsersService {
           email: input.email,
           mobile: input.mobile,
           providerLoginRole: role,
+          isManager: input.isManager ?? false,
         }),
       );
       const roleAssignments = manager.getRepository(RoleAssignment);

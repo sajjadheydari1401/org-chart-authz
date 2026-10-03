@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Repository } from 'typeorm';
 import type { EffectiveAccess } from '../../../types/effective-access.js';
+import { User } from '../../users/entities/user.entity.js';
+import { Access } from './accesses/entities/access.entity.js';
 import { GET_DESCENDANT_UNIT_IDS_QUERY } from './queries/get-descendant-unit-ids.query.js';
 import { RoleAssignment } from './role-assignments/entities/role-assignment.entity.js';
 import { RoleAccess } from './role-accesses/entities/role-access.entity.js';
@@ -16,13 +18,69 @@ export class EffectiveAccessService {
     private readonly roles: Repository<Role>,
     @InjectRepository(RoleAccess)
     private readonly roleAccesses: Repository<RoleAccess>,
+    @InjectRepository(Access)
+    private readonly accesses: Repository<Access>,
+    @InjectRepository(User)
+    private readonly users: Repository<User>,
     @InjectDataSource() private readonly dataSource: DataSource,
   ) {}
+
+  private async userHasOwnerRole(username: string): Promise<boolean> {
+    const user = await this.users.findOne({
+      where: { username },
+      relations: { providerLoginRole: true },
+    });
+
+    if (user?.providerLoginRole?.name?.trim().toLowerCase() === 'owner') {
+      return true;
+    }
+
+    const assignments = await this.roleAssignments.find({
+      where: { user: { username } },
+      relations: { role: true },
+    });
+
+    return assignments.some(
+      ({ role }) => role.name.trim().toLowerCase() === 'owner',
+    );
+  }
+
+  private async getOwnerAccesses(): Promise<EffectiveAccess[]> {
+    const allAccesses = await this.accesses.find({
+      relations: { resource: true },
+    });
+
+    // Owners bypass unit-based limits, so we build a full access list from every
+    // known route/method pair. The UI checks unitIds.length > 0 to decide if a
+    // section is visible, so we give the owner a non-empty marker instead of an empty set.
+    const distinctAccesses = new Map<string, EffectiveAccess>();
+    for (const access of allAccesses) {
+      // Route + HTTP method is the unique identity for a permission.
+      const key = `${access.resource.route}\0${access.methodName}`;
+
+      // Remove duplicate permissions if the same route + method appears more than once.
+      if (!distinctAccesses.has(key)) {
+        distinctAccesses.set(key, {
+          route: access.resource.route,
+          methodName: access.methodName,
+          // We do not want to restrict an owner to a specific unit.
+          // A non-empty array keeps the frontend visibility checks happy.
+          unitIds: ['owner'],
+        });
+      }
+    }
+
+    return [...distinctAccesses.values()];
+  }
 
   /** Resolves route/method accesses granted by the user's assigned roles and their scope. */
   async getEffectiveAccessesForUsername(
     username: string,
   ): Promise<EffectiveAccess[]> {
+    if (await this.userHasOwnerRole(username)) {
+      return this.getOwnerAccesses();
+    }
+
     // 1) Get all role assignments for this user.
     //    Example: "John has roles in unit A and unit B".
     const assignments = await this.roleAssignments.find({

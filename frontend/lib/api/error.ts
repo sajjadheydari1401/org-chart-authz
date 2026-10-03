@@ -1,17 +1,7 @@
 ﻿import type { AuthActionError } from '@/types/auth/auth';
 import { redirect } from 'next/navigation';
 import { TRANSPORT_ERROR_MESSAGE } from './transport-error';
-
-export class ApiError extends Error {
-  constructor(
-    public readonly status: number,
-    message: string,
-    public readonly sessionExpired = false,
-  ) {
-    super(message);
-    this.name = 'ApiError';
-  }
-}
+import { ApiError } from './api-error';
 
 // Server Actions must return serializable errors rather than throw them to the browser.
 export function toActionError(error: unknown): AuthActionError {

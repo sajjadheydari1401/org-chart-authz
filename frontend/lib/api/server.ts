@@ -1,17 +1,15 @@
 ﻿import 'server-only';
 import type { AxiosRequestConfig } from 'axios';
-import { API } from './client';
+import { API } from './server-client';
 import { clearSession, getAccessToken } from '@/lib/auth/session';
-import { ApiError } from './error';
+import { ApiError } from './api-error';
+import type { AppApiResponse } from './app-api-response';
 import { apiErrorSchema, apiSuccessSchema } from './response';
 import { TRANSPORT_ERROR_MESSAGE } from './transport-error';
 
-type ApiRequestConfig = AxiosRequestConfig & { authenticated?: boolean };
+export type { AppApiResponse } from './app-api-response';
 
-export interface AppApiResponse<T> {
-  data: T;
-  message?: string;
-}
+type ApiRequestConfig = AxiosRequestConfig & { authenticated?: boolean };
 
 export async function AppApi<T>(
   path: string,

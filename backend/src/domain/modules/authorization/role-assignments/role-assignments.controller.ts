@@ -10,7 +10,12 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FormatResponseInterceptor } from '../../../../common/utils/interceptor/format-response.interceptor.js';
-import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CreateRoleAssignmentDto } from './dto/create-role-assignment.dto.js';
 import { UpdateRoleAssignmentDto } from './dto/update-role-assignment.dto.js';
 import { RoleAssignmentsService } from './role-assignments.service.js';
@@ -18,6 +23,7 @@ import { RequireAccess } from '../../../../common/decorator/require-access.decor
 
 @UseInterceptors(FormatResponseInterceptor)
 @ApiTags('Role Assignments')
+@ApiBearerAuth('bearer')
 @Controller('role-assignments')
 export class RoleAssignmentsController {
   constructor(

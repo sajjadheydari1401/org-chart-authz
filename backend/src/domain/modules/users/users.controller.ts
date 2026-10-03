@@ -11,7 +11,13 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FormatResponseInterceptor } from '../../../common/utils/interceptor/format-response.interceptor.js';
-import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 import { UsersService } from './users.service.js';
 import { RequireAccess } from '../../../common/decorator/require-access.decorator.js';
@@ -22,6 +28,7 @@ type AuthenticatedRequest = Request & { user: { username: string } };
 
 @UseInterceptors(FormatResponseInterceptor)
 @ApiTags('Users')
+@ApiBearerAuth('bearer')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}

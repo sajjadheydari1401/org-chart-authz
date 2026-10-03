@@ -9,13 +9,19 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FormatResponseInterceptor } from '../../../../common/utils/interceptor/format-response.interceptor.js';
-import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CreateRoleAccessDto } from './dto/create-role-access.dto.js';
 import { RoleAccessesService } from './role-accesses.service.js';
 import { RequireAccess } from '../../../../common/decorator/require-access.decorator.js';
 
 @UseInterceptors(FormatResponseInterceptor)
 @ApiTags('Role Accesses')
+@ApiBearerAuth('bearer')
 @Controller('role-accesses')
 export class RoleAccessesController {
   constructor(private readonly roleAccessesService: RoleAccessesService) {}

@@ -1,5 +1,5 @@
 import { Body, Controller, Post, UseInterceptors } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service.js';
 import { ConfirmRegistrationBySmsDto } from './dto/confirm-registration-by-sms.dto.js';
 import { LoginWithUsernamePasswordDto } from './dto/login-with-username-password.dto.js';
@@ -19,6 +19,7 @@ export class AuthController {
     route: '/auth/register/username-password',
     methodName: 'POST',
   })
+  @ApiBearerAuth('bearer')
   @ApiOperation({
     summary: 'Register with username and password',
     description:
@@ -30,6 +31,7 @@ export class AuthController {
 
   @Post('register/confirm-sms')
   @RequireAccess({ route: '/auth/register/confirm-sms', methodName: 'POST' })
+  @ApiBearerAuth('bearer')
   @ApiOperation({
     summary: 'Confirm registration by SMS',
     description: 'Confirms a new account using the SMS verification code.',
@@ -43,6 +45,7 @@ export class AuthController {
   @ApiOperation({
     summary: 'Log in with username and password',
     description: 'Validates credentials and returns an access token.',
+    security: [],
   })
   loginWithUsernamePassword(@Body() input: LoginWithUsernamePasswordDto) {
     return this.authService.loginWithUsernamePassword(input);

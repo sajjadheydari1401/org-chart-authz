@@ -10,7 +10,12 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FormatResponseInterceptor } from '../../../../common/utils/interceptor/format-response.interceptor.js';
-import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CreateRoleDto } from './dto/create-role.dto.js';
 import { UpdateRoleDto } from './dto/update-role.dto.js';
 import { RolesService } from './roles.service.js';
@@ -18,6 +23,7 @@ import { RequireAccess } from '../../../../common/decorator/require-access.decor
 
 @UseInterceptors(FormatResponseInterceptor)
 @ApiTags('Roles')
+@ApiBearerAuth('bearer')
 @Controller('roles')
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}

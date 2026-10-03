@@ -27,9 +27,22 @@ async function bootstrap() {
     .setDescription(
       'Local API for authentication, users, organizational units, and authorization data.',
     )
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        in: 'header',
+      },
+      'bearer',
+    )
     .build();
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api/docs', app, swaggerDocument);
+  SwaggerModule.setup('api/docs', app, swaggerDocument, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  });
 
   const config = app.get(ConfigService);
   const port = config.get<number>('PORT') ?? 3000;

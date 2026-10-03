@@ -10,7 +10,12 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FormatResponseInterceptor } from '../../../../common/utils/interceptor/format-response.interceptor.js';
-import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AccessesService } from './accesses.service.js';
 import { CreateAccessDto } from './dto/create-access.dto.js';
 import { UpdateAccessDto } from './dto/update-access.dto.js';
@@ -18,6 +23,7 @@ import { RequireAccess } from '../../../../common/decorator/require-access.decor
 
 @UseInterceptors(FormatResponseInterceptor)
 @ApiTags('Accesses')
+@ApiBearerAuth('bearer')
 @Controller('accesses')
 export class AccessesController {
   constructor(private readonly accessesService: AccessesService) {}

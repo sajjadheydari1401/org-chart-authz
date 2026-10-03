@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { FormatResponseInterceptor } from '../../../common/utils/interceptor/format-response.interceptor.js';
 import {
+  ApiBearerAuth,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -24,6 +25,7 @@ import { RequireAccess } from '../../../common/decorator/require-access.decorato
 
 @UseInterceptors(FormatResponseInterceptor)
 @ApiTags('Organizational Units')
+@ApiBearerAuth('bearer')
 @Controller('units')
 export class UnitsController {
   constructor(private readonly unitsService: UnitsService) {}

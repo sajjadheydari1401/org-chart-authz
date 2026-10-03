@@ -1,7 +1,7 @@
 ﻿import 'server-only';
 import type { AxiosRequestConfig } from 'axios';
 import { API } from './server-client';
-import { clearSession, getAccessToken } from '@/lib/auth/session';
+import { getAccessToken } from '@/lib/auth/session';
 import { ApiError } from './api-error';
 import type { AppApiResponse } from './app-api-response';
 import { apiErrorSchema, apiSuccessSchema } from './response';
@@ -33,7 +33,6 @@ export async function AppApi<T>(
     const sessionExpired =
       authenticated &&
       (response.status === 401 || failure.data.statusCode === 401);
-    if (sessionExpired) await clearSession();
     throw new ApiError(
       failure.data.statusCode,
       failure.data.message,
@@ -42,7 +41,6 @@ export async function AppApi<T>(
   }
   if (response.status < 200 || response.status >= 300) {
     const sessionExpired = authenticated && response.status === 401;
-    if (sessionExpired) await clearSession();
     throw new ApiError(
       response.status,
       TRANSPORT_ERROR_MESSAGE,

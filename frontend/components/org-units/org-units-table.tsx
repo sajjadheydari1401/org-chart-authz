@@ -8,16 +8,16 @@ import {
 import type { IOrgUnit } from '@/types/org-unit';
 
 export function OrgUnitsTable({
-  units,
+  filteredUnits,
   allUnits,
   caption,
 }: {
-  units: readonly IOrgUnit[];
+  filteredUnits: readonly IOrgUnit[];
   allUnits: readonly IOrgUnit[];
   caption: string;
 }) {
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
-  const unitNames = new Map(allUnits.map((unit) => [unit.id, unit.name]));
+  const unitNameById = new Map(allUnits.map((unit) => [unit.id, unit.name]));
   const columns: AppTableColumn<IOrgUnit>[] = [
     { key: 'id', header: 'شناسه' },
     { key: 'name', header: 'نام' },
@@ -25,14 +25,14 @@ export function OrgUnitsTable({
       key: 'parentId',
       header: 'واحد بالادست',
       render: (unit) =>
-        unit.parentId === null ? '—' : (unitNames.get(unit.parentId) ?? '—'),
+        unit.parentId === null ? '—' : (unitNameById.get(unit.parentId) ?? '—'),
     },
   ];
 
   return (
     <AppTable
       columns={columns}
-      data={units}
+      data={filteredUnits}
       rowKey={(unit) => unit.id}
       rowLabel={(unit) => unit.name}
       caption={caption}

@@ -14,17 +14,18 @@ const TAB_NAMES = [
 export function OrgUnitsTabs({ units }: { units: readonly IOrgUnit[] }) {
   const [value, setValue] =
     useState<(typeof TAB_NAMES)[number]['value']>('departments');
+
   const tabContents = {
     departments: (
       <OrgUnitsTable
-        units={getDepartments(units)}
+        filteredUnits={getDepartments(units)}
         allUnits={units}
         caption="واحدهای سازمانی"
       />
     ),
     teams: (
       <OrgUnitsTable
-        units={getTeams(units)}
+        filteredUnits={getTeams(units)}
         allUnits={units}
         caption="تیم‌ها"
       />

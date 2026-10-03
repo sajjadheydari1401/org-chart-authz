@@ -7,8 +7,22 @@ import { Strategy, ExtractJwt } from 'passport-jwt';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(@Inject(ConfigService) config: ConfigService) {
     super({
-      /*AuthHeaderAsBearerToken تنظیم استخراج توکن از*/
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (request: { headers?: { cookie?: string } } | undefined) => {
+          const rawCookie = request?.headers?.cookie;
+          if (!rawCookie) return null;
+
+          const match = rawCookie
+            .split(';')
+            .map((part: string) => part.trim())
+            .find((part: string) => part.startsWith('access_token='));
+
+          if (!match) return null;
+
+          return decodeURIComponent(match.split('=')[1] ?? '');
+        },
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ]),
       ignoreExpiration: false,
 
       // This is the app's signing key, not a provider JWT secret.

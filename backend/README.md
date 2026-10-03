@@ -1,118 +1,192 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Organization Chart API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+NestJS backend for authentication, organizational units, users, and unit-scoped role-based authorization. The API uses PostgreSQL through TypeORM and delegates credential verification and provider-side authorization catalog operations to the configured authentication provider.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Architecture
 
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
-
-```bash
-$ pnpm install
+```text
+src/
+  common/                  Guards, decorators, provider client, errors, logging
+  config/                  TypeORM configuration
+  database/migrations/     Versioned PostgreSQL schema changes
+  domain/modules/
+    auth/                  Registration, SMS confirmation, login
+    authorization/         Resources, accesses, roles, assignments, effective access
+    units/                 Organizational hierarchy
+    users/                 Local user records and scoped user queries
+  types/                   Shared domain types
 ```
 
-## Compile and run the project
+`AppModule` registers the global JWT guard, access guard, exception filter, feature modules, and database connection. The authorization module groups the role/access management modules; `EffectiveAccessService` is shared with the guards and user queries.
+
+## Local Setup
+
+Requirements: Node.js supported by the workspace, pnpm `12.5.1`, and PostgreSQL.
 
 ```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+pnpm install
 ```
 
-## Run tests
+Copy `backend/.env.example` to `backend/.env`, create a PostgreSQL database, and fill in the local values. Do not commit `.env` or expose provider credentials or `JWT_SECRET`.
+
+| Variable                                                         | Purpose                                                             |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `PORT`                                                           | HTTP port; defaults to `3000`.                                      |
+| `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`        | PostgreSQL connection.                                              |
+| `AUTH_BASE_URL`                                                  | Authentication provider base URL. Provider requests must use HTTPS. |
+| `AUTH_SYSTEM_USERNAME`, `AUTH_SYSTEM_PASSWORD`                   | Server-side provider credentials.                                   |
+| `AUTH_SMS_TEMPLATE`, `AUTH_PATTERN_NAME`, `AUTH_SMS_SYSTEM_NAME` | Provider SMS registration settings.                                 |
+| `JWT_SECRET`                                                     | Locally generated signing key; at least 32 characters.              |
+| `JWT_EXPIRES_IN`                                                 | Local JWT lifetime in seconds; must be a positive integer.          |
+
+Start the API from the repository root:
 
 ```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+pnpm --dir backend start:dev
 ```
 
-## Deployment
+The API prefix is `/api`; Swagger is available at `http://localhost:3000/api/docs` when using the default port.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## Authentication
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+The provider verifies credentials. This application issues its own JWT and uses the local user/authorization database for subsequent API requests.
+
+### Registration
+
+1. `POST /api/auth/register/username-password` looks up the submitted English role name in the local `roles` table. The current implementation checks that the role exists; it does not enforce a self-registration role allowlist.
+2. The backend requests provider registration and SMS verification.
+3. In a local database transaction, it creates the `users` row and an initial `role_assignments` row for the selected role. That role is also stored as the user's `providerLoginRole` for provider login.
+4. If local persistence fails after provider registration, the backend attempts to delete the provider user as compensation.
+5. `POST /api/auth/register/confirm-sms` confirms the code with the provider. It does not issue a JWT.
+
+**Current route behavior:** registration and SMS confirmation are protected by `@RequireAccess`, just like other permissioned routes. Only login is public. They therefore require a valid JWT and matching route grants unless this policy is deliberately changed. Account for this when testing onboarding.
+
+### Login and JWTs
+
+`POST /api/auth/login/username-password` is marked `@Public`. The backend loads the local user's `providerLoginRole.name`, sends that role name and the credentials to the provider, validates the provider response, then signs a local JWT with `username` as its `sub`. The provider token is validated but is not returned or used as the API bearer token. The response also includes the local `isManager` flag; this flag is descriptive user data, not a role grant.
+
+Protected requests send the local token as `Authorization: Bearer <token>`. `JwtStrategy` verifies its signature with `JWT_SECRET`, checks its expiration, and exposes the username on `request.user`. Tokens are not refreshed by this API; clients must log in again after expiration.
+
+## Authorization Model
+
+The local authorization graph is:
+
+```text
+Resource (route template)
+  -> Access (HTTP method + description)
+  <- RoleAccess -> Role (unit + scope mode)
+                       ^
+                       |
+User <- RoleAssignment
+```
+
+- A **Resource** identifies a route template, for example `/users/:id`.
+- An **Access** identifies an HTTP method on a resource, for example `GET` on `/users/:id`.
+- A **Role** belongs to one organizational unit and has a scope mode: `SELF` or `DESCENDANTS`.
+- A **RoleAccess** links a role to an access.
+- A **RoleAssignment** links a user to a role. A user may have multiple assignments, but duplicate user/role pairs are rejected.
+- Organizational units form a parent/child tree. `isManager` is not used to grant API access.
+
+`EffectiveAccessService` resolves a user's assignments and their linked accesses. `SELF` includes only accesses linked to the assigned role. `DESCENDANTS` also includes accesses linked to roles anchored in descendant units. The result is deduplicated by route and method and carries the unit IDs that supplied each grant. Unit scope is then used by user queries to limit which records the caller can list, view, update, or delete.
+
+### Request Guard Flow
+
+The global guards run in this order: `JwtAuthGuard`, then `AccessGuard`.
+
+```mermaid
+flowchart TD
+  Request --> JwtGuard[JwtAuthGuard]
+  JwtGuard -->|Invalid or missing token| Unauthorized[401 Unauthorized]
+  JwtGuard -->|Public metadata| Handler[Controller handler]
+  JwtGuard -->|Valid token| AccessGuard[AccessGuard]
+  AccessGuard -->|Public metadata| Handler
+  AccessGuard -->|AuthenticatedOnly and username present| Handler
+  AccessGuard -->|RequireAccess metadata| Effective[Resolve effective accesses]
+  Effective -->|Exact route and method grant| Handler
+  Effective -->|No matching grant| Forbidden[403 Forbidden]
+  AccessGuard -->|No access metadata| Forbidden
+```
+
+Use one of these decorators on each controller handler:
+
+```ts
+@Public() // No JWT or permission required.
+@AuthenticatedOnly() // Valid JWT required; no separate route grant.
+@RequireAccess({ route: '/users', methodName: 'GET' }) // JWT and exact grant required.
+```
+
+Protected handlers without `@RequireAccess` or `@AuthenticatedOnly` fail closed. `@RequireAccess` compares the declared route template and uppercase HTTP method against effective grants; it does not match a concrete URL by prefix. Keep the route key identical to the corresponding Resource route and include controller/handler path segments. The global `/api` prefix is not part of the permission key.
+
+When adding a protected endpoint:
+
+1. Add the matching `@RequireAccess({ route, methodName })` to the handler.
+2. Register that exact route as a Resource and the uppercase method as an Access.
+3. Link the Access to a Role with RoleAccess, and assign that Role to users.
+4. Add unit-aware data filtering in the service when the endpoint returns or mutates unit-scoped records. The global guard only decides whether the route/method is granted; it does not automatically filter query results.
+
+The backend currently has no seed routine registered in TypeORM. A deployment must provision initial units, resources, accesses, roles, links, and assignments through its controlled bootstrap process before protected routes can be used.
+
+## Route Reference
+
+All paths below are under `/api`. Unless marked `Public` or `AuthenticatedOnly`, handlers require the exact route/method grant shown by their `@RequireAccess` metadata.
+
+| Method and route                                                                           | Access rule / behavior                                                                                                  |
+| ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| `POST /auth/login/username-password`                                                       | Public; provider verifies credentials; returns a local JWT.                                                             |
+| `POST /auth/register/username-password`                                                    | `POST /auth/register/username-password`; creates provider and local user records.                                       |
+| `POST /auth/register/confirm-sms`                                                          | `POST /auth/register/confirm-sms`; confirms provider SMS code.                                                          |
+| `GET /me/accesses`                                                                         | AuthenticatedOnly; returns effective route, method, and unit grants.                                                    |
+| `GET /users`                                                                               | `GET /users`; filters users to the caller's granted unit scope; supports `unitId`, `page`, `pageSize`, and `isManager`. |
+| `GET /users/:id`, `PATCH /users/:id`, `DELETE /users/:id`                                  | Matching method grant on `/users/:id`; record must also belong to the caller's allowed unit scope.                      |
+| `GET /units`, `POST /units`                                                                | Matching method grant on `/units`.                                                                                      |
+| `GET /units/:id`, `PATCH /units/:id`, `DELETE /units/:id`                                  | Matching method grant on `/units/:id`; delete removes the selected unit subtree and cannot delete a root unit.          |
+| `GET /roles`, `POST /roles`                                                                | Matching method grant on `/roles`.                                                                                      |
+| `PATCH /roles/:id`, `DELETE /roles/:id`                                                    | Matching method grant on `/roles/:id`.                                                                                  |
+| `GET /resources`, `POST /resources`                                                        | Matching method grant on `/resources`.                                                                                  |
+| `PATCH /resources/:id`, `DELETE /resources/:id`                                            | Matching method grant on `/resources/:id`.                                                                              |
+| `GET /accesses`, `POST /accesses`                                                          | Matching method grant on `/accesses`.                                                                                   |
+| `PATCH /accesses/:id`, `DELETE /accesses/:id`                                              | Matching method grant on `/accesses/:id`.                                                                               |
+| `GET /role-accesses/role-accesses`, `POST /role-accesses/role-accesses`                    | Matching method grant on `/role-accesses/role-accesses`. The repeated segment is the current controller route.          |
+| `DELETE /role-accesses/:roleId/accesses/:accessId`                                         | Matching method grant on that exact template.                                                                           |
+| `GET /role-assignments`, `POST /role-assignments`                                          | Matching method grant on `/role-assignments`.                                                                           |
+| `GET /role-assignments/:id`, `PATCH /role-assignments/:id`, `DELETE /role-assignments/:id` | Matching method grant on `/role-assignments/:id`.                                                                       |
+
+`GET /users` pagination defaults and limits are defined by its DTO and pagination helper. `unitId`, when supplied, must be among the unit IDs granted for that route/method or the request is forbidden.
+
+## Provider and Database Boundaries
+
+The authentication provider owns credential verification and provider-side role/resource/access records. This API stores local UUID records and provider IDs; role unit/scope data, the Farsi role name, users, and user-role assignments are local. Effective API authorization is resolved from the local database.
+
+Provider requests go through `postToProvider`, which requires an HTTPS URL and validates the provider response envelope. Some create flows compensate for a local insert failure by deleting the newly created provider record. These calls are not a distributed transaction: update/delete flows call the provider before changing local rows, so a later database failure can leave provider and local state out of sync. User deletion has the same provider-first ordering.
+
+PostgreSQL schema changes belong in `src/database/migrations`. Migrations are explicitly registered and run at startup; TypeORM `synchronize` is disabled. Entity IDs are UUIDs. Foreign keys use `ON DELETE NO ACTION`, so deleting a unit, role, user, resource, or access with dependent rows can fail until those references are handled. In particular, subtree deletion does not automatically remove roles assigned to those units.
+
+## Validation and Responses
+
+The global `ValidationPipe` transforms DTO input, strips non-whitelisted fields, and rejects unknown fields. Route IDs that use `ParseUUIDPipe` must be UUIDs. Keep request validation in DTOs with `class-validator` decorators.
+
+Feature controllers use `FormatResponseInterceptor` for successful responses:
+
+```json
+{
+  "status": "success",
+  "data": {},
+  "message": { "fa": "...", "en": "..." },
+  "timestamp": "..."
+}
+```
+
+The global exception filter normalizes errors to `status: "fail"`, `statusCode`, `message`, `timestamp`, and `path`. Provider credentials and raw internal server errors are not included in client responses or error logs.
+
+## Development Commands
 
 ```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+pnpm --dir backend start:dev
+pnpm --dir backend build
+pnpm --dir backend test
+pnpm --dir backend test:e2e
+pnpm --dir backend lint
+pnpm --dir backend exec tsc --noEmit -p tsconfig.build.json
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Observability
-
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
-
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
-
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
-
-This project is already instrumented. Create a free account at [observe.nestjs.com](https://observe.nestjs.com), add an application, and paste the generated app key and secret into the `ObserveModule.forRoot()` call in `src/app.module.ts`.
-
-The free plan needs no payment details and covers 300,000 events a month. You can also browse the [live demo](https://www.observe-demo.nestjs.com/dashboard) first - the whole dashboard over a busy service's data, with nothing to install.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observe](https://observe.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Unit and integration tests use Vitest. Keep tests beside the feature as `*.spec.ts`; the production build excludes specs. `test:e2e` uses `vitest.config.e2e.ts` and may require a running database and configured provider environment.

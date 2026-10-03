@@ -176,7 +176,7 @@ export function AddUserForm({ onSuccess }: { onSuccess: () => void }) {
           <AppCombobox
             id="role"
             options={roleOptions}
-            value={field.value}
+            value={typeof field.value === 'string' ? field.value : ''}
             onChange={field.onChange}
             onBlur={field.onBlur}
             placeholder="انتخاب نقش"

@@ -15,7 +15,7 @@ import {
   type VerifySmsFormInput,
 } from '@/lib/schemas/auth';
 
-export function VerifySmsForm({ onSuccess }: { onSuccess: () => void }) {
+export function VerifySmsForm({ onSuccess }: { onSuccess?: () => void } = {}) {
   const {
     register,
     handleSubmit,
@@ -38,7 +38,7 @@ export function VerifySmsForm({ onSuccess }: { onSuccess: () => void }) {
 
     if (result.success) {
       if (result.message) showSuccess(result.message);
-      onSuccess();
+      onSuccess?.();
       return;
     }
 

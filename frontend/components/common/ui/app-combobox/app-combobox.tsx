@@ -8,7 +8,7 @@ import { useAppCombobox } from './use-app-combobox';
 
 export interface AppComboboxProps {
   options: readonly AppSelectOption[];
-  value: string;
+  value?: string;
   onChange: (value: string) => void;
   onBlur?: () => void;
   id?: string;
@@ -22,7 +22,7 @@ export interface AppComboboxProps {
 /** Controlled, searchable single selection; connect it with React Hook Form Controller. */
 export function AppCombobox({
   options,
-  value,
+  value = '',
   onChange,
   onBlur,
   id,

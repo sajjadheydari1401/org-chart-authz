@@ -37,7 +37,9 @@ export function createGraph(units: readonly IOrgUnit[]) {
   // parentId already describes the hierarchy, so each parent-child
   // relationship can be converted directly into a React Flow edge.
   const edges: Edge[] = units
-    .filter((unit) => unit.parentId !== null)
+    .filter(
+      (unit): unit is IOrgUnit & { parentId: string } => unit.parentId !== null,
+    )
     .map((unit) => ({
       id: `${unit.parentId}-${unit.id}`,
       source: unit.parentId,

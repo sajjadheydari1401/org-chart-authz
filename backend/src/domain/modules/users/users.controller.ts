@@ -34,7 +34,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  @RequireAccess({ route: '/users', methodName: 'GET' })
+  @RequireAccess({ route: '/users', methodName: 'GET', allowOwner: true })
   @ApiOperation({
     summary: 'List users',
     description: "Returns users assigned to units within the caller's scope.",
@@ -63,7 +63,11 @@ export class UsersController {
   }
 
   @Get(':id')
-  @RequireAccess({ route: '/users/:id', methodName: 'GET' })
+  @RequireAccess({
+    route: '/users/:id',
+    methodName: 'GET',
+    allowOwner: true,
+  })
   @ApiParam({
     name: 'id',
     type: String,
@@ -82,7 +86,11 @@ export class UsersController {
   }
 
   @Patch(':id')
-  @RequireAccess({ route: '/users/:id', methodName: 'PATCH' })
+  @RequireAccess({
+    route: '/users/:id',
+    methodName: 'PATCH',
+    allowOwner: true,
+  })
   @ApiParam({
     name: 'id',
     type: String,
@@ -102,7 +110,11 @@ export class UsersController {
   }
 
   @Delete(':id')
-  @RequireAccess({ route: '/users/:id', methodName: 'DELETE' })
+  @RequireAccess({
+    route: '/users/:id',
+    methodName: 'DELETE',
+    allowOwner: true,
+  })
   @ApiParam({
     name: 'id',
     type: String,

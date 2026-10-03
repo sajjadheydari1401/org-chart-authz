@@ -56,6 +56,14 @@ export class AccessGuard implements CanActivate {
 
     const accesses =
       await this.effectiveAccess.getEffectiveAccessesForUsername(username);
+
+    if (
+      requiredAccess.allowOwner &&
+      accesses.some((access) => access.unitIds.includes('owner'))
+    ) {
+      return true;
+    }
+
     return accesses.some(
       (access) =>
         access.route === requiredAccess.route &&

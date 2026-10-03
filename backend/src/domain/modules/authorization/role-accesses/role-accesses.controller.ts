@@ -27,7 +27,11 @@ export class RoleAccessesController {
   constructor(private readonly roleAccessesService: RoleAccessesService) {}
 
   @Get('role-accesses')
-  @RequireAccess({ route: '/role-accesses/role-accesses', methodName: 'GET' })
+  @RequireAccess({
+    route: '/role-accesses/role-accesses',
+    methodName: 'GET',
+    allowOwner: true,
+  })
   @ApiOperation({
     summary: 'List role-access links',
     description:
@@ -38,7 +42,11 @@ export class RoleAccessesController {
   }
 
   @Post('role-accesses')
-  @RequireAccess({ route: '/role-accesses/role-accesses', methodName: 'POST' })
+  @RequireAccess({
+    route: '/role-accesses/role-accesses',
+    methodName: 'POST',
+    allowOwner: true,
+  })
   @ApiOperation({
     summary: 'Link an access to a role',
     description: 'Creates a provider role-access link and stores it locally.',
@@ -51,6 +59,7 @@ export class RoleAccessesController {
   @RequireAccess({
     route: '/role-accesses/:roleId/accesses/:accessId',
     methodName: 'DELETE',
+    allowOwner: true,
   })
   @ApiParam({
     name: 'roleId',

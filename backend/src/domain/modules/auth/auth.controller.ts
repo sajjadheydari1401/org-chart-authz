@@ -18,6 +18,7 @@ export class AuthController {
   @RequireAccess({
     route: '/auth/register/username-password',
     methodName: 'POST',
+    allowOwner: true,
   })
   @ApiBearerAuth('bearer')
   @ApiOperation({
@@ -30,7 +31,11 @@ export class AuthController {
   }
 
   @Post('register/confirm-sms')
-  @RequireAccess({ route: '/auth/register/confirm-sms', methodName: 'POST' })
+  @RequireAccess({
+    route: '/auth/register/confirm-sms',
+    methodName: 'POST',
+    allowOwner: true,
+  })
   @ApiBearerAuth('bearer')
   @ApiOperation({
     summary: 'Confirm registration by SMS',

@@ -29,7 +29,11 @@ export class ResourcesController {
   constructor(private readonly resourcesService: ResourcesService) {}
 
   @Delete(':id')
-  @RequireAccess({ route: '/resources/:id', methodName: 'DELETE' })
+  @RequireAccess({
+    route: '/resources/:id',
+    methodName: 'DELETE',
+    allowOwner: true,
+  })
   @ApiParam({
     name: 'id',
     type: String,
@@ -45,7 +49,7 @@ export class ResourcesController {
   }
 
   @Get()
-  @RequireAccess({ route: '/resources', methodName: 'GET' })
+  @RequireAccess({ route: '/resources', methodName: 'GET', allowOwner: true })
   @ApiOperation({
     summary: 'List resources',
     description: 'Returns resources stored in the local database.',
@@ -55,7 +59,7 @@ export class ResourcesController {
   }
 
   @Post()
-  @RequireAccess({ route: '/resources', methodName: 'POST' })
+  @RequireAccess({ route: '/resources', methodName: 'POST', allowOwner: true })
   @ApiOperation({
     summary: 'Create a resource',
     description: 'Creates a route resource in the provider and local database.',
@@ -65,7 +69,11 @@ export class ResourcesController {
   }
 
   @Patch(':id')
-  @RequireAccess({ route: '/resources/:id', methodName: 'PATCH' })
+  @RequireAccess({
+    route: '/resources/:id',
+    methodName: 'PATCH',
+    allowOwner: true,
+  })
   @ApiParam({
     name: 'id',
     type: String,

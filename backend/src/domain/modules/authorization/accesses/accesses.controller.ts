@@ -29,7 +29,11 @@ export class AccessesController {
   constructor(private readonly accessesService: AccessesService) {}
 
   @Delete(':id')
-  @RequireAccess({ route: '/accesses/:id', methodName: 'DELETE' })
+  @RequireAccess({
+    route: '/accesses/:id',
+    methodName: 'DELETE',
+    allowOwner: true,
+  })
   @ApiParam({
     name: 'id',
     type: String,
@@ -45,7 +49,11 @@ export class AccessesController {
   }
 
   @Patch(':id')
-  @RequireAccess({ route: '/accesses/:id', methodName: 'PATCH' })
+  @RequireAccess({
+    route: '/accesses/:id',
+    methodName: 'PATCH',
+    allowOwner: true,
+  })
   @ApiParam({
     name: 'id',
     type: String,
@@ -65,7 +73,7 @@ export class AccessesController {
   }
 
   @Get()
-  @RequireAccess({ route: '/accesses', methodName: 'GET' })
+  @RequireAccess({ route: '/accesses', methodName: 'GET', allowOwner: true })
   @ApiOperation({
     summary: 'List accesses',
     description: 'Returns accesses stored in the local database.',
@@ -75,7 +83,7 @@ export class AccessesController {
   }
 
   @Post()
-  @RequireAccess({ route: '/accesses', methodName: 'POST' })
+  @RequireAccess({ route: '/accesses', methodName: 'POST', allowOwner: true })
   @ApiOperation({
     summary: 'Create an access',
     description:

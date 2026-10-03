@@ -31,7 +31,7 @@ export class UnitsController {
   constructor(private readonly unitsService: UnitsService) {}
 
   @Get()
-  @RequireAccess({ route: '/units', methodName: 'GET' })
+  @RequireAccess({ route: '/units', methodName: 'GET', allowOwner: true })
   @ApiOperation({
     summary: 'List organizational units',
     description: 'Returns flat unit records, including each parent UUID.',
@@ -42,7 +42,11 @@ export class UnitsController {
   }
 
   @Get(':id')
-  @RequireAccess({ route: '/units/:id', methodName: 'GET' })
+  @RequireAccess({
+    route: '/units/:id',
+    methodName: 'GET',
+    allowOwner: true,
+  })
   @ApiParam({
     name: 'id',
     type: String,
@@ -58,7 +62,7 @@ export class UnitsController {
   }
 
   @Post()
-  @RequireAccess({ route: '/units', methodName: 'POST' })
+  @RequireAccess({ route: '/units', methodName: 'POST', allowOwner: true })
   @ApiOperation({
     summary: 'Create an organizational unit',
     description: 'Creates a unit, optionally under an existing parent unit.',
@@ -68,7 +72,11 @@ export class UnitsController {
   }
 
   @Patch(':id')
-  @RequireAccess({ route: '/units/:id', methodName: 'PATCH' })
+  @RequireAccess({
+    route: '/units/:id',
+    methodName: 'PATCH',
+    allowOwner: true,
+  })
   @ApiParam({
     name: 'id',
     type: String,
@@ -87,7 +95,11 @@ export class UnitsController {
   }
 
   @Delete(':id')
-  @RequireAccess({ route: '/units/:id', methodName: 'DELETE' })
+  @RequireAccess({
+    route: '/units/:id',
+    methodName: 'DELETE',
+    allowOwner: true,
+  })
   @ApiParam({
     name: 'id',
     type: String,

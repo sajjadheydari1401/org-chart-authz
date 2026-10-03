@@ -29,7 +29,7 @@ export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
   @Get()
-  @RequireAccess({ route: '/roles', methodName: 'GET' })
+  @RequireAccess({ route: '/roles', methodName: 'GET', allowOwner: true })
   @ApiOperation({
     summary: 'List roles',
     description: 'Returns roles stored in the local database.',
@@ -39,7 +39,7 @@ export class RolesController {
   }
 
   @Post()
-  @RequireAccess({ route: '/roles', methodName: 'POST' })
+  @RequireAccess({ route: '/roles', methodName: 'POST', allowOwner: true })
   @ApiOperation({
     summary: 'Create a role',
     description: 'Creates a role in the provider and stores its local scope.',
@@ -49,7 +49,11 @@ export class RolesController {
   }
 
   @Patch(':id')
-  @RequireAccess({ route: '/roles/:id', methodName: 'PATCH' })
+  @RequireAccess({
+    route: '/roles/:id',
+    methodName: 'PATCH',
+    allowOwner: true,
+  })
   @ApiParam({
     name: 'id',
     type: String,
@@ -68,7 +72,11 @@ export class RolesController {
   }
 
   @Delete(':id')
-  @RequireAccess({ route: '/roles/:id', methodName: 'DELETE' })
+  @RequireAccess({
+    route: '/roles/:id',
+    methodName: 'DELETE',
+    allowOwner: true,
+  })
   @ApiParam({
     name: 'id',
     type: String,

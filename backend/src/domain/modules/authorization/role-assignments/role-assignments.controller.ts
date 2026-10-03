@@ -31,7 +31,11 @@ export class RoleAssignmentsController {
   ) {}
 
   @Post()
-  @RequireAccess({ route: '/role-assignments', methodName: 'POST' })
+  @RequireAccess({
+    route: '/role-assignments',
+    methodName: 'POST',
+    allowOwner: true,
+  })
   @ApiOperation({
     summary: 'Assign a role to a user',
     description:
@@ -42,7 +46,11 @@ export class RoleAssignmentsController {
   }
 
   @Get()
-  @RequireAccess({ route: '/role-assignments', methodName: 'GET' })
+  @RequireAccess({
+    route: '/role-assignments',
+    methodName: 'GET',
+    allowOwner: true,
+  })
   @ApiOperation({
     summary: 'List role assignments',
     description: 'Returns local role assignments with their users and roles.',
@@ -52,7 +60,11 @@ export class RoleAssignmentsController {
   }
 
   @Get(':id')
-  @RequireAccess({ route: '/role-assignments/:id', methodName: 'GET' })
+  @RequireAccess({
+    route: '/role-assignments/:id',
+    methodName: 'GET',
+    allowOwner: true,
+  })
   @ApiParam({
     name: 'id',
     type: String,
@@ -68,7 +80,11 @@ export class RoleAssignmentsController {
   }
 
   @Patch(':id')
-  @RequireAccess({ route: '/role-assignments/:id', methodName: 'PATCH' })
+  @RequireAccess({
+    route: '/role-assignments/:id',
+    methodName: 'PATCH',
+    allowOwner: true,
+  })
   @ApiParam({
     name: 'id',
     type: String,
@@ -87,7 +103,11 @@ export class RoleAssignmentsController {
   }
 
   @Delete(':id')
-  @RequireAccess({ route: '/role-assignments/:id', methodName: 'DELETE' })
+  @RequireAccess({
+    route: '/role-assignments/:id',
+    methodName: 'DELETE',
+    allowOwner: true,
+  })
   @ApiParam({
     name: 'id',
     type: String,

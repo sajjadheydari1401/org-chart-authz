@@ -217,14 +217,15 @@ export class AuthorizationProviderService {
   }
 
   async createResource(route: string): Promise<AddResourceResult> {
+    const { systemUsername, systemPassword } = systemCredentials(this.config);
     const data = await postToProvider<AddResourceResult>(
       providerUrl(this.config, '/admin/addResource'),
       {
-        ...systemCredentials(this.config),
+        username: systemUsername,
+        password: systemPassword,
         route,
       },
     );
-
     const result = data.result;
     const providerId = result?.id;
     if (!result || typeof providerId !== 'string' || !providerId.trim()) {

@@ -42,6 +42,32 @@ export class UsersService {
     return { roleName, isManager: user?.isManager ?? false };
   }
 
+  private async isOwner(username: string): Promise<boolean> {
+    const user = await this.users.findOne({
+      where: { username },
+      relations: { providerLoginRole: true },
+    });
+
+    if (user?.providerLoginRole?.name?.trim().toLowerCase() === 'owner') {
+      return true;
+    }
+
+    const assignmentsRepository =
+      this.dataSource?.getRepository?.(RoleAssignment);
+    if (!assignmentsRepository) {
+      return false;
+    }
+
+    const assignments = await assignmentsRepository.find({
+      where: { user: { username } },
+      relations: { role: true },
+    });
+
+    return assignments.some(
+      ({ role }) => role.name.trim().toLowerCase() === 'owner',
+    );
+  }
+
   async getAllUsers(
     username: string,
     unitId?: string,
@@ -49,14 +75,13 @@ export class UsersService {
     pageSize?: number,
     isManager?: boolean,
   ): Promise<PaginatedResponse<User>> {
-    const allowedUnitIds = await this.getScopedUnitIds(
-      username,
-      '/users',
-      'GET',
-      unitId,
-    );
+    const isOwner = await this.isOwner(username);
+    const query = isOwner
+      ? this.users.createQueryBuilder('user')
+      : this.buildUsersInUnitsQuery(
+          await this.getScopedUnitIds(username, '/users', 'GET', unitId),
+        );
 
-    const query = this.buildUsersInUnitsQuery(allowedUnitIds);
     if (isManager !== undefined) {
       query.andWhere('user.isManager = :isManager', { isManager });
     }
@@ -110,6 +135,12 @@ export class UsersService {
     username: string,
     methodName: 'GET' | 'PATCH' | 'DELETE',
   ): Promise<User> {
+    if (await this.isOwner(username)) {
+      const user = await this.users.findOneBy({ id });
+      if (user) return user;
+      throw new NotFoundException();
+    }
+
     const allowedUnitIds = await this.getScopedUnitIds(
       username,
       '/users/:id',

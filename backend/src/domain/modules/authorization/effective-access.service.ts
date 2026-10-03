@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Repository } from 'typeorm';
 import type { EffectiveAccess } from '../../../types/effective-access.js';
-import { User } from '../../users/entities/user.entity.js';
 import { Access } from './accesses/entities/access.entity.js';
 import { GET_DESCENDANT_UNIT_IDS_QUERY } from './queries/get-descendant-unit-ids.query.js';
 import { RoleAssignment } from './role-assignments/entities/role-assignment.entity.js';
 import { RoleAccess } from './role-accesses/entities/role-access.entity.js';
 import { Role, RoleScopeMode } from './roles/entities/role.entity.js';
+import { User } from '../users/entities/user.entity.js';
 
 @Injectable()
 export class EffectiveAccessService {

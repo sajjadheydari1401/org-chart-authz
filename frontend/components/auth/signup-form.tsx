@@ -9,6 +9,7 @@ import { registerWithUsernamePasswordAction } from '@/app/actions/auth';
 import { AppButton } from '@/components/common/ui/app-button';
 import { AppCombobox } from '@/components/common/ui/app-combobox/app-combobox';
 import { AppControlledFormField } from '@/components/common/ui/app-controlled-form-field';
+import { AppCheckbox } from '@/components/common/ui/app-checkbox';
 import { AppFormField } from '@/components/common/ui/app-form-field';
 import { AppInput } from '@/components/common/ui/app-input';
 import { useRoles } from '@/hooks/authorization/use-roles';
@@ -52,6 +53,7 @@ export function AddUserForm({ onSuccess }: { onSuccess: () => void }) {
       username: '',
       password: '',
       mobile: '',
+      isManager: false,
     },
   });
 
@@ -184,6 +186,10 @@ export function AddUserForm({ onSuccess }: { onSuccess: () => void }) {
           />
         )}
       />
+
+      <AppFormField label="مدیر است" htmlFor="isManager">
+        <AppCheckbox id="isManager" {...register('isManager')} />
+      </AppFormField>
 
       <AppFormField
         label="رمز عبور"

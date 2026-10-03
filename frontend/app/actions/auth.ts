@@ -121,6 +121,7 @@ export async function loginWithUsernamePasswordAction(
     ...(result.message ? { message: result.message } : {}),
     user: {
       username: result.data.username,
+      isManager: result.data.isManager,
     },
   };
 }

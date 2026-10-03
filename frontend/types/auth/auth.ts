@@ -4,6 +4,7 @@ export interface RegisterWithUsernamePasswordRequest {
   password: string;
   mobile: string;
   role: string;
+  isManager: boolean;
 }
 
 export interface LoginWithUsernamePasswordRequest {
@@ -18,10 +19,12 @@ export interface VerifySmsRequest {
 export interface AuthTokenResponse {
   accessToken: string;
   username: string;
+  isManager: boolean;
 }
 
 export interface AuthUser {
   username: string;
+  isManager: boolean;
 }
 
 export interface AuthActionSuccess {

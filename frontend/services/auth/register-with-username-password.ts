@@ -16,13 +16,13 @@ export async function registerWithUsernamePassword(
     password: input.password,
     mobile: input.mobile,
     role: input.role,
+    isManager: input.isManager,
   };
 
   try {
     const response = await AppApi('/auth/register/username-password', {
       method: 'POST',
       data: body,
-      authenticated: false,
     });
     return {
       success: true,

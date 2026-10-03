@@ -28,6 +28,8 @@ export const signupSchema = z.object({
       (value) => /^09\d{9}$/.test(value),
       'لطفاً یک شماره موبایل ایرانی معتبر وارد کنید',
     ),
+
+  isManager: z.boolean().default(false),
 });
 
 export const loginSchema = z.object({

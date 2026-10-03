@@ -11,7 +11,6 @@ export async function confirmRegistrationBySms(
   try {
     const response = await AppApi('/auth/register/confirm-sms', {
       method: 'POST',
-      authenticated: false,
       data: { code: input.code, username: await getPendingUsername() },
     });
     return {

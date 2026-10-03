@@ -3,30 +3,37 @@ import { AccessesController } from './accesses.controller.js';
 import { AccessesService } from './accesses.service.js';
 
 describe('AccessesController', () => {
+  const accessId = '550e8400-e29b-41d4-a716-446655440001';
+
   it('delegates access deletion with the local ID', async () => {
     const service = { deleteAccess: vi.fn().mockResolvedValue(undefined) };
     const controller = new AccessesController(
       service as unknown as AccessesService,
     );
 
-    await expect(controller.deleteAccess(9)).resolves.toBeUndefined();
-    expect(service.deleteAccess).toHaveBeenCalledExactlyOnceWith(9);
+    await expect(controller.deleteAccess(accessId)).resolves.toBeUndefined();
+    expect(service.deleteAccess).toHaveBeenCalledExactlyOnceWith(accessId);
   });
 
   it('delegates access updates with the local ID and input', async () => {
     const input = { methodName: 'post', description: 'updated' };
-    const access = { id: 9, ...input };
+    const access = { id: accessId, ...input };
     const service = { updateAccess: vi.fn().mockResolvedValue(access) };
     const controller = new AccessesController(
       service as unknown as AccessesService,
     );
-    await expect(controller.updateAccess(9, input)).resolves.toBe(access);
-    expect(service.updateAccess).toHaveBeenCalledExactlyOnceWith(9, input);
+    await expect(controller.updateAccess(accessId, input)).resolves.toBe(
+      access,
+    );
+    expect(service.updateAccess).toHaveBeenCalledExactlyOnceWith(
+      accessId,
+      input,
+    );
   });
   it('delegates getAllAccesses to the service', async () => {
     const accesses = [
       {
-        id: 1,
+        id: '550e8400-e29b-41d4-a716-446655440002',
         methodName: 'GET',
         description: 'read',
         providerId: 'access-id',
@@ -42,17 +49,18 @@ describe('AccessesController', () => {
   });
 
   it('delegates access creation to the service', async () => {
+    const resourceId = '550e8400-e29b-41d4-a716-446655440003';
     const input = {
-      resourceId: 7,
+      resourceId,
       methodName: 'post',
       description: 'description',
     };
     const access = {
-      id: 1,
+      id: '550e8400-e29b-41d4-a716-446655440004',
       methodName: 'POST',
       description: input.description,
       providerId: 'provider-id',
-      resource: { id: 7 },
+      resource: { id: resourceId },
     };
     const service = { createAccess: vi.fn().mockResolvedValue(access) };
     const controller = new AccessesController(

@@ -5,7 +5,9 @@ import { RoleScopeMode } from './entities/role.entity.js';
 
 describe('RolesController', () => {
   it('delegates getAllRoles to the local service', async () => {
-    const roles = [{ id: 1, name: 'manager' }];
+    const roles = [
+      { id: '550e8400-e29b-41d4-a716-446655440001', name: 'manager' },
+    ];
     const service = {
       getAllRoles: vi.fn().mockResolvedValue(roles),
       createRole: vi.fn(),
@@ -25,11 +27,11 @@ describe('RolesController', () => {
       name: 'manager',
       farsiName: 'مدیر سازمان',
       description: 'description',
-      unitId: 7,
+      unitId: '550e8400-e29b-41d4-a716-446655440002',
       scopeMode: RoleScopeMode.DESCENDANTS,
     };
     const role = {
-      id: 1,
+      id: '550e8400-e29b-41d4-a716-446655440003',
       name: input.name,
       description: input.description,
       providerId: 'role-id',
@@ -41,12 +43,12 @@ describe('RolesController', () => {
   });
 
   it('delegates role updates with the local role ID and input', async () => {
-    const id = 12;
+    const id = '550e8400-e29b-41d4-a716-446655440004';
     const input = {
       name: 'manager',
       farsiName: 'مدیر سازمان',
       description: 'updated description',
-      unitId: 7,
+      unitId: '550e8400-e29b-41d4-a716-446655440005',
       scopeMode: RoleScopeMode.SELF,
     };
     const role = { id, ...input, providerId: 'provider-role-id' };
@@ -58,7 +60,7 @@ describe('RolesController', () => {
   });
 
   it('delegates role deletion with the local role ID', async () => {
-    const id = 12;
+    const id = '550e8400-e29b-41d4-a716-446655440006';
     const service = { deleteRole: vi.fn().mockResolvedValue(undefined) };
     const controller = new RolesController(service as unknown as RolesService);
 

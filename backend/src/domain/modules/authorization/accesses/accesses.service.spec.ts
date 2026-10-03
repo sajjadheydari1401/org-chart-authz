@@ -5,13 +5,15 @@ import { ResourcesService } from '../resources/resources.service.js';
 import { AccessesService } from './accesses.service.js';
 
 describe('AccessesService', () => {
+  const resourceId = '550e8400-e29b-41d4-a716-446655440001';
+  const accessId = '550e8400-e29b-41d4-a716-446655440002';
   const input = {
-    resourceId: 7,
+    resourceId,
     methodName: 'post',
     description: 'requested description',
   };
   const resource = {
-    id: 7,
+    id: resourceId,
     route: '/example',
     providerId: 'provider-resource-id',
   };
@@ -36,7 +38,7 @@ describe('AccessesService', () => {
       findOneBy: vi.fn(),
       find: vi.fn(),
       create: vi.fn((value) => value),
-      save: vi.fn(async (value) => ({ id: 1, ...value })),
+      save: vi.fn(async (value) => ({ id: accessId, ...value })),
     };
     resources = { getSingleResource: vi.fn().mockResolvedValue(resource) };
     provider = {
@@ -56,57 +58,69 @@ describe('AccessesService', () => {
   });
 
   it('deletes locally after the provider succeeds', async () => {
-    repository.findOneBy.mockResolvedValue({ id: 9, providerId: 'access-id' });
+    repository.findOneBy.mockResolvedValue({
+      id: accessId,
+      providerId: 'access-id',
+    });
     provider.deleteAccess.mockImplementation(async () => {
       await Promise.resolve();
       expect(repository.delete).not.toHaveBeenCalled();
     });
 
-    await expect(service.deleteAccess(9)).resolves.toBeUndefined();
-    expect(repository.findOneBy).toHaveBeenCalledWith({ id: 9 });
+    await expect(service.deleteAccess(accessId)).resolves.toBeUndefined();
+    expect(repository.findOneBy).toHaveBeenCalledWith({ id: accessId });
     expect(provider.deleteAccess).toHaveBeenCalledExactlyOnceWith('access-id');
-    expect(repository.delete).toHaveBeenCalledExactlyOnceWith(9);
+    expect(repository.delete).toHaveBeenCalledExactlyOnceWith(accessId);
   });
 
   it('does not delete locally when the provider fails', async () => {
-    repository.findOneBy.mockResolvedValue({ id: 9, providerId: 'access-id' });
+    repository.findOneBy.mockResolvedValue({
+      id: accessId,
+      providerId: 'access-id',
+    });
     const error = new Error('provider failed');
     provider.deleteAccess.mockRejectedValue(error);
 
-    await expect(service.deleteAccess(9)).rejects.toBe(error);
+    await expect(service.deleteAccess(accessId)).rejects.toBe(error);
     expect(repository.delete).not.toHaveBeenCalled();
   });
 
   it('does not call the provider when the access to delete is missing', async () => {
     repository.findOneBy.mockResolvedValue(null);
 
-    await expect(service.deleteAccess(404)).rejects.toBeInstanceOf(
-      NotFoundException,
-    );
+    await expect(
+      service.deleteAccess('550e8400-e29b-41d4-a716-446655440999'),
+    ).rejects.toBeInstanceOf(NotFoundException);
     expect(provider.deleteAccess).not.toHaveBeenCalled();
     expect(repository.delete).not.toHaveBeenCalled();
   });
 
   it('returns not found when local deletion affects no rows', async () => {
-    repository.findOneBy.mockResolvedValue({ id: 9, providerId: 'access-id' });
+    repository.findOneBy.mockResolvedValue({
+      id: accessId,
+      providerId: 'access-id',
+    });
     repository.delete.mockResolvedValue({ affected: 0 });
 
-    await expect(service.deleteAccess(9)).rejects.toBeInstanceOf(
+    await expect(service.deleteAccess(accessId)).rejects.toBeInstanceOf(
       NotFoundException,
     );
   });
 
   it('propagates local deletion failures', async () => {
-    repository.findOneBy.mockResolvedValue({ id: 9, providerId: 'access-id' });
+    repository.findOneBy.mockResolvedValue({
+      id: accessId,
+      providerId: 'access-id',
+    });
     const error = new Error('database failed');
     repository.delete.mockRejectedValue(error);
 
-    await expect(service.deleteAccess(9)).rejects.toBe(error);
+    await expect(service.deleteAccess(accessId)).rejects.toBe(error);
   });
 
   it('saves the method name and description returned by the provider', async () => {
     const access = {
-      id: 9,
+      id: accessId,
       providerId: 'access-id',
       methodName: 'GET',
       description: 'old',
@@ -117,7 +131,7 @@ describe('AccessesService', () => {
       description: 'updated',
     });
 
-    const result = await service.updateAccess(9, {
+    const result = await service.updateAccess(accessId, {
       methodName: 'post',
       description: 'requested',
     });
@@ -133,14 +147,17 @@ describe('AccessesService', () => {
   });
 
   it('waits for the provider response before saving locally', async () => {
-    repository.findOneBy.mockResolvedValue({ id: 9, providerId: 'access-id' });
+    repository.findOneBy.mockResolvedValue({
+      id: accessId,
+      providerId: 'access-id',
+    });
     provider.updateAccess.mockImplementation(async () => {
       await Promise.resolve();
       expect(repository.save).not.toHaveBeenCalled();
       return { methodName: 'POST', description: 'updated' };
     });
 
-    await service.updateAccess(9, {
+    await service.updateAccess(accessId, {
       methodName: 'post',
       description: 'updated',
     });
@@ -150,30 +167,38 @@ describe('AccessesService', () => {
 
   it('does not update the provider when the access is missing', async () => {
     repository.findOneBy.mockResolvedValue(null);
-    await expect(service.updateAccess(404, input)).rejects.toBeInstanceOf(
-      NotFoundException,
-    );
+    await expect(
+      service.updateAccess('550e8400-e29b-41d4-a716-446655440999', input),
+    ).rejects.toBeInstanceOf(NotFoundException);
     expect(provider.updateAccess).not.toHaveBeenCalled();
     expect(repository.save).not.toHaveBeenCalled();
   });
 
   it('does not save when the provider update fails', async () => {
-    repository.findOneBy.mockResolvedValue({ id: 9, providerId: 'access-id' });
+    repository.findOneBy.mockResolvedValue({
+      id: accessId,
+      providerId: 'access-id',
+    });
     const error = new Error('provider failed');
     provider.updateAccess.mockRejectedValue(error);
-    await expect(service.updateAccess(9, input)).rejects.toBe(error);
+    await expect(service.updateAccess(accessId, input)).rejects.toBe(error);
     expect(repository.save).not.toHaveBeenCalled();
   });
 
   it('returns accesses from the local repository without calling the provider', async () => {
     const accesses = [
       {
-        id: 1,
+        id: '550e8400-e29b-41d4-a716-446655440003',
         methodName: 'POST',
         description: 'create',
         providerId: 'access-1',
       },
-      { id: 2, methodName: 'GET', description: 'read', providerId: 'access-2' },
+      {
+        id: '550e8400-e29b-41d4-a716-446655440004',
+        methodName: 'GET',
+        description: 'read',
+        providerId: 'access-2',
+      },
     ];
     repository.find.mockResolvedValue(accesses);
 
@@ -219,7 +244,7 @@ describe('AccessesService', () => {
       id: 1,
       ...saved,
     });
-    expect(resources.getSingleResource).toHaveBeenCalledWith(7);
+    expect(resources.getSingleResource).toHaveBeenCalledWith(resourceId);
     expect(provider.createAccess).toHaveBeenCalledWith(
       'provider-resource-id',
       'post',

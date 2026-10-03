@@ -8,6 +8,8 @@ describe('EffectiveAccessService', () => {
   let roleAssignments: { find: ReturnType<typeof vi.fn> };
   let roles: { find: ReturnType<typeof vi.fn> };
   let roleAccesses: { find: ReturnType<typeof vi.fn> };
+  let accesses: { find: ReturnType<typeof vi.fn> };
+  let users: { findOne: ReturnType<typeof vi.fn> };
   let dataSource: { query: ReturnType<typeof vi.fn> };
   let service: EffectiveAccessService;
 
@@ -15,11 +17,15 @@ describe('EffectiveAccessService', () => {
     roleAssignments = { find: vi.fn() };
     roles = { find: vi.fn() };
     roleAccesses = { find: vi.fn() };
+    accesses = { find: vi.fn() };
+    users = { findOne: vi.fn().mockResolvedValue(null) };
     dataSource = { query: vi.fn() };
     service = new EffectiveAccessService(
       roleAssignments as never,
       roles as never,
       roleAccesses as never,
+      accesses as never,
+      users as never,
       dataSource as never,
     );
   });

@@ -3,6 +3,7 @@ import { AuthorizationProviderService } from '../authorization-provider.service.
 import { ResourcesService } from './resources.service.js';
 
 describe('ResourcesService', () => {
+  const resourceId = '550e8400-e29b-41d4-a716-446655440001';
   let service: ResourcesService;
   let repository: {
     delete: ReturnType<typeof vi.fn>;
@@ -23,7 +24,7 @@ describe('ResourcesService', () => {
       findOneBy: vi.fn(),
       find: vi.fn(),
       create: vi.fn((input) => input),
-      save: vi.fn(async (resource) => ({ id: 1, ...resource })),
+      save: vi.fn(async (resource) => ({ id: resourceId, ...resource })),
     };
     provider = {
       deleteResource: vi.fn().mockResolvedValue(undefined),
@@ -57,29 +58,31 @@ describe('ResourcesService', () => {
       return { affected: 1 };
     });
 
-    await expect(service.deleteResource(7)).resolves.toBeUndefined();
-    expect(repository.findOneBy).toHaveBeenCalledWith({ id: 7 });
+    await expect(service.deleteResource(resourceId)).resolves.toBeUndefined();
+    expect(repository.findOneBy).toHaveBeenCalledWith({ id: resourceId });
     expect(provider.deleteResource).toHaveBeenCalledExactlyOnceWith(
       'provider-id',
     );
-    expect(repository.delete).toHaveBeenCalledExactlyOnceWith(7);
+    expect(repository.delete).toHaveBeenCalledExactlyOnceWith(resourceId);
     expect(calls).toEqual(['provider', 'local']);
   });
 
   it('does not delete locally when provider deletion fails', async () => {
     repository.findOneBy.mockResolvedValue({
-      id: 7,
+      id: resourceId,
       providerId: 'provider-id',
     });
     const error = new Error('provider deletion failed');
     provider.deleteResource.mockRejectedValue(error);
-    await expect(service.deleteResource(7)).rejects.toBe(error);
+    await expect(service.deleteResource(resourceId)).rejects.toBe(error);
     expect(repository.delete).not.toHaveBeenCalled();
   });
 
   it('does not call provider deletion when the local resource is missing', async () => {
     repository.findOneBy.mockResolvedValue(null);
-    await expect(service.deleteResource(404)).rejects.toMatchObject({
+    await expect(
+      service.deleteResource('550e8400-e29b-41d4-a716-446655440999'),
+    ).rejects.toMatchObject({
       status: 404,
     });
     expect(provider.deleteResource).not.toHaveBeenCalled();
@@ -92,19 +95,19 @@ describe('ResourcesService', () => {
       providerId: 'provider-id',
     });
     repository.delete.mockResolvedValue({ affected: 0 });
-    await expect(service.deleteResource(7)).rejects.toMatchObject({
+    await expect(service.deleteResource(resourceId)).rejects.toMatchObject({
       status: 404,
     });
   });
 
   it('propagates local deletion failures', async () => {
     repository.findOneBy.mockResolvedValue({
-      id: 7,
+      id: resourceId,
       providerId: 'provider-id',
     });
     const error = new Error('database deletion failed');
     repository.delete.mockRejectedValue(error);
-    await expect(service.deleteResource(7)).rejects.toBe(error);
+    await expect(service.deleteResource(resourceId)).rejects.toBe(error);
   });
 
   it('updates the provider first and saves only its returned route locally', async () => {
@@ -116,12 +119,12 @@ describe('ResourcesService', () => {
     });
 
     await expect(
-      service.updateResource(7, { route: '/requested' }),
+      service.updateResource(resourceId, { route: '/requested' }),
     ).resolves.toEqual({
       ...resource,
       route: '/updated',
     });
-    expect(repository.findOneBy).toHaveBeenCalledWith({ id: 7 });
+    expect(repository.findOneBy).toHaveBeenCalledWith({ id: resourceId });
     expect(provider.updateResource).toHaveBeenCalledWith(
       'provider-id',
       '/requested',
@@ -137,21 +140,27 @@ describe('ResourcesService', () => {
     repository.findOneBy.mockResolvedValue(null);
 
     await expect(
-      service.updateResource(404, { route: '/updated' }),
+      service.updateResource('550e8400-e29b-41d4-a716-446655440999', {
+        route: '/updated',
+      }),
     ).rejects.toMatchObject({ status: 404 });
     expect(provider.updateResource).not.toHaveBeenCalled();
     expect(repository.save).not.toHaveBeenCalled();
   });
 
   it('keeps the local resource unchanged when the provider update fails', async () => {
-    const resource = { id: 7, route: '/old', providerId: 'provider-id' };
+    const resource = {
+      id: resourceId,
+      route: '/old',
+      providerId: 'provider-id',
+    };
     repository.findOneBy.mockResolvedValue(resource);
     const error = new Error('provider rejected update');
     provider.updateResource.mockRejectedValue(error);
 
-    await expect(service.updateResource(7, { route: '/updated' })).rejects.toBe(
-      error,
-    );
+    await expect(
+      service.updateResource(resourceId, { route: '/updated' }),
+    ).rejects.toBe(error);
     expect(repository.save).not.toHaveBeenCalled();
     expect(resource.route).toBe('/old');
   });
